@@ -15,6 +15,9 @@ npm run build    # génère ./dist
 npm run preview  # prévisualise le build
 ```
 
+Le site est publié sur <https://aravenad.github.io/portfolio/> à chaque push sur `main`,
+via le workflow `.github/workflows/deploy.yml`.
+
 ## Structure
 
 ```text
