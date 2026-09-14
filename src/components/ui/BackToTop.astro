@@ -1,0 +1,40 @@
+---
+import Arrow from "./Arrow.astro";
+---
+
+<button
+  type="button"
+  data-back-to-top
+  aria-label="Revenir en haut de la page"
+  class="invisible fixed bottom-6 right-6 z-40 flex size-11 translate-y-2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900/90 text-zinc-400 opacity-0 backdrop-blur transition hover:border-accent/40 hover:text-accent data-[visible]:visible data-[visible]:translate-y-0 data-[visible]:opacity-100"
+>
+  <Arrow direction="up" />
+</button>
+
+<script>
+  /**
+   * Le bouton n'apparaît qu'une fois la première fenêtre dépassée : plus haut,
+   * le haut de page est déjà à portée de molette.
+   */
+  const button = document.querySelector<HTMLButtonElement>("[data-back-to-top]");
+
+  if (button) {
+    const update = () => {
+      if (window.scrollY > window.innerHeight) {
+        button.dataset.visible = "";
+      } else {
+        delete button.dataset.visible;
+      }
+    };
+
+    button.addEventListener("click", () => {
+      // Sans `behavior`, le défilement suit le `scroll-behavior` de la feuille
+      // de style, qui respecte déjà `prefers-reduced-motion`.
+      window.scrollTo({ top: 0 });
+    });
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+  }
+</script>

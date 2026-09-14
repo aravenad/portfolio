@@ -1,0 +1,124 @@
+---
+import Container from "../ui/Container.astro";
+import { navLinks, site } from "../../data/site";
+
+/** Comparaison insensible au slash final ("/projects" et "/projects/"). */
+const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
+const currentPath = normalize(Astro.url.pathname);
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
+>
+  <Container class="flex h-16 items-center justify-between">
+    <a href="/" class="font-medium tracking-tight transition hover:text-white">
+      {site.name}
+    </a>
+
+    <nav aria-label="Navigation principale">
+      <ul class="flex items-center gap-6 text-sm">
+        {
+          navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                data-nav-link
+                data-sections={link.sections?.join(" ")}
+                aria-current={
+                  normalize(link.href) === currentPath ? "page" : undefined
+                }
+                class="text-zinc-400 transition hover:text-zinc-100 aria-[current=page]:text-accent data-[active]:text-accent"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </Container>
+</header>
+
+<script>
+  /**
+   * Surligne le lien de la dernière section dont le haut a franchi une ligne de
+   * lecture placée au premier tiers de la fenêtre, sous le header collant.
+   *
+   * « La dernière commencée » plutôt que « celle qui croise la ligne » : entre
+   * deux sections, le lien précédent reste allumé au lieu de s'éteindre.
+   *
+   * Le bas de page est un cas à part : sur un grand écran, la dernière section
+   * peut occuper la moitié de la fenêtre sans que son haut ait franchi la ligne
+   * de lecture. Puisqu'on ne peut pas défiler plus loin, elle est alors forcée.
+   *
+   * Le calcul est géométrique plutôt que basé sur IntersectionObserver : celui-ci
+   * ne délivre rien tant que l'onglet n'est pas peint, et le choix de la section
+   * « la plus visible » est instable quand une section dépasse la hauteur de la
+   * fenêtre.
+   *
+   * Sans section observable (pages autres que l'accueil), rien ne se passe et
+   * l'état `aria-current="page"` rendu par le serveur reste seul en place.
+   */
+  const HEADER_HEIGHT = 64;
+  const READING_LINE = 0.3;
+
+  const links = [
+    ...document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"),
+  ];
+
+  const linkBySection = new Map<string, HTMLAnchorElement>();
+
+  for (const link of links) {
+    for (const id of (link.dataset.sections ?? "").split(" ").filter(Boolean)) {
+      linkBySection.set(id, link);
+    }
+  }
+
+  const sections = [...linkBySection.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((section): section is HTMLElement => section !== null);
+
+  if (sections.length > 0) {
+    sections.sort((a, b) =>
+      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+    );
+
+    const update = () => {
+      const line =
+        HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) * READING_LINE;
+
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 1;
+
+      let current = atBottom ? sections[sections.length - 1] : undefined;
+
+      if (!current) {
+        let closest = -Infinity;
+
+        for (const section of sections) {
+          const { top } = section.getBoundingClientRect();
+
+          if (top <= line && top > closest) {
+            closest = top;
+            current = section;
+          }
+        }
+      }
+
+      const active = current ? linkBySection.get(current.id) : undefined;
+
+      for (const link of links) {
+        if (link === active) {
+          link.dataset.active = "";
+        } else {
+          delete link.dataset.active;
+        }
+      }
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+  }
+</script>

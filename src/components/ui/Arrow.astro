@@ -1,0 +1,26 @@
+---
+interface Props {
+  direction?: "left" | "right" | "up";
+  class?: string;
+}
+
+const { direction = "right", class: className } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 16 16"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class:list={[
+    "size-4 shrink-0",
+    direction === "left" && "rotate-180",
+    direction === "up" && "-rotate-90",
+    className,
+  ]}
+>
+  <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"></path>
+</svg>

@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends Omit<HTMLAttributes<"div">, "href"> {
+  /** Rend un <a> cliquable si défini, un <div> sinon. */
+  href?: string;
+}
+
+const { href, class: className, ...rest } = Astro.props;
+
+const base =
+  "group block rounded-xl border border-zinc-800 bg-zinc-950/50 transition";
+
+const interactive =
+  "hover:-translate-y-1 hover:border-zinc-600 hover:bg-zinc-900";
+---
+
+{
+  href ? (
+    <a href={href} class:list={[base, interactive, className]} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <div class:list={[base, className]} {...rest}>
+      <slot />
+    </div>
+  )
+}

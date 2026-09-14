@@ -1,0 +1,41 @@
+---
+interface Crumb {
+  label: string;
+  /** Absent pour le dernier niveau : la page courante. */
+  href?: string;
+}
+
+interface Props {
+  /** Niveaux à afficher après l'accueil, du plus général au plus précis. */
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
+---
+
+<nav aria-label="Fil d'Ariane" class="text-sm">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500">
+    {
+      crumbs.map((crumb, index) => (
+        <li class="flex items-center gap-x-2">
+          {index > 0 && (
+            <span aria-hidden="true" class="text-zinc-700">
+              /
+            </span>
+          )}
+
+          {crumb.href ? (
+            <a href={crumb.href} class="transition hover:text-zinc-200">
+              {crumb.label}
+            </a>
+          ) : (
+            <span aria-current="page" class="text-zinc-300">
+              {crumb.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

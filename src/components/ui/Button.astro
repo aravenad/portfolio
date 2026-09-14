@@ -1,0 +1,38 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends Omit<HTMLAttributes<"a">, "href"> {
+  /** Rend un <a> si défini, un <button> sinon. */
+  href?: string;
+  variant?: "primary" | "secondary";
+}
+
+const {
+  href,
+  variant = "primary",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center rounded-lg px-5 py-3 font-medium transition";
+
+const variants = {
+  primary: "bg-white text-black hover:bg-zinc-200",
+  secondary: "border border-zinc-700 hover:bg-zinc-900",
+};
+
+const classes = [base, variants[variant], className];
+---
+
+{
+  href ? (
+    <a href={href} class:list={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button class:list={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}

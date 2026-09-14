@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Container from "./Container.astro";
+
+interface Props extends HTMLAttributes<"section"> {
+  /** Ancre de la section, utilisée par la navigation. */
+  id?: string;
+}
+
+const { id, class: className, ...rest } = Astro.props;
+---
+
+<section id={id} class:list={["scroll-mt-16 py-24 sm:py-32 lg:py-40", className]} {...rest}>
+  <Container>
+    <slot />
+  </Container>
+</section>
