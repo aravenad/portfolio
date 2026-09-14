@@ -1,0 +1,42 @@
+---
+import ProjectCard from "../ProjectCard.astro";
+import Container from "../ui/Container.astro";
+import Pagination from "../ui/Pagination.astro";
+import SectionHeading from "../ui/SectionHeading.astro";
+import { getProjectsPageHref, type ProjectsPage } from "../../lib/projects";
+
+type Props = ProjectsPage;
+
+const { projects, currentPage, totalPages } = Astro.props;
+---
+
+<section class="py-16 sm:py-20" aria-labelledby="projects-title">
+  <Container>
+    <SectionHeading
+      as="h1"
+      headingId="projects-title"
+      title="Tous mes projets"
+      description="L'ensemble des projets réalisés durant ma formation, du plus ancien au plus récent."
+    />
+
+    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+
+    {
+      totalPages > 1 && (
+        <div class="mt-16 flex flex-col items-center gap-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            href={getProjectsPageHref}
+          />
+
+          <p class="text-sm text-zinc-600">
+            Page {currentPage} sur {totalPages}
+          </p>
+        </div>
+      )
+    }
+  </Container>
+</section>

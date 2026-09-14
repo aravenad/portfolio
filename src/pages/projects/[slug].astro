@@ -1,0 +1,110 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import Arrow from "../../components/ui/Arrow.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Breadcrumb from "../../components/ui/Breadcrumb.astro";
+import Container from "../../components/ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProjects, statusLabels } from "../../lib/projects";
+
+export const getStaticPaths = (async () => {
+  const projects = await getProjects();
+
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      previous: projects[index - 1],
+      next: projects[index + 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project, previous, next } = Astro.props;
+const { title, summary, tags, status, team, year } = project.data;
+const { Content } = await render(project);
+
+const meta = [team, year?.toString()].filter(Boolean);
+---
+
+<BaseLayout title={`${title} — Damien`} description={summary}>
+  <Container class="pt-10">
+    <Breadcrumb
+      items={[{ label: "Projets", href: "/projects" }, { label: title }]}
+    />
+  </Container>
+
+  <article class="py-14 sm:py-20">
+    <Container>
+      <header class="border-b border-zinc-900 pb-12">
+        <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{title}</h1>
+
+        <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">{summary}</p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2">
+          {tags.map((tag) => <Badge>{tag}</Badge>)}
+        </div>
+
+        <p class="mt-5 flex flex-wrap items-center gap-x-2 text-sm text-zinc-500">
+          <span
+            class:list={[
+              status === "en-cours" ? "text-accent" : "text-zinc-400",
+            ]}
+          >
+            {statusLabels[status]}
+          </span>
+
+          {
+            meta.length > 0 && (
+              <>
+                <span aria-hidden="true" class="text-zinc-700">
+                  ·
+                </span>
+                <span>{meta.join(" · ")}</span>
+              </>
+            )
+          }
+        </p>
+      </header>
+
+      <div class="prose mt-14 max-w-3xl">
+        <Content />
+      </div>
+
+      {
+        (previous || next) && (
+          <nav
+            class="mt-20 grid gap-4 border-t border-zinc-900 pt-10 text-sm sm:grid-cols-2"
+            aria-label="Projets précédent et suivant"
+          >
+            {previous ? (
+              <a
+                href={`/projects/${previous.id}`}
+                class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100"
+              >
+                <Arrow
+                  direction="left"
+                  class="text-zinc-600 transition group-hover:-translate-x-1 group-hover:text-accent"
+                />
+                {previous.data.title}
+              </a>
+            ) : (
+              <span />
+            )}
+
+            {next && (
+              <a
+                href={`/projects/${next.id}`}
+                class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100 sm:justify-end"
+              >
+                {next.data.title}
+                <Arrow class="text-zinc-600 transition group-hover:translate-x-1 group-hover:text-accent" />
+              </a>
+            )}
+          </nav>
+        )
+      }
+    </Container>
+  </article>
+</BaseLayout>

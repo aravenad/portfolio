@@ -1,0 +1,20 @@
+---
+import ProjectsList from "../../components/sections/ProjectsList.astro";
+import Breadcrumb from "../../components/ui/Breadcrumb.astro";
+import Container from "../../components/ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProjectsPage } from "../../lib/projects";
+
+const page = await getProjectsPage(1);
+---
+
+<BaseLayout
+  title="Projets — Damien"
+  description="L'ensemble des projets réalisés par Damien durant sa formation en BUT informatique."
+>
+  <Container class="pt-10">
+    <Breadcrumb items={[{ label: "Projets" }]} />
+  </Container>
+
+  <ProjectsList {...page} />
+</BaseLayout>

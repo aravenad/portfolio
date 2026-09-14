@@ -1,0 +1,109 @@
+---
+import Arrow from "./Arrow.astro";
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  /** Construit l'URL d'une page donnée. */
+  href: (page: number) => string;
+  /** Libellé du <nav>, utile si la page contient plusieurs paginations. */
+  label?: string;
+}
+
+const {
+  currentPage,
+  totalPages,
+  href,
+  label = "Pagination",
+} = Astro.props;
+
+/**
+ * Première page, dernière page et voisines immédiates de la page courante.
+ * Les trous sont matérialisés par une ellipsis.
+ */
+function buildItems(current: number, total: number): (number | "ellipsis")[] {
+  const shown = new Set<number>([1, total, current - 1, current, current + 1]);
+  const pages = [...shown]
+    .filter((page) => page >= 1 && page <= total)
+    .sort((a, b) => a - b);
+
+  return pages.flatMap((page, index) => {
+    const previous = pages[index - 1];
+
+    return previous !== undefined && page - previous > 1
+      ? (["ellipsis", page] as (number | "ellipsis")[])
+      : [page];
+  });
+}
+
+const items = buildItems(currentPage, totalPages);
+const hasPrevious = currentPage > 1;
+const hasNext = currentPage < totalPages;
+
+const linkBase =
+  "inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition";
+/* Même largeur pour Précédent et Suivant : sans ça, le bloc des numéros est décentré. */
+const stepWidth = "sm:min-w-32";
+const inactive =
+  "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-900 hover:text-zinc-100";
+const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
+---
+
+{
+  totalPages > 1 && (
+    <nav aria-label={label} class="flex justify-center">
+      <ul class="flex flex-wrap items-center justify-center gap-2">
+        <li>
+          <a
+            href={hasPrevious ? href(currentPage - 1) : undefined}
+            aria-disabled={hasPrevious ? undefined : "true"}
+            tabindex={hasPrevious ? undefined : -1}
+            class:list={[linkBase, stepWidth, hasPrevious ? inactive : disabled]}
+          >
+            <Arrow direction="left" />
+            <span class="hidden sm:inline">Précédent</span>
+            <span class="sr-only sm:hidden">Page précédente</span>
+          </a>
+        </li>
+
+        {items.map((item) =>
+          item === "ellipsis" ? (
+            <li aria-hidden="true" class="px-1 text-zinc-600">
+              …
+            </li>
+          ) : (
+            <li>
+              <a
+                href={href(item)}
+                aria-current={item === currentPage ? "page" : undefined}
+                aria-label={`Page ${item}`}
+                class:list={[
+                  linkBase,
+                  "min-w-10 tabular-nums",
+                  item === currentPage
+                    ? "border-accent/50 bg-accent/10 text-accent"
+                    : inactive,
+                ]}
+              >
+                {item}
+              </a>
+            </li>
+          ),
+        )}
+
+        <li>
+          <a
+            href={hasNext ? href(currentPage + 1) : undefined}
+            aria-disabled={hasNext ? undefined : "true"}
+            tabindex={hasNext ? undefined : -1}
+            class:list={[linkBase, stepWidth, hasNext ? inactive : disabled]}
+          >
+            <span class="hidden sm:inline">Suivant</span>
+            <span class="sr-only sm:hidden">Page suivante</span>
+            <Arrow />
+          </a>
+        </li>
+      </ul>
+    </nav>
+  )
+}
