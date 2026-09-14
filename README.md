@@ -1,43 +1,81 @@
-# Astro Starter Kit: Minimal
+# Portfolio
+
+Portfolio personnel de Damien Aravena Bravo — étudiant en BUT Informatique à Grenoble.
+
+Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
+Site entièrement statique, sans JavaScript côté client hormis deux scripts de quelques
+centaines d'octets (navigation active au défilement, retour en haut de page).
+
+## Démarrer
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # génère ./dist
+npm run preview  # prévisualise le build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Structure
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+├── components/
+│   ├── ui/          primitives réutilisables (Button, Card, Pagination…)
+│   ├── layout/      Header et Footer
+│   ├── sections/    blocs de la page d'accueil
+│   └── ProjectCard.astro
+├── content/projects/  une fiche Markdown par projet
+├── data/            contenu éditable : site, compétences, parcours
+├── lib/             accès aux projets et pagination
+├── layouts/         BaseLayout
+├── pages/           routes
+└── styles/          global.css (thème et rendu Markdown)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Modifier le contenu
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+| Quoi | Où |
+| :--- | :--- |
+| Coordonnées, navigation | `src/data/site.ts` |
+| Compétences techniques et transversales | `src/data/skills.ts` |
+| Expérience et formation | `src/data/career.ts` |
+| Projets | `src/content/projects/*.md` |
 
-Any static assets, like images, can be placed in the `public/` directory.
+### Ajouter un projet
 
-## 🧞 Commands
+Créer un fichier dans `src/content/projects/`. Le nom du fichier devient l'URL
+(`/projects/mon-projet`), le corps est du Markdown libre.
 
-All commands are run from the root of the project, from a terminal:
+```md
+---
+title: "Titre du projet"
+summary: "Une phrase affichée sur la carte."
+tags: ["Java", "SQL"]
+status: "termine" # termine | en-cours | a-venir
+team: "En binôme"
+year: 2026
+order: 8 # ordre d'affichage
+featured: true # mis en avant sur l'accueil
+---
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Contexte
 
-## 👀 Want to learn more?
+…
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Le schéma est validé au build par `src/content.config.ts` : un champ manquant ou
+mal typé arrête la compilation.
+
+## Personnaliser
+
+La couleur d'accent est définie une seule fois dans `src/styles/global.css` :
+
+```css
+@theme {
+  --color-accent: oklch(82.8% 0.189 84.429);
+}
+```
+
+Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
+via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer le
+fichier dans `public/logos/` et renseigner `logo:` dans `src/data/career.ts`.
