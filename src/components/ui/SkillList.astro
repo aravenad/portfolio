@@ -1,0 +1,31 @@
+---
+import type { Skill } from "../../types";
+
+interface Props {
+  skills: Skill[];
+}
+
+const { skills } = Astro.props;
+---
+
+<ul class="border-t border-zinc-900">
+  {
+    skills.map((skill) => (
+      <li class="group flex flex-col gap-1 border-b border-zinc-900 py-4 transition sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+        <span class="flex items-baseline gap-3 font-medium text-zinc-200">
+          <span
+            aria-hidden="true"
+            class="h-1 w-1 shrink-0 translate-y-[-0.2rem] rounded-full bg-zinc-700 transition group-hover:bg-accent"
+          />
+          {skill.label}
+        </span>
+
+        {skill.detail && (
+          <span class="pl-4 text-sm text-zinc-500 sm:pl-0 sm:text-right">
+            {skill.detail}
+          </span>
+        )}
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,45 @@
+---
+import { Icon } from "astro-icon/components";
+import type { Skill } from "../../types";
+
+interface Props {
+  skill: Skill;
+}
+
+const { skill } = Astro.props;
+---
+
+<div
+  title={skill.label}
+  class="skill-tile flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-center transition hover:border-accent/40 hover:bg-zinc-800"
+  style={skill.color ? `--skill-color: ${skill.color}` : undefined}
+>
+  {
+    skill.icon ? (
+      <Icon
+        name={skill.icon}
+        class="skill-icon size-8 text-zinc-100 transition-colors sm:size-10"
+      />
+    ) : (
+      <span class="font-mono text-base font-bold tracking-tight text-zinc-100">
+        {skill.short ?? skill.label}
+      </span>
+    )
+  }
+
+  {/* Inutile de répéter le nom quand la tuile n'affiche que lui. */}
+  {
+    (skill.icon || skill.short) && (
+      <span class="text-[0.65rem] uppercase tracking-wide text-zinc-500">
+        {skill.label}
+      </span>
+    )
+  }
+</div>
+
+<style>
+  /* Le logo reprend la couleur de sa marque au survol de la tuile. */
+  .skill-tile:hover .skill-icon {
+    color: var(--skill-color, currentColor);
+  }
+</style>
