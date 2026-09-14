@@ -5,6 +5,7 @@ import Button from "../ui/Button.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { getFeaturedProjects, getProjects } from "../../lib/projects";
+import { url } from "../../lib/url";
 
 const projects = await getProjects();
 const featuredProjects = await getFeaturedProjects(3);
@@ -24,7 +25,7 @@ const featuredProjects = await getFeaturedProjects(3);
   {
     projects.length > featuredProjects.length && (
       <div class="mt-12">
-        <Button href="/projects" variant="secondary" class="group gap-2">
+        <Button href={url("/projects")} variant="secondary" class="group gap-2">
           Voir tous les projets
           <Arrow class="transition group-hover:translate-x-1" />
         </Button>

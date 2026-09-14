@@ -1,6 +1,7 @@
 ---
 import Container from "../ui/Container.astro";
 import { navLinks, site } from "../../data/site";
+import { url } from "../../lib/url";
 
 /** Comparaison insensible au slash final ("/projects" et "/projects/"). */
 const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
@@ -11,7 +12,7 @@ const currentPath = normalize(Astro.url.pathname);
   class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
 >
   <Container class="flex h-16 items-center justify-between">
-    <a href="/" class="font-medium tracking-tight transition hover:text-white">
+    <a href={url("/")} class="font-medium tracking-tight transition hover:text-white">
       {site.name}
     </a>
 
@@ -21,11 +22,11 @@ const currentPath = normalize(Astro.url.pathname);
           navLinks.map((link) => (
             <li>
               <a
-                href={link.href}
+                href={url(link.href)}
                 data-nav-link
                 data-sections={link.sections?.join(" ")}
                 aria-current={
-                  normalize(link.href) === currentPath ? "page" : undefined
+                  normalize(url(link.href)) === currentPath ? "page" : undefined
                 }
                 class="text-zinc-400 transition hover:text-zinc-100 aria-[current=page]:text-accent data-[active]:text-accent"
               >

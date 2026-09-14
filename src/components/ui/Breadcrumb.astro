@@ -1,4 +1,6 @@
 ---
+import { url } from "../../lib/url";
+
 interface Crumb {
   label: string;
   /** Absent pour le dernier niveau : la page courante. */
@@ -26,7 +28,7 @@ const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
           )}
 
           {crumb.href ? (
-            <a href={crumb.href} class="transition hover:text-zinc-200">
+            <a href={url(crumb.href)} class="transition hover:text-zinc-200">
               {crumb.label}
             </a>
           ) : (

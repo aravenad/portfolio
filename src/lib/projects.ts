@@ -1,5 +1,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
+import { url } from "./url";
+
 export type Project = CollectionEntry<"projects">;
 export type ProjectStatus = Project["data"]["status"];
 
@@ -20,7 +22,7 @@ export interface ProjectsPage {
 
 /** URL d'une page de la liste : la première reste `/projects`. */
 export function getProjectsPageHref(page: number): string {
-  return page <= 1 ? "/projects" : `/projects/page/${page}`;
+  return url(page <= 1 ? "/projects" : `/projects/page/${page}`);
 }
 
 /** Découpe les projets en pages de `PROJECTS_PER_PAGE`. */

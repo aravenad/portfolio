@@ -7,6 +7,7 @@ import Breadcrumb from "../../components/ui/Breadcrumb.astro";
 import Container from "../../components/ui/Container.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects, statusLabels } from "../../lib/projects";
+import { url } from "../../lib/url";
 
 export const getStaticPaths = (async () => {
   const projects = await getProjects();
@@ -80,7 +81,7 @@ const meta = [team, year?.toString()].filter(Boolean);
           >
             {previous ? (
               <a
-                href={`/projects/${previous.id}`}
+                href={url(`/projects/${previous.id}`)}
                 class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100"
               >
                 <Arrow
@@ -95,7 +96,7 @@ const meta = [team, year?.toString()].filter(Boolean);
 
             {next && (
               <a
-                href={`/projects/${next.id}`}
+                href={url(`/projects/${next.id}`)}
                 class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100 sm:justify-end"
               >
                 {next.data.title}
