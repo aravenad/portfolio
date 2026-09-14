@@ -1,0 +1,30 @@
+---
+import Button from "../ui/Button.astro";
+import Container from "../ui/Container.astro";
+
+interface Props {
+  /** Texte précédant le prénom mis en couleur. */
+  intro: string;
+  name: string;
+  description: string;
+}
+
+const { intro, name, description } = Astro.props;
+---
+
+<section class="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-24 sm:py-32">
+  <Container>
+    <h1 class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
+      {intro} <span class="text-accent">{name}</span>.
+    </h1>
+
+    <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
+      {description}
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-4">
+      <Button href="#projects">Voir mes projets</Button>
+      <Button href="#contact" variant="secondary">Me contacter</Button>
+    </div>
+  </Container>
+</section>

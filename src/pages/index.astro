@@ -1,47 +1,63 @@
 ---
+import Career from "../components/sections/Career.astro";
+import Contact from "../components/sections/Contact.astro";
+import Hero from "../components/sections/Hero.astro";
+import ProjectsPreview from "../components/sections/ProjectsPreview.astro";
+import Skills from "../components/sections/Skills.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../data/site";
+import { softSkills, technicalSkills } from "../data/skills";
 ---
 
-<BaseLayout
-  title="Damien — Portfolio"
-  description="Portfolio de Damien, étudiant et développeur informatique."
->
-  <main>
-    <section
-      class="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6"
-    >
-      <p
-        class="mb-4 text-sm font-medium uppercase tracking-widest text-zinc-400"
-      >
-        Développeur
-      </p>
+<BaseLayout title={site.title} description={site.description}>
+  <Hero
+    intro="Bonjour, moi c'est"
+    name="Damien"
+    description="Étudiant en BUT informatique à Grenoble, je développe des applications, des sites web et différents projets logiciels."
+  />
 
-      <h1 class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
-        Bonjour, moi c'est Damien.
-      </h1>
+  <Skills id="skills" title="Compétences techniques" skills={technicalSkills}>
+    <p>
+      Au fil de mes projets et de ma formation, j'ai pratiqué plusieurs langages
+      et environnements de développement. Côté web, je travaille avec HTML, CSS,
+      PHP et JavaScript. J'ai également développé en Java et en Python pour la
+      programmation orientée objet, et en C++ pour une approche plus
+      procédurale. Je manipule enfin les données en SQL, avec une pratique plus
+      poussée de PostgreSQL.
+    </p>
 
-      <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
-        Étudiant en informatique, je développe des applications, des sites web
-        et différents projets logiciels.
-      </p>
+    <p>
+      Côté outils, j'utilise les IDE de la suite JetBrains adaptés à ces
+      langages, ainsi que Git et GitHub pour le versionnement et le travail
+      collaboratif.
+    </p>
+  </Skills>
 
-      <div class="mt-10 flex gap-4">
-        <a
-          href="#projects"
-          class="rounded-lg bg-white px-5 py-3 font-medium text-black transition hover:bg-zinc-200"
-        >
-          Voir mes projets
-        </a>
+  <Skills
+    id="soft-skills"
+    title="Compétences transversales"
+    skills={softSkills}
+    variant="list"
+    reverse
+  >
+    <p>
+      La plupart de mes projets se sont déroulés en équipe, de deux à sept
+      personnes. J'y ai appris à répartir le travail, à tenir des délais et à
+      documenter mes choix pour que les autres puissent reprendre le code
+      derrière moi.
+    </p>
 
-        <a
-          href="#contact"
-          class="rounded-lg border border-zinc-700 px-5 py-3 font-medium transition hover:bg-zinc-900"
-        >
-          Me contacter
-        </a>
-      </div>
-      <div>
-      </div>
-    </section>
-  </main>
+    <p>
+      Plusieurs d'entre eux m'ont demandé de sortir du code : recueillir un
+      besoin auprès d'un client, vulgariser un sujet technique pour un public
+      qui ne l'est pas, ou rédiger en anglais un guide d'installation
+      suffisamment précis pour être reproduit pas à pas.
+    </p>
+  </Skills>
+
+  <Career />
+
+  <ProjectsPreview />
+
+  <Contact />
 </BaseLayout>
