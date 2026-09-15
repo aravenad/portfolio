@@ -15,7 +15,12 @@ const { title, description = site.description } = Astro.props;
 
 /** URL absolues : les robots d'aperçu ignorent les chemins relatifs. */
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const ogImageURL = new URL(url("/og.png"), Astro.site);
+/*
+ * Nom versionné : LinkedIn met en cache les images d'aperçu par URL et ne
+ * retélécharge pas un fichier de même nom. Renommer à chaque refonte de
+ * l'image est le seul moyen de forcer leur mise à jour.
+ */
+const ogImageURL = new URL(url("/og-v2.png"), Astro.site);
 ---
 
 <!doctype html>
