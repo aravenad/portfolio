@@ -8,10 +8,18 @@ const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
 const currentPath = normalize(Astro.url.pathname);
 ---
 
-<header
-  class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
->
-  <Container class="flex h-16 items-center justify-between gap-4">
+<header class="sticky top-0 z-50">
+  {/*
+    Le fond flouté est un calque séparé : un élément portant `backdrop-filter`
+    isole ses descendants, et le panneau du menu — s'il était à l'intérieur —
+    n'aurait plus la page comme arrière-plan à flouter.
+  */}
+  <div
+    class="absolute inset-x-0 top-0 h-16 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
+  >
+  </div>
+
+  <Container class="relative flex h-16 items-center justify-between gap-4">
     <a href={url("/")} class="font-medium tracking-tight transition hover:text-white">
       {site.name}
     </a>
@@ -42,7 +50,7 @@ const currentPath = normalize(Astro.url.pathname);
 
       <ul
         id="nav-menu"
-        class="absolute inset-x-0 top-16 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950 p-4 text-sm data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0"
+        class="fixed inset-x-0 top-16 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/90 p-4 text-sm backdrop-blur-xl data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
       >
         {
           navLinks.map((link) => (
