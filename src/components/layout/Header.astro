@@ -11,13 +11,39 @@ const currentPath = normalize(Astro.url.pathname);
 <header
   class="sticky top-0 z-50 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
 >
-  <Container class="flex h-16 items-center justify-between">
+  <Container class="flex h-16 items-center justify-between gap-4">
     <a href={url("/")} class="font-medium tracking-tight transition hover:text-white">
       {site.name}
     </a>
 
     <nav aria-label="Navigation principale">
-      <ul class="flex items-center gap-6 text-sm">
+      {/* Quatre liens ne tiennent pas à côté du logo sous 640px. */}
+      <button
+        type="button"
+        data-nav-toggle
+        aria-controls="nav-menu"
+        aria-expanded="false"
+        aria-label="Ouvrir le menu"
+        class="-mr-2 flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white sm:hidden"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          aria-hidden="true"
+          class="size-5"
+        >
+          <path class="nav-icon-open" d="M4 7h16M4 12h16M4 17h16"></path>
+          <path class="nav-icon-close hidden" d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+
+      <ul
+        id="nav-menu"
+        class="absolute inset-x-0 top-16 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950 p-4 text-sm data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0"
+      >
         {
           navLinks.map((link) => (
             <li>
@@ -28,7 +54,7 @@ const currentPath = normalize(Astro.url.pathname);
                 aria-current={
                   normalize(url(link.href)) === currentPath ? "page" : undefined
                 }
-                class="text-zinc-400 transition hover:text-zinc-100 aria-[current=page]:text-accent data-[active]:text-accent"
+                class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current=page]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
               >
                 {link.label}
               </a>
@@ -39,6 +65,49 @@ const currentPath = normalize(Astro.url.pathname);
     </nav>
   </Container>
 </header>
+
+<script>
+  /**
+   * Menu repliable sous 640px. Le même `<ul>` sert aux deux tailles : dupliquer
+   * les liens dédoublerait aussi les cibles du surlignage au défilement.
+   */
+  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const menu = document.getElementById("nav-menu");
+
+  if (toggle && menu) {
+    const iconOpen = toggle.querySelector(".nav-icon-open");
+    const iconClose = toggle.querySelector(".nav-icon-close");
+
+    const setOpen = (open: boolean) => {
+      menu.toggleAttribute("data-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+      iconOpen?.classList.toggle("hidden", open);
+      iconClose?.classList.toggle("hidden", !open);
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(!menu.hasAttribute("data-open"));
+    });
+
+    // Une ancre ne recharge pas la page : sans ça le menu resterait ouvert.
+    for (const link of menu.querySelectorAll("a")) {
+      link.addEventListener("click", () => setOpen(false));
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.hasAttribute("data-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Repasser en grand écran laisserait sinon l'état « ouvert » derrière soi.
+    window.matchMedia("(min-width: 640px)").addEventListener("change", (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>
 
 <script>
   /**
