@@ -26,3 +26,6 @@ pnpm-debug.log*
 # ai assistant files
 AGENTS.md
 CLAUDE.md
+
+# documentation technique interne
+DOCUMENTATION.md
