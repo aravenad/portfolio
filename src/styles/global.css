@@ -8,6 +8,44 @@
   --color-accent: oklch(82.8% 0.189 84.429); /* amber-400 */
 }
 
+/*
+ * Matière du fond. Un aplat unique de zinc-950 rend le site plat et froid :
+ * un halo d'accent très dilué réchauffe le haut de page, un second en bas
+ * évite que la fin du document retombe dans le noir pur.
+ */
+body {
+  background-image:
+    radial-gradient(
+      64rem 34rem at 50% -10rem,
+      color-mix(in oklab, var(--color-accent) 9%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      48rem 28rem at 88% 100%,
+      color-mix(in oklab, var(--color-zinc-700) 22%, transparent),
+      transparent 70%
+    );
+  /* Pas de `background-attachment: fixed` : coûteux au défilement et capricieux
+     sur iOS. Les halos appartiennent au document, pas à la fenêtre. */
+  background-repeat: no-repeat;
+}
+
+/*
+ * Grain. Une tuile de bruit répétée par-dessus toute la page, inerte au clic.
+ * Il casse l'uniformité des aplats sombres, où les dégradés se voient par
+ * bandes sur certains écrans.
+ */
+body::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  content: "";
+  inset: 0;
+  opacity: 0.05;
+  pointer-events: none;
+  position: fixed;
+  z-index: 100;
+}
+
 html {
   scroll-behavior: smooth;
 }
