@@ -1,6 +1,6 @@
 ---
 title: "Création d'une base de données"
-summary: "Modélisation, implémentation PostgreSQL et interrogation d'une base sur le naufrage du Titanic."
+summary: "Modélisation en schéma entités-associations, implémentation PostgreSQL et interrogation d'une base de données sur le naufrage du Titanic."
 tags: ["PostgreSQL", "SQL", "Modélisation"]
 status: "termine"
 team: "En binôme"

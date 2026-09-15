@@ -28,6 +28,7 @@ const ogImageURL = new URL(url("/og.png"), Astro.site);
     />
 
     <meta name="description" content={description} />
+    <meta name="author" content={site.author} />
     <meta name="generator" content={Astro.generator} />
 
     <link rel="canonical" href={canonicalURL} />

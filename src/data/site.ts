@@ -3,8 +3,11 @@ import type { NavLink, SocialLink } from "../types";
 /** Informations globales du site. */
 export const site = {
   name: "Damien",
+  author: "Damien Aravena Bravo",
   title: "Damien — Portfolio",
-  description: "Portfolio de Damien, étudiant et développeur informatique.",
+  // Les aperçus LinkedIn demandent au moins 100 caractères de description.
+  description:
+    "Portfolio de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble : projets de développement web, d'applications Java et de bases de données.",
   email: "damien.aravena@gmail.com",
   github: "https://github.com/aravenad",
   linkedin: "https://www.linkedin.com/in/aravenad/",
