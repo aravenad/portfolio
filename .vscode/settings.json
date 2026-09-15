@@ -1,0 +1,8 @@
+{
+  // `@theme`, `@apply`… sont des directives Tailwind v4 que le validateur CSS
+  // intégré ne connaît pas : il les signale à tort comme « Unknown at rule ».
+  "css.lint.unknownAtRules": "ignore",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
