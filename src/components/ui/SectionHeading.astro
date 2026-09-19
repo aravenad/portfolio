@@ -6,14 +6,42 @@ interface Props {
   headingId?: string;
   /** Niveau du titre : h1 pour le titre principal d'une page. */
   as?: "h1" | "h2";
+  /**
+   * Donne le lettrage chromé au dernier mot du titre.
+   *
+   * Le dernier mot plutôt qu'un mot nommé : c'est lui qui porte le sens dans
+   * tous les titres du site (« Compétences *techniques* », « Mes *projets* »,
+   * « Me *contacter* »), et une règle vaut mieux qu'une liste de cas à tenir.
+   */
+  chrome?: boolean;
 }
 
-const { title, description, headingId, as: Heading = "h2" } = Astro.props;
+const {
+  title,
+  description,
+  headingId,
+  as: Heading = "h2",
+  chrome = false,
+} = Astro.props;
+
+/* Le titre est découpé pour isoler son dernier mot. */
+const words = title.trim().split(/\s+/);
+const lastWord = words.pop() ?? title;
+const leading = words.join(" ");
 ---
 
 <div class="max-w-2xl">
   <Heading id={headingId} class="text-3xl font-bold tracking-tight sm:text-5xl">
-    {title}
+    {
+      chrome ? (
+        <Fragment>
+          {leading && `${leading} `}
+          <span class="text-chrome">{lastWord}</span>
+        </Fragment>
+      ) : (
+        title
+      )
+    }
   </Heading>
 
   {

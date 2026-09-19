@@ -21,7 +21,7 @@ const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
 <Section id={id} aria-labelledby={`${id}-title`}>
   <div class="grid items-start gap-12 lg:grid-cols-2 lg:gap-20">
     <div class:list={[reverse && "lg:order-2"]}>
-      <SectionHeading headingId={`${id}-title`} title={title} />
+      <SectionHeading headingId={`${id}-title`} title={title} chrome />
 
       <div class="mt-6 space-y-4 text-lg leading-8 text-zinc-400">
         <slot />

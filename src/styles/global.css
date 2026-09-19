@@ -98,29 +98,31 @@ body::after {
 
 /*
  * Reflet mobile. Transposition en CSS de ShineText (smoothui.dev) : un dégradé
- * bien plus large que le texte, dont la position horizontale est balayée de
- * 150 % à -150 %. Le composant d'origine est du React piloté par `motion`, ce
- * qui imposerait React et framer-motion pour animer un mot ; ici ce n'est
- * qu'une `background-position`, donc une animation CSS, sans une ligne de JS.
+ * bien plus large que le texte, dont la position horizontale est balayée en
+ * boucle. Le composant d'origine est du React piloté par `motion`, ce qui
+ * imposerait React et framer-motion pour animer un mot ; ici ce n'est qu'une
+ * `background-position`, donc une animation CSS, sans une ligne de JS.
  *
- * Deux écarts assumés au composant :
+ * LA BOUCLE EST SANS COUTURE, et c'est la contrainte qui dicte tout le reste.
  *
- * 1. Ses arrêts sont deux tons plats (base terne, bande claire). Appliqués ici,
- *    ils rendaient le prénom globalement plus sombre que le texte blanc qui
- *    l'entoure — la régression même que la répartition du lettrage chromé
- *    corrige plus haut. Les arrêts ci-dessous gardent donc la face blanche et
- *    n'y font voyager qu'un reflet : c'est le métal poli de la bannière, pas
- *    un surlignage.
- * 2. Le `repeatDelay` de 0,6 s n'existe pas en CSS. Il est obtenu en étirant la
- *    frise à 3,1 s (2,5 + 0,6) et en immobilisant le dégradé sur les derniers
- *    19,4 %.
+ * Le composant d'origine sépare deux passages par un `repeatDelay`. Imité par
+ * un palier dans les keyframes, ce délai ne fige pas un mot propre : le motif
+ * se répétant (`background-repeat: repeat`), la position d'arrêt laissait une
+ * tuile poser son reflet sur la fin du mot, immobile six dixièmes de seconde.
  *
- * Sous `prefers-reduced-motion`, rien de tout cela ne s'applique : le lettrage
- * garde le dégradé fixe défini ci-dessus, comme le fait le composant d'origine.
+ * La boucle décale donc le motif d'exactement une tuile, sans palier. Comme les
+ * arrêts extrêmes du dégradé sont blancs, les bords de tuile coïncident et le
+ * raccord est invisible. Le repos entre deux reflets n'est plus un arrêt : il
+ * vient de la portion blanche du motif qui traverse le texte.
+ *
+ * D'où le -166.667 % : `background-position` en pourcentage se rapporte à
+ * (largeur du texte - largeur du motif), soit -1,5 fois la largeur du texte
+ * pour une tuile de 250 %. Décaler d'une tuile pleine (2,5) demande donc
+ * 2,5 / 1,5 = 1,6667 tour de cette unité.
  */
 @media (prefers-reduced-motion: no-preference) {
   .text-chrome {
-    animation: text-chrome-shine 3.1s linear infinite;
+    animation: text-chrome-shine 6s linear infinite;
     background-image: linear-gradient(
       110deg,
       var(--color-white) 32%,
@@ -129,22 +131,19 @@ body::after {
       var(--color-zinc-300) 57%,
       var(--color-white) 68%
     );
+    /* Explicite, et non hérité du défaut : la boucle en dépend. */
+    background-repeat: repeat;
     background-size: 250% 100%;
   }
 }
 
 @keyframes text-chrome-shine {
-  0% {
-    background-position: 150% 0;
+  from {
+    background-position: 0 0;
   }
 
-  /* 2,5 s de balayage sur les 3,1 s de la frise. */
-  80.6% {
-    background-position: -150% 0;
-  }
-
-  100% {
-    background-position: -150% 0;
+  to {
+    background-position: -166.667% 0;
   }
 }
 
