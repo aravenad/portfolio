@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import chromeField from "../assets/chrome.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
@@ -76,6 +77,17 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
     <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} />
 
     <title>{title}</title>
+
+    {/*
+      Transitions de page : la navigation devient un échange de DOM avec fondu,
+      au lieu d'un rechargement complet.
+
+      ⚠️ Conséquence à ne pas perdre de vue : les `<script>` des composants ne
+      sont plus réexécutés d'une page à l'autre. Tout comportement doit passer
+      par `onEachPage()` (src/lib/enhance.ts), sinon il meurt à la deuxième page
+      sans rien signaler.
+    */}
+    <ClientRouter />
   </head>
 
   <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
@@ -99,6 +111,8 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
     <BackToTop />
 
     <script>
+      import { onEachPage } from "../lib/enhance";
+
       /**
        * Met chaque reflet chromé en pause dès qu'il quitte l'écran.
        *
@@ -112,9 +126,35 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
        * Sous `prefers-reduced-motion`, il n'y a aucune animation à mettre en
        * pause : la propriété est alors posée dans le vide, sans effet ni coût.
        */
-      const shines = document.querySelectorAll<HTMLElement>(".text-chrome");
+      /**
+       * Une ancre atteinte depuis une autre page se rejoint en descendant.
+       *
+       * Sans cela, arriver sur `/#career` depuis la page projets dépose le
+       * lecteur au milieu du document sans qu'il ait vu ce qu'il traversait —
+       * mesuré, la trajectoire faisait un bond de 1 800 px avant de finir en
+       * douceur. On repart donc du haut, puis on descend.
+       *
+       * Le retour vers le haut est explicitement instantané ; la descente, elle,
+       * n'impose aucun `behavior` et suit le `scroll-behavior` de la feuille de
+       * style, qui respecte déjà `prefers-reduced-motion`. `scrollIntoView`
+       * honore aussi le `scroll-mt-16` des sections, donc le header collant ne
+       * recouvre pas le titre visé.
+       */
+      onEachPage(() => {
+        const id = window.location.hash.slice(1);
+        const target = id ? document.getElementById(id) : null;
 
-      if (shines.length > 0 && "IntersectionObserver" in window) {
+        if (!target) return;
+
+        window.scrollTo({ top: 0, behavior: "instant" });
+        requestAnimationFrame(() => target.scrollIntoView());
+      });
+
+      onEachPage((signal) => {
+        const shines = document.querySelectorAll<HTMLElement>(".text-chrome");
+
+        if (shines.length === 0 || !("IntersectionObserver" in window)) return;
+
         const observer = new IntersectionObserver((entries) => {
           for (const entry of entries) {
             (entry.target as HTMLElement).style.animationPlayState =
@@ -123,7 +163,10 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
         });
 
         for (const shine of shines) observer.observe(shine);
-      }
+
+        // L'observateur vise des éléments que l'échange de DOM va détruire.
+        signal.addEventListener("abort", () => observer.disconnect());
+      });
     </script>
   </body>
 </html>

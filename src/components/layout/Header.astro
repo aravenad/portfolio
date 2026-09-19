@@ -8,7 +8,12 @@ const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
 const currentPath = normalize(Astro.url.pathname);
 ---
 
-<header class="sticky top-0 z-50">
+{/*
+  `transition:persist` garde le header en place d'une page à l'autre : il ne
+  clignote pas pendant l'échange, et son animation d'entrée ne rejoue pas à
+  chaque navigation — elle appartient à l'ouverture du site, pas à chaque page.
+*/}
+<header transition:persist class="page-enter page-enter-down sticky top-0 z-50">
   {/*
     Le fond flouté est un calque séparé : un élément portant `backdrop-filter`
     isole ses descendants, et le panneau du menu — s'il était à l'intérieur —
@@ -117,6 +122,7 @@ const currentPath = normalize(Astro.url.pathname);
 </style>
 
 <script>
+  import { onEachPage } from "../../lib/enhance";
   /**
    * Sur la page d'accueil, le logo remonte en haut au lieu de recharger.
    *
@@ -129,75 +135,131 @@ const currentPath = normalize(Astro.url.pathname);
    * clavier et le clic du milieu restent intacts — seul le clic simple, sans
    * modificateur, est détourné.
    */
-  const homeLink = document.querySelector<HTMLAnchorElement>("[data-home-link]");
+  onEachPage((signal) => {
+    const homeLink = document.querySelector<HTMLAnchorElement>("[data-home-link]");
 
-  if (homeLink) {
-    homeLink.addEventListener("click", (event) => {
-      const plainClick =
-        event.button === 0 &&
-        !event.metaKey &&
-        !event.ctrlKey &&
-        !event.shiftKey &&
-        !event.altKey;
+    if (homeLink) {
+      homeLink.addEventListener(
+        "click",
+        (event) => {
+          const plainClick =
+            event.button === 0 &&
+            !event.metaKey &&
+            !event.ctrlKey &&
+            !event.shiftKey &&
+            !event.altKey;
 
-      const samePage =
-        new URL(homeLink.href).pathname.replace(/\/+$/, "") ===
-        window.location.pathname.replace(/\/+$/, "");
+          const samePage =
+            new URL(homeLink.href).pathname.replace(/\/+$/, "") ===
+            window.location.pathname.replace(/\/+$/, "");
 
-      if (plainClick && samePage) {
-        event.preventDefault();
-        window.scrollTo({ top: 0 });
-        // L'ancre disparaît de l'URL : le haut de page n'en est pas une.
-        history.replaceState(null, "", window.location.pathname);
-      }
-    });
-  }
+          if (plainClick && samePage) {
+            event.preventDefault();
+            window.scrollTo({ top: 0 });
+            // L'ancre disparaît de l'URL : le haut de page n'en est pas une.
+            history.replaceState(null, "", window.location.pathname);
+          }
+        },
+        { signal },
+      );
+    }
+  });
 </script>
 
 <script>
+  import { onEachPage } from "../../lib/enhance";
+
+  /**
+   * Resynchronise le lien de la page courante après chaque navigation.
+   *
+   * Le header porte `transition:persist` : son DOM traverse les navigations
+   * sans être remplacé. L'`aria-current` rendu par le serveur reste donc figé
+   * sur la page d'arrivée initiale — le filet chromé se retrouve sous le mauvais
+   * lien, et un lecteur d'écran annonce la mauvaise page courante.
+   *
+   * La comparaison reprend exactement celle du serveur : le `href` rendu, déjà
+   * préfixé de la base, débarrassé de son slash final. Les liens à ancre
+   * (« /portfolio/#skills ») ne peuvent ainsi jamais correspondre à un chemin
+   * seul, ce qui est voulu — le surlignage au défilement s'en charge.
+   */
+  onEachPage(() => {
+    const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
+    const current = normalize(window.location.pathname);
+
+    for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]")) {
+      const href = normalize(link.getAttribute("href") ?? "");
+
+      if (href === current) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    }
+  });
+</script>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
   /**
    * Menu repliable sous 640px. Le même `<ul>` sert aux deux tailles : dupliquer
    * les liens dédoublerait aussi les cibles du surlignage au défilement.
    */
-  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
-  const menu = document.getElementById("nav-menu");
+  onEachPage((signal) => {
+    const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+    const menu = document.getElementById("nav-menu");
 
-  if (toggle && menu) {
-    const iconOpen = toggle.querySelector(".nav-icon-open");
-    const iconClose = toggle.querySelector(".nav-icon-close");
+    if (toggle && menu) {
+      const iconOpen = toggle.querySelector(".nav-icon-open");
+      const iconClose = toggle.querySelector(".nav-icon-close");
 
-    const setOpen = (open: boolean) => {
-      menu.toggleAttribute("data-open", open);
-      toggle.setAttribute("aria-expanded", String(open));
-      toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
-      iconOpen?.classList.toggle("hidden", open);
-      iconClose?.classList.toggle("hidden", !open);
-    };
+      const setOpen = (open: boolean) => {
+        menu.toggleAttribute("data-open", open);
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+        iconOpen?.classList.toggle("hidden", open);
+        iconClose?.classList.toggle("hidden", !open);
+      };
 
-    toggle.addEventListener("click", () => {
-      setOpen(!menu.hasAttribute("data-open"));
-    });
+      // `{ signal }` même sur un élément : le header est persisté, ses nœuds
+      // survivent à la navigation et les écouteurs s'y accumuleraient.
+      toggle.addEventListener(
+        "click",
+        () => {
+          setOpen(!menu.hasAttribute("data-open"));
+        },
+        { signal },
+      );
 
-    // Une ancre ne recharge pas la page : sans ça le menu resterait ouvert.
-    for (const link of menu.querySelectorAll("a")) {
-      link.addEventListener("click", () => setOpen(false));
-    }
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && menu.hasAttribute("data-open")) {
-        setOpen(false);
-        toggle.focus();
+      // Une ancre ne recharge pas la page : sans ça le menu resterait ouvert.
+      for (const link of menu.querySelectorAll("a")) {
+        link.addEventListener("click", () => setOpen(false), { signal });
       }
-    });
 
-    // Repasser en grand écran laisserait sinon l'état « ouvert » derrière soi.
-    window.matchMedia("(min-width: 640px)").addEventListener("change", (event) => {
-      if (event.matches) setOpen(false);
-    });
-  }
+      document.addEventListener(
+        "keydown",
+        (event) => {
+          if (event.key === "Escape" && menu.hasAttribute("data-open")) {
+            setOpen(false);
+            toggle.focus();
+          }
+        },
+        { signal },
+      );
+
+      // Repasser en grand écran laisserait sinon l'état « ouvert » derrière soi.
+      window.matchMedia("(min-width: 640px)").addEventListener(
+        "change",
+        (event) => {
+          if (event.matches) setOpen(false);
+        },
+        { signal },
+      );
+    }
+  });
 </script>
 
 <script>
+  import { onEachPage } from "../../lib/enhance";
   /**
    * Surligne le lien de la dernière section dont le haut a franchi une ligne de
    * lecture placée au premier tiers de la fenêtre, sous le header collant.
@@ -217,66 +279,68 @@ const currentPath = normalize(Astro.url.pathname);
    * Sans section observable (pages autres que l'accueil), rien ne se passe et
    * l'état `aria-current="page"` rendu par le serveur reste seul en place.
    */
-  const HEADER_HEIGHT = 64;
-  const READING_LINE = 0.3;
+  onEachPage((signal) => {
+    const HEADER_HEIGHT = 64;
+    const READING_LINE = 0.3;
 
-  const links = [
-    ...document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"),
-  ];
+    const links = [
+      ...document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"),
+    ];
 
-  const linkBySection = new Map<string, HTMLAnchorElement>();
+    const linkBySection = new Map<string, HTMLAnchorElement>();
 
-  for (const link of links) {
-    for (const id of (link.dataset.sections ?? "").split(" ").filter(Boolean)) {
-      linkBySection.set(id, link);
+    for (const link of links) {
+      for (const id of (link.dataset.sections ?? "").split(" ").filter(Boolean)) {
+        linkBySection.set(id, link);
+      }
     }
-  }
 
-  const sections = [...linkBySection.keys()]
-    .map((id) => document.getElementById(id))
-    .filter((section): section is HTMLElement => section !== null);
+    const sections = [...linkBySection.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null);
 
-  if (sections.length > 0) {
-    sections.sort((a, b) =>
-      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
-    );
+    if (sections.length > 0) {
+      sections.sort((a, b) =>
+        a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+      );
 
-    const update = () => {
-      const line =
-        HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) * READING_LINE;
+      const update = () => {
+        const line =
+          HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) * READING_LINE;
 
-      const atBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 1;
+        const atBottom =
+          window.innerHeight + window.scrollY >=
+          document.documentElement.scrollHeight - 1;
 
-      let current = atBottom ? sections[sections.length - 1] : undefined;
+        let current = atBottom ? sections[sections.length - 1] : undefined;
 
-      if (!current) {
-        let closest = -Infinity;
+        if (!current) {
+          let closest = -Infinity;
 
-        for (const section of sections) {
-          const { top } = section.getBoundingClientRect();
+          for (const section of sections) {
+            const { top } = section.getBoundingClientRect();
 
-          if (top <= line && top > closest) {
-            closest = top;
-            current = section;
+            if (top <= line && top > closest) {
+              closest = top;
+              current = section;
+            }
           }
         }
-      }
 
-      const active = current ? linkBySection.get(current.id) : undefined;
+        const active = current ? linkBySection.get(current.id) : undefined;
 
-      for (const link of links) {
-        if (link === active) {
-          link.dataset.active = "";
-        } else {
-          delete link.dataset.active;
+        for (const link of links) {
+          if (link === active) {
+            link.dataset.active = "";
+          } else {
+            delete link.dataset.active;
+          }
         }
-      }
-    };
+      };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-  }
+      update();
+      window.addEventListener("scroll", update, { passive: true, signal });
+      window.addEventListener("resize", update, { signal });
+    }
+  });
 </script>

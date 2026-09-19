@@ -215,6 +215,56 @@ body::after {
   }
 }
 
+/*
+ * Entrée du gabarit à l'ouverture de la page. Le header descend, le hero et le
+ * pied de page montent, en trois temps rapprochés.
+ *
+ * Ce n'est pas un squelette de chargement : le site est statique, son HTML
+ * arrive complet, il n'y a rien à masquer en attendant. Masquer volontairement
+ * un contenu déjà présent le ferait seulement paraître plus lent.
+ *
+ * L'apparition au défilement ne couvre pas ce cas : au chargement, les blocs
+ * déjà visibles ont dépassé leur plage d'entrée et s'affichent d'un coup.
+ *
+ * ⚠️ Les durées et les décalages restent courts. Le titre du hero est
+ * l'élément le plus grand de la page, donc sa mesure de LCP : chaque
+ * milliseconde d'opacité nulle y est comptée comme du retard d'affichage.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter {
+    animation: page-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--index, 0) * 70ms);
+  }
+
+  .page-enter-down {
+    animation-name: page-enter-down;
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-enter-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
