@@ -19,12 +19,12 @@ export const technicalSkills: Skill[] = [
     color: "#F7DF1E",
   },
   { label: "C++", icon: "simple-icons:cplusplus", color: "#00599C" },
-  // simple-icons ne publie pas de logo Java (marque déposée) : c'est Duke, la
-  // mascotte d'OpenJDK, qui en tient lieu — vérifié, aucune icône `java` dans
-  // les 3 733 du jeu. Duke est un dessin au trait et ne couvre que 16 % de sa
-  // boîte, contre 33 à 64 % pour ses voisins : d'où `lineArt`.
-  // OpenJDK est officiellement noir : orange Java, plus lisible ici.
-  { label: "Java", icon: "simple-icons:openjdk", color: "#E76F00", lineArt: true },
+  // Logo local (src/icons/java.svg) : simple-icons ne publie pas de logo Java,
+  // la marque étant déposée. Celui-ci vient de devicon, sous licence MIT — voir
+  // l'en-tête du fichier. Comme toutes les tasses Java, c'est un dessin au
+  // trait qui ne couvre que 12 % de sa boîte contre 33 à 64 % pour ses
+  // voisins : d'où `lineArt`, qui le remonte à 18 %.
+  { label: "Java", icon: "java", color: "#E76F00", lineArt: true },
   { label: "Python", icon: "simple-icons:python", color: "#3776AB" },
   { label: "SQL" },
   {
