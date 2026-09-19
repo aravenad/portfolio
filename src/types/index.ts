@@ -17,6 +17,11 @@ export interface Skill {
   short?: string;
   /** Icône Iconify, par exemple `simple-icons:php`. */
   icon?: string;
+  /**
+   * Logo dessiné au trait plutôt qu'en glyphe plein. Déclenche une correction
+   * de poids optique dans la tuile — voir SkillTile.astro.
+   */
+  lineArt?: boolean;
   /** Précision affichée à côté du libellé dans la variante liste. */
   detail?: string;
   /** Couleur de marque appliquée au logo au survol. */
