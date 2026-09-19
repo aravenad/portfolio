@@ -26,7 +26,12 @@ export const technicalSkills: Skill[] = [
   // voisins : d'où `lineArt`, qui le remonte à 18 %.
   { label: "Java", icon: "java", color: "#E76F00", lineArt: true },
   { label: "Python", icon: "simple-icons:python", color: "#3776AB" },
-  { label: "SQL" },
+  // SQL n'a pas de logo — c'est une norme ISO. Le cylindre générique
+  // (src/icons/database.svg) est le seul pictogramme non-marque de la grille,
+  // posé pour que cette tuile ne soit plus la seule sans glyphe. Pas de `color`
+  // non plus : sans marque, pas de couleur de marque, la tuile ne se teinte donc
+  // pas au survol — `--skill-color` retombe sur `currentColor`.
+  { label: "SQL", icon: "database" },
   // L'éléphant est un dessin au trait, comme la tasse Java : 19 % d'encre là où
   // le Git et le GitHub de la même rangée en peignent 43 à 46 %. `lineArt` le
   // remonte à 28 %. Il vient de simple-icons, donc déjà en viewBox 24 : la règle
