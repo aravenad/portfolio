@@ -88,6 +88,38 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
       sans rien signaler.
     */}
     <ClientRouter />
+
+    {/*
+      Ce script est volontairement en ligne et bloquant : il doit s'exécuter
+      AVANT le premier rendu. Posé dans un module différé, les blocs
+      s'afficheraient puis disparaîtraient pour se révéler — un clignotement pire
+      que l'absence d'animation.
+
+      Le garde-fou compte autant que le drapeau : si le module qui révèle les
+      blocs n'arrive jamais (erreur réseau, script bloqué), le drapeau se retire
+      tout seul et tout redevient visible. Rien ne doit pouvoir rendre la moitié
+      du site invisible de façon permanente.
+    */}
+    <script is:inline>
+      if (
+        !CSS.supports("animation-timeline: view()") &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        /*
+          `setAttribute` / `hasAttribute` plutôt que `dataset` : une valeur de
+          dataset vide est une chaîne vide, donc FAUSSE. Un test `if (!dataset.x)`
+          se déclenche alors même quand le drapeau est posé — c'est ce qui faisait
+          sortir l'observateur aussitôt et retirer le drapeau à tous les coups.
+        */
+        document.documentElement.setAttribute("data-reveal-fallback", "");
+
+        setTimeout(() => {
+          if (!document.documentElement.hasAttribute("data-reveal-ready")) {
+            document.documentElement.removeAttribute("data-reveal-fallback");
+          }
+        }, 3000);
+      }
+    </script>
   </head>
 
   <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
@@ -148,6 +180,45 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
 
         window.scrollTo({ top: 0, behavior: "instant" });
         requestAnimationFrame(() => target.scrollIntoView());
+      });
+
+      /**
+       * Révèle les blocs au défilement là où `animation-timeline` manque.
+       *
+       * Là où il existe, le CSS s'en charge seul, sur le compositeur : ce
+       * script se retire alors immédiatement. Il n'y a jamais les deux.
+       */
+      onEachPage((signal) => {
+        const root = document.documentElement;
+
+        if (!root.hasAttribute("data-reveal-fallback")) return;
+
+        const blocks = document.querySelectorAll<HTMLElement>(".reveal");
+
+        // Sans IntersectionObserver, mieux vaut tout montrer que rien.
+        if (!("IntersectionObserver" in window)) {
+          root.removeAttribute("data-reveal-fallback");
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+
+              (entry.target as HTMLElement).dataset.revealed = "";
+              observer.unobserve(entry.target);
+            }
+          },
+          // Le bloc se révèle une fois franchement entré, pas au ras du bord.
+          { rootMargin: "0px 0px -12% 0px" },
+        );
+
+        for (const block of blocks) observer.observe(block);
+
+        // Signale au garde-fou que la relève est assurée.
+        root.setAttribute("data-reveal-ready", "");
+        signal.addEventListener("abort", () => observer.disconnect());
       });
 
       onEachPage((signal) => {

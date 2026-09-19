@@ -229,6 +229,34 @@ body::after {
 }
 
 /*
+ * Repli pour les navigateurs sans `animation-timeline` — Firefox notamment, où
+ * ni `animation-timeline` ni `animation-range` ne sont reconnus : le bloc
+ * `@supports` ci-dessus y est ignoré, et il ne reste aucune animation.
+ *
+ * ⚠️ L'état masqué est conditionné à `[data-reveal-fallback]`, posé par un
+ * script, et JAMAIS écrit en dur sur `.reveal`. Sans cette précaution, un échec
+ * du JavaScript laisserait la moitié du site invisible pour toujours : c'est le
+ * pire défaut possible, et il ne se verrait qu'en production.
+ *
+ * Une transition plutôt qu'une animation : elle part de l'état courant, donc un
+ * bloc déjà révélé ne peut pas se remasquer.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal-fallback] .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-reveal-fallback] .reveal[data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
  * Entrée du gabarit à l'ouverture de la page. Le header descend, le hero et le
  * pied de page montent, en trois temps rapprochés.
  *
