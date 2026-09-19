@@ -8,7 +8,8 @@ import type { CareerEntry } from "../types";
  * Format des périodes, à respecter pour toute nouvelle entrée :
  *
  * - « Mois AAAA » pour une date unique, « Mois AAAA – mois AAAA » pour un
- *   intervalle ; les années scolaires restent en « AAAA – AAAA ».
+ *   intervalle. Toujours au mois, y compris les diplômes : une précision qui
+ *   varie d'une ligne à l'autre se lit comme une négligence.
  * - Tiret demi-cadratin (–, U+2013) entouré d'espaces normales. Jamais de
  *   trait d'union, jamais d'espace insécable.
  * - Capitale au premier mois seulement : il ouvre le libellé. Les suivants
@@ -97,7 +98,7 @@ export const education: CareerEntry[] = [
     title: "Classe préparatoire TSI",
     organization: "Lycée polyvalent Gaspard Monge",
     location: "Chambéry",
-    period: "2020 – 2023",
+    period: "Septembre 2020 – juin 2023",
     description: "Technologie et sciences industrielles.",
     initials: "GM",
   },
@@ -105,7 +106,7 @@ export const education: CareerEntry[] = [
     title: "Baccalauréat STI2D",
     organization: "Lycée polyvalent Pablo Neruda",
     location: "Saint-Martin-d'Hères",
-    period: "2018 – 2020",
+    period: "Septembre 2018 – juin 2020",
     description: "Mention bien.",
     initials: "PN",
   },
