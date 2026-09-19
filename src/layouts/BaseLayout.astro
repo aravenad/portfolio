@@ -1,4 +1,5 @@
 ---
+import chromeField from "../assets/chrome.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
@@ -53,6 +54,24 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
     />
 
     <meta name="twitter:card" content="summary_large_image" />
+
+    {/*
+      La matière du fond est déclarée en `background-image` dans global.css : le
+      navigateur ne la découvre donc qu'une fois la feuille de style reçue et
+      analysée. Mesuré sur le build, en 4G lente : découverte à 377 ms contre
+      172 ms pour le CSS — le fond apparaissait visiblement après le texte.
+
+      Ce préchargement la rend visible dès le HTML, en parallèle du CSS.
+      L'import en frontmatter est indispensable : c'est lui qui donne l'URL
+      empreintée par Vite, qu'un chemin écrit à la main ne peut pas deviner.
+    */}
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      href={chromeField.src}
+      fetchpriority="high"
+    />
 
     <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} />
 
