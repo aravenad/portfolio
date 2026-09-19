@@ -20,7 +20,11 @@ const currentPath = normalize(Astro.url.pathname);
   </div>
 
   <Container class="relative flex h-16 items-center justify-between gap-4">
-    <a href={url("/")} class="font-medium tracking-tight transition hover:text-white">
+    <a
+      href={url("/")}
+      data-home-link
+      class="font-medium tracking-tight transition hover:text-white"
+    >
       {site.name}
     </a>
 
@@ -111,6 +115,44 @@ const currentPath = normalize(Astro.url.pathname);
     }
   }
 </style>
+
+<script>
+  /**
+   * Sur la page d'accueil, le logo remonte en haut au lieu de recharger.
+   *
+   * Sans cela, cliquer « Damien » depuis le bas de l'accueil relance un
+   * chargement complet pour aboutir au même document, tout en haut et d'un coup.
+   * Intercepté, le même geste devient un simple défilement.
+   *
+   * `scrollTo` est appelé sans `behavior` : il suit alors le `scroll-behavior`
+   * de la feuille de style, qui respecte déjà `prefers-reduced-motion`. Le
+   * clavier et le clic du milieu restent intacts — seul le clic simple, sans
+   * modificateur, est détourné.
+   */
+  const homeLink = document.querySelector<HTMLAnchorElement>("[data-home-link]");
+
+  if (homeLink) {
+    homeLink.addEventListener("click", (event) => {
+      const plainClick =
+        event.button === 0 &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.shiftKey &&
+        !event.altKey;
+
+      const samePage =
+        new URL(homeLink.href).pathname.replace(/\/+$/, "") ===
+        window.location.pathname.replace(/\/+$/, "");
+
+      if (plainClick && samePage) {
+        event.preventDefault();
+        window.scrollTo({ top: 0 });
+        // L'ancre disparaît de l'URL : le haut de page n'en est pas une.
+        history.replaceState(null, "", window.location.pathname);
+      }
+    });
+  }
+</script>
 
 <script>
   /**
