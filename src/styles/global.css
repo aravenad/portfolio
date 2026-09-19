@@ -96,6 +96,58 @@ body::after {
   -webkit-text-fill-color: transparent;
 }
 
+/*
+ * Reflet mobile. Transposition en CSS de ShineText (smoothui.dev) : un dégradé
+ * bien plus large que le texte, dont la position horizontale est balayée de
+ * 150 % à -150 %. Le composant d'origine est du React piloté par `motion`, ce
+ * qui imposerait React et framer-motion pour animer un mot ; ici ce n'est
+ * qu'une `background-position`, donc une animation CSS, sans une ligne de JS.
+ *
+ * Deux écarts assumés au composant :
+ *
+ * 1. Ses arrêts sont deux tons plats (base terne, bande claire). Appliqués ici,
+ *    ils rendaient le prénom globalement plus sombre que le texte blanc qui
+ *    l'entoure — la régression même que la répartition du lettrage chromé
+ *    corrige plus haut. Les arrêts ci-dessous gardent donc la face blanche et
+ *    n'y font voyager qu'un reflet : c'est le métal poli de la bannière, pas
+ *    un surlignage.
+ * 2. Le `repeatDelay` de 0,6 s n'existe pas en CSS. Il est obtenu en étirant la
+ *    frise à 3,1 s (2,5 + 0,6) et en immobilisant le dégradé sur les derniers
+ *    19,4 %.
+ *
+ * Sous `prefers-reduced-motion`, rien de tout cela ne s'applique : le lettrage
+ * garde le dégradé fixe défini ci-dessus, comme le fait le composant d'origine.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .text-chrome {
+    animation: text-chrome-shine 3.1s linear infinite;
+    background-image: linear-gradient(
+      110deg,
+      var(--color-white) 32%,
+      var(--color-zinc-400) 44%,
+      var(--color-white) 50%,
+      var(--color-zinc-300) 57%,
+      var(--color-white) 68%
+    );
+    background-size: 250% 100%;
+  }
+}
+
+@keyframes text-chrome-shine {
+  0% {
+    background-position: 150% 0;
+  }
+
+  /* 2,5 s de balayage sur les 3,1 s de la frise. */
+  80.6% {
+    background-position: -150% 0;
+  }
+
+  100% {
+    background-position: -150% 0;
+  }
+}
+
 ::selection {
   /* Le lettrage chromé est déjà transparent : lui redonner une couleur pleine. */
   -webkit-text-fill-color: var(--color-zinc-950);
