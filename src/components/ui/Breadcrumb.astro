@@ -20,11 +20,20 @@ const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500">
     {
       crumbs.map((crumb, index) => (
-        <li class="flex items-center gap-x-2">
+        <li class="crumb flex items-center gap-x-2" style={`--index: ${index}`}>
           {index > 0 && (
-            <span aria-hidden="true" class="text-zinc-700">
-              /
-            </span>
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              class="size-3.5 text-zinc-700"
+            >
+              <path d="m6 3.5 4.5 4.5L6 12.5" />
+            </svg>
           )}
 
           {crumb.href ? (
@@ -41,3 +50,33 @@ const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
     }
   </ol>
 </nav>
+
+<style>
+  /*
+   * Entrée en cascade, transposée de Breadcrumb (smoothui.dev) : chaque niveau
+   * arrive décalé de 4 px vers la gauche, à 40 ms d'intervalle. Le composant
+   * d'origine est du React piloté par `motion` ; ici rien ne dépend de l'état,
+   * donc une animation CSS suffit et n'embarque aucun JS.
+   *
+   * Le ressort `bounce: 0.1` de l'original est approché par une courbe à léger
+   * dépassement : à 0,25 s et sur 4 px, la différence n'est pas perceptible.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .crumb {
+      animation: crumb-in 0.25s cubic-bezier(0.34, 1.12, 0.64, 1) both;
+      animation-delay: calc(var(--index) * 40ms);
+    }
+  }
+
+  @keyframes crumb-in {
+    from {
+      opacity: 0;
+      transform: translateX(-4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
