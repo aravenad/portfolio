@@ -4,12 +4,27 @@ import type { CareerEntry } from "../types";
  * Logos : `icon` pour les marques présentes dans simple-icons, sinon `initials`.
  * Pour un vrai logo (entreprise, université, lycée), déposer le fichier dans
  * `public/logos/` et renseigner `logo: "/logos/mon-fichier.svg"`.
+ *
+ * Format des périodes, à respecter pour toute nouvelle entrée :
+ *
+ * - « Mois AAAA » pour une date unique, « Mois AAAA – mois AAAA » pour un
+ *   intervalle ; les années scolaires restent en « AAAA – AAAA ».
+ * - Tiret demi-cadratin (–, U+2013) entouré d'espaces normales. Jamais de
+ *   trait d'union, jamais d'espace insécable.
+ * - Capitale au premier mois seulement : il ouvre le libellé. Les suivants
+ *   restent en minuscule, comme le veut le français.
+ * - L'année n'est répétée que si elle change : « Mai – juin 2026 », mais
+ *   « Septembre 2025 – janvier 2026 ».
+ *
+ * ⚠️ La capitalisation ne se voit pas à l'écran : CareerItem rend les périodes
+ * en `uppercase`. Elle n'en compte pas moins — c'est la donnée, et elle
+ * redeviendrait visible le jour où ce style changerait.
  */
 export const experiences: CareerEntry[] = [
   {
     organization: "Horizon Groupe",
     location: "Villard-Bonnot",
-    period: "Juillet 2025 – Juin 2026",
+    period: "Juillet 2025 – juin 2026",
     description:
       "Groupe réunissant Microstore, Iso Rhône-Alpes et Chryséis, spécialisé dans le réemploi et l'infogérance de parcs informatiques.",
     initials: "HG",
