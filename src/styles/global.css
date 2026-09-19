@@ -164,97 +164,51 @@ body::after {
 }
 
 /*
- * Apparition au défilement. L'élément monte de 12 px en se révélant, au fur et
- * à mesure qu'il entre dans la fenêtre.
+ * Apparition au défilement : le bloc monte de 48 px en se révélant, une fois
+ * entré dans la fenêtre, avec un décalage entre voisins.
  *
- * C'est une animation pilotée par le défilement (`animation-timeline: view()`)
- * et non un `IntersectionObserver` : aucun JS, et le navigateur la joue sur le
- * compositeur plutôt que sur le fil principal. La piste vient de `scroll-fade`
- * chez shadcn/ui, qui emploie la même famille de propriétés.
+ * ⚠️ VOIE UNIQUE, VOLONTAIREMENT. Une première version utilisait les animations
+ * pilotées par le défilement (`animation-timeline: view()`), avec ce repli pour
+ * les navigateurs qui ne les connaissent pas. Deux raisons de n'en garder qu'une :
  *
- * Le `@supports` n'est pas une précaution de style : sans lui, un navigateur
- * sans `animation-timeline` rattacherait l'animation à la timeline du document
- * et laisserait le contenu invisible. Avec, il ignore le bloc et tout s'affiche
- * normalement — même repli que sous `prefers-reduced-motion`.
+ * 1. Une animation pilotée par le défilement est ASSERVIE à la position, pas au
+ *    temps : elle avance au rythme de la molette et recule si l'on remonte. Elle
+ *    se lit comme un contenu qui est là, pas comme quelque chose qui arrive.
+ *    Jouée une fois à son propre rythme, la révélation se remarque enfin.
+ * 2. Firefox ne connaît ni `animation-timeline` ni `animation-range` : garder
+ *    les deux voies, c'était deux comportements à régler et à vérifier, et un
+ *    site qui ne bouge pas pareil selon le navigateur.
  *
- * ⚠️ LA PLAGE SE MESURE SUR `cover`, PAS SUR `entry`.
- *
- * La plage `entry` d'un bloc vaut sa propre hauteur : pour un titre de 96 px,
- * `entry 8% entry 50%` jouait toute la révélation sur une quarantaine de pixels
- * de défilement — dans l'épaisseur du bord bas de l'écran. L'animation existait,
- * mais personne ne pouvait la voir.
- *
- * ⚠️ Ne pas chercher à vérifier cela avec `getComputedStyle().opacity` : ces
- * animations sont jouées par le compositeur, et le fil principal n'en voit que
- * quelques valeurs intermédiaires. La mesure annonçait 25 px là où les captures
- * d'écran en montraient 280. Seul ce qui est peint fait foi.
- *
- * `cover` couvre toute la traversée de la fenêtre, hauteur du bloc comprise :
- * la plage ne dépend donc plus de la taille du bloc. 35 % de cette traversée
- * donne quelques centaines de pixels, le bloc achevant sa montée bien avant
- * d'atteindre le centre.
- */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    /*
-     * Propriétés longues, et surtout PAS le raccourci `animation`.
-     *
-     * `animation-timeline` ne fait pas partie du raccourci : écrit à côté de
-     * lui, Lightning CSS les fusionne à la minification en
-     * `animation: linear both reveal-in view()`, que le navigateur rejette en
-     * bloc — plus d'animation du tout, et rien ne le signale au build. Le
-     * symptôme se voit seulement dans le CSS compilé.
-     */
-    .reveal {
-      animation-duration: auto;
-      animation-fill-mode: both;
-      animation-name: reveal-in;
-      animation-range: cover 0% cover 35%;
-      animation-timeline: view();
-      animation-timing-function: linear;
-    }
-  }
-}
-
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/*
- * Repli pour les navigateurs sans `animation-timeline` — Firefox notamment, où
- * ni `animation-timeline` ni `animation-range` ne sont reconnus : le bloc
- * `@supports` ci-dessus y est ignoré, et il ne reste aucune animation.
- *
- * ⚠️ L'état masqué est conditionné à `[data-reveal-fallback]`, posé par un
- * script, et JAMAIS écrit en dur sur `.reveal`. Sans cette précaution, un échec
- * du JavaScript laisserait la moitié du site invisible pour toujours : c'est le
- * pire défaut possible, et il ne se verrait qu'en production.
+ * ⚠️ L'état masqué est conditionné à `[data-reveal-armed]`, posé par un script,
+ * et JAMAIS écrit en dur sur `.reveal`. Sans cette précaution, un échec du
+ * JavaScript laisserait la moitié du site invisible pour toujours — le pire
+ * défaut possible, et il ne se verrait qu'en production.
  *
  * Une transition plutôt qu'une animation : elle part de l'état courant, donc un
  * bloc déjà révélé ne peut pas se remasquer.
+ *
+ * ⚠️ LA COURBE COMPTE AUTANT QUE LA DURÉE. `cubic-bezier(0.22, 1, 0.36, 1)`,
+ * employée ailleurs sur le site, place 90 % du mouvement dans le premier quart :
+ * une transition de 0,7 s s'y lit comme 0,2 s, et l'effet paraît escamoté.
+ * L'assouplissement cubique ci-dessous étale le déplacement sur toute la durée,
+ * ce qui le rend enfin lisible — c'est le réglage qui manquait, pas l'amplitude.
  */
 @media (prefers-reduced-motion: no-preference) {
-  [data-reveal-fallback] .reveal {
+  [data-reveal-armed] .reveal {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(48px);
     transition:
-      opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.75s cubic-bezier(0.33, 1, 0.68, 1),
+      transform 0.75s cubic-bezier(0.33, 1, 0.68, 1);
+    transition-delay: calc(var(--reveal-index, 0) * 110ms);
   }
 
-  [data-reveal-fallback] .reveal[data-revealed] {
+  [data-reveal-armed] .reveal[data-revealed] {
     opacity: 1;
     transform: none;
   }
 }
+
 
 /*
  * Entrée du gabarit à l'ouverture de la page. Le header descend, le hero et le

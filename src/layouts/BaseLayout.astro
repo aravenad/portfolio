@@ -101,23 +101,40 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
       du site invisible de façon permanente.
     */}
     <script is:inline>
-      if (
-        !CSS.supports("animation-timeline: view()") &&
-        !matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         /*
           `setAttribute` / `hasAttribute` plutôt que `dataset` : une valeur de
           dataset vide est une chaîne vide, donc FAUSSE. Un test `if (!dataset.x)`
           se déclenche alors même quand le drapeau est posé — c'est ce qui faisait
           sortir l'observateur aussitôt et retirer le drapeau à tous les coups.
         */
-        document.documentElement.setAttribute("data-reveal-fallback", "");
+        const arm = (root) => {
+          root.setAttribute("data-reveal-armed", "");
 
-        setTimeout(() => {
-          if (!document.documentElement.hasAttribute("data-reveal-ready")) {
-            document.documentElement.removeAttribute("data-reveal-fallback");
-          }
-        }, 3000);
+          // Garde-fou : si le module qui révèle les blocs n'arrive jamais, le
+          // drapeau se retire seul et tout redevient visible. Sans lui, une
+          // erreur de chargement cacherait la moitié du site pour toujours.
+          setTimeout(() => {
+            if (!document.documentElement.hasAttribute("data-reveal-ready")) {
+              document.documentElement.removeAttribute("data-reveal-armed");
+            }
+          }, 3000);
+        };
+
+        arm(document.documentElement);
+
+        /*
+          ⚠️ Réarmer à CHAQUE navigation, sur le document ENTRANT.
+
+          L'échange de vue recopie les attributs de `<html>` depuis le document
+          entrant : un drapeau posé à l'exécution est donc effacé, et la
+          révélation ne fonctionnait que sur la première page visitée. Le poser
+          sur `event.newDocument` l'installe avant que la page ne soit peinte —
+          `astro:page-load` serait trop tard et ferait clignoter le contenu.
+        */
+        document.addEventListener("astro:before-swap", (event) => {
+          arm(event.newDocument.documentElement);
+        });
       }
     </script>
   </head>
@@ -183,22 +200,38 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
       });
 
       /**
-       * Révèle les blocs au défilement là où `animation-timeline` manque.
-       *
-       * Là où il existe, le CSS s'en charge seul, sur le compositeur : ce
-       * script se retire alors immédiatement. Il n'y a jamais les deux.
+       * Révèle les blocs à mesure qu'ils entrent dans la fenêtre.
        */
       onEachPage((signal) => {
         const root = document.documentElement;
 
-        if (!root.hasAttribute("data-reveal-fallback")) return;
+        if (!root.hasAttribute("data-reveal-armed")) return;
 
         const blocks = document.querySelectorAll<HTMLElement>(".reveal");
 
         // Sans IntersectionObserver, mieux vaut tout montrer que rien.
         if (!("IntersectionObserver" in window)) {
-          root.removeAttribute("data-reveal-fallback");
+          root.removeAttribute("data-reveal-armed");
           return;
+        }
+
+        /*
+         * Décalage entre voisins : les trois cartes d'une rangée arrivent l'une
+         * après l'autre plutôt qu'en bloc. C'est ce qui fait lire l'effet comme
+         * une animation et non comme un contenu qui s'allume.
+         *
+         * Plafonné : une liste de parcours en compte huit, et 8 x 110 ms de
+         * retard sur le dernier se remarquerait comme une lenteur.
+         */
+        for (const block of blocks) {
+          const siblings = [...(block.parentElement?.children ?? [])].filter(
+            (child) => child.classList.contains("reveal"),
+          );
+
+          block.style.setProperty(
+            "--reveal-index",
+            String(Math.min(siblings.indexOf(block), 3)),
+          );
         }
 
         const observer = new IntersectionObserver(
@@ -206,12 +239,12 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
             for (const entry of entries) {
               if (!entry.isIntersecting) continue;
 
-              (entry.target as HTMLElement).dataset.revealed = "";
+              (entry.target as HTMLElement).setAttribute("data-revealed", "");
               observer.unobserve(entry.target);
             }
           },
           // Le bloc se révèle une fois franchement entré, pas au ras du bord.
-          { rootMargin: "0px 0px -12% 0px" },
+          { rootMargin: "0px 0px -15% 0px" },
         );
 
         for (const block of blocks) observer.observe(block);
