@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8" />
+<!--
+  Source de public/og-v3.png. Rendue par Chrome headless plutôt qu'avec les
+  primitives ImageMagick : la mise en page reprend telle quelle celle du site
+  (mêmes couleurs, même marbrage, même lettrage chromé), et le texte est composé
+  par un vrai moteur de rendu. C'est ce qui garantit que l'aperçu LinkedIn et la
+  page d'accueil se ressemblent. Commande de rendu : §10 de DOCUMENTATION.md.
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background-color: #09090b;
+    background-image:
+      url("../src/assets/chrome.webp"),
+      radial-gradient(48rem 26rem at 50% -8rem, #cfe0f314, transparent 68%);
+    background-repeat: no-repeat;
+    background-position: top center;
+    /* 2,2:1, le format natif de la matière : aucun étirement. */
+    background-size: 1200px 545px, auto;
+    background-blend-mode: screen, normal;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 22px;
+    padding: 0 88px;
+
+    color: #fafafa;
+    font: 400 46px/1.25 "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  /* Le filet chromé, transposition du trait d'accent de l'ancienne version. */
+  .rule {
+    width: 132px;
+    height: 4px;
+    border-radius: 2px;
+    background-image: linear-gradient(90deg, #ffffff, #a1a1aa, #52525b);
+  }
+
+  h1 {
+    font-size: 92px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    background-image: linear-gradient(
+      172deg, #ffffff 0%, #ffffff 46%, #a1a1aa 63%, #f4f4f5 78%, #d4d4d8 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p { color: #a1a1aa; }
+
+  /*
+   * Pas de grain ici, contrairement au site : un bruit par pixel sur 2400 px
+   * fait passer le PNG de 0,1 à 1,2 Mo, et LinkedIn recompresse l'image de
+   * toute façon. Le marbrage seul suffit à casser l'aplat.
+   */
+</style>
+
+<div class="rule"></div>
+<h1>Damien Aravena Bravo</h1>
+<p>Étudiant en BUT Informatique — Grenoble</p>
