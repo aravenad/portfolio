@@ -1,23 +1,40 @@
 @import "tailwindcss";
 
 /*
- * Couleur d'accent du site. Ambre chaud, seule touche de couleur sur une base
- * noir et blanc : prénom, liens actifs, flèches au survol, focus clavier.
+ * Couleur d'accent du site. Un argent froid, calqué sur les hautes lumières de
+ * la bannière LinkedIn : la direction artistique est strictement monochrome,
+ * l'accent se distingue par sa température, pas par une teinte franche.
+ * Il porte le lien de nav actif, les flèches au survol, le focus clavier.
  */
 @theme {
-  --color-accent: oklch(82.8% 0.189 84.429); /* amber-400 */
+  --color-accent: oklch(90% 0.032 250);
 }
 
 /*
- * Matière du fond. Un aplat unique de zinc-950 rend le site plat et froid :
- * un halo d'accent très dilué réchauffe le haut de page, un second en bas
- * évite que la fin du document retombe dans le noir pur.
+ * Matière du fond. Trois couches, toutes sur `body` :
+ *
+ * 1. Le marbrage « métal liquide » en haut de page, repris de la bannière
+ *    LinkedIn. L'image est opaque et fondue vers le noir ; elle est composée en
+ *    `screen`, où le noir laisse le fond intact et où seuls les rubans clairs
+ *    s'ajoutent. C'est ce qui évite un canal alpha, trente fois plus lourd à
+ *    encoder ici (8 Ko contre 265). Source et rendu : tools/chrome.svg, §5.
+ *    L'image vit dans src/assets/ et non public/ : Vite lui applique la base
+ *    du site et une empreinte, ce qu'un chemin absolu en CSS ne peut pas faire.
+ * 2. Un halo argent très dilué en haut, un gris neutre en bas à droite, pour
+ *    qu'aucune extrémité du document ne retombe dans le noir pur.
+ *
+ * `background-size: max(64rem, 100%)` garde au marbrage une largeur minimale :
+ * écrasé à 390 px sur un téléphone, son écoulement horizontal disparaîtrait.
+ *
+ * Pas de `background-attachment: fixed` : coûteux au défilement et capricieux
+ * sur iOS. Ces couches appartiennent au document, pas à la fenêtre.
  */
 body {
   background-image:
+    url("../assets/chrome.webp"),
     radial-gradient(
       64rem 34rem at 50% -10rem,
-      color-mix(in oklab, var(--color-accent) 9%, transparent),
+      color-mix(in oklab, var(--color-accent) 7%, transparent),
       transparent 68%
     ),
     radial-gradient(
@@ -25,15 +42,22 @@ body {
       color-mix(in oklab, var(--color-zinc-700) 22%, transparent),
       transparent 70%
     );
-  /* Pas de `background-attachment: fixed` : coûteux au défilement et capricieux
-     sur iOS. Les halos appartiennent au document, pas à la fenêtre. */
+  background-position:
+    top center,
+    center,
+    center;
   background-repeat: no-repeat;
+  background-size:
+    max(64rem, 100%) 44rem,
+    auto,
+    auto;
+  background-blend-mode: screen, normal, normal;
 }
 
 /*
  * Grain. Une tuile de bruit répétée par-dessus toute la page, inerte au clic.
  * Il casse l'uniformité des aplats sombres, où les dégradés se voient par
- * bandes sur certains écrans.
+ * bandes sur certains écrans — y compris dans le fondu du marbrage.
  */
 body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -44,6 +68,48 @@ body::after {
   pointer-events: none;
   position: fixed;
   z-index: 100;
+}
+
+/*
+ * Lettrage chromé. Un dégradé argent découpé par le texte, qui rejoue le reflet
+ * des rubans de la bannière. Réservé aux très grands corps — sous ~2rem, les
+ * bandes du dégradé se lisent comme un défaut de rendu plutôt que comme un
+ * reflet, et le contraste s'effondre sur les stops sombres.
+ *
+ * La face reste blanche sur les deux tiers hauts, et un unique reflet la barre
+ * en bas. Réparti à parts égales entre clair et sombre, le mot passait sous le
+ * texte blanc qui l'entoure : il doit rester le point le plus lumineux de la
+ * ligne, pas seulement le plus contrasté.
+ */
+.text-chrome {
+  background-image: linear-gradient(
+    172deg,
+    var(--color-white) 0%,
+    var(--color-white) 46%,
+    var(--color-zinc-400) 63%,
+    var(--color-zinc-100) 78%,
+    var(--color-zinc-300) 100%
+  );
+  background-clip: text;
+  color: transparent;
+  /* Sans cela, la sélection du texte masquerait entièrement les glyphes. */
+  -webkit-text-fill-color: transparent;
+}
+
+::selection {
+  /* Le lettrage chromé est déjà transparent : lui redonner une couleur pleine. */
+  -webkit-text-fill-color: var(--color-zinc-950);
+  background-color: var(--color-accent);
+  color: var(--color-zinc-950);
+}
+
+/*
+ * Arête spéculaire. Un filet clair sur le bord haut d'une surface, comme la
+ * ligne de lumière qui court sur un métal poli. C'est ce qui donne du relief
+ * aux cartes et aux tuiles sans ajouter de couleur.
+ */
+.surface-lit {
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-white) 7%, transparent);
 }
 
 html {
@@ -61,11 +127,6 @@ html {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
   border-radius: 2px;
-}
-
-::selection {
-  background-color: var(--color-accent);
-  color: var(--color-zinc-950);
 }
 
 /*

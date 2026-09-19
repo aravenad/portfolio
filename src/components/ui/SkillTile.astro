@@ -11,7 +11,7 @@ const { skill } = Astro.props;
 
 <div
   title={skill.label}
-  class="skill-tile flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60 p-3 text-center transition hover:border-zinc-600 hover:from-zinc-800/80 hover:to-zinc-800/60"
+  class="skill-tile surface-lit flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60 p-3 text-center transition hover:border-zinc-600 hover:from-zinc-800/80 hover:to-zinc-800/60"
   style={skill.color ? `--skill-color: ${skill.color}` : undefined}
 >
   {

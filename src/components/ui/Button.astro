@@ -17,9 +17,15 @@ const {
 const base =
   "inline-flex items-center justify-center rounded-lg px-5 py-3 font-medium transition";
 
+/*
+ * Le bouton plein est un dégradé haut-bas plutôt qu'un aplat blanc : c'est le
+ * même éclairage venu du haut que les tuiles et les cartes, appliqué ici à une
+ * surface claire. Le secondaire porte l'arête spéculaire des surfaces sombres.
+ */
 const variants = {
-  primary: "bg-white text-black hover:bg-zinc-200",
-  secondary: "border border-zinc-700 hover:bg-zinc-900",
+  primary:
+    "bg-gradient-to-b from-white to-zinc-300 text-black hover:to-zinc-200",
+  secondary: "surface-lit border border-zinc-700 hover:bg-zinc-900",
 };
 
 const classes = [base, variants[variant], className];

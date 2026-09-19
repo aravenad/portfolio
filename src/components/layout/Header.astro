@@ -74,6 +74,44 @@ const currentPath = normalize(Astro.url.pathname);
   </Container>
 </header>
 
+<style>
+  /*
+   * Marque du lien actif. L'accent argent est trop proche du `zinc-100` du
+   * survol pour distinguer les deux états par la seule couleur : l'état actif
+   * porte en plus un filet chromé, qui s'éteint sur ses deux bords.
+   *
+   * Deux positions : sous le libellé une fois la barre horizontale, et calé sur
+   * le bas du bouton tant que les liens sont des blocs empilés dans le menu.
+   */
+  [data-nav-link][aria-current="page"],
+  [data-nav-link][data-active] {
+    position: relative;
+  }
+
+  [data-nav-link][aria-current="page"]::after,
+  [data-nav-link][data-active]::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-accent),
+      transparent
+    );
+    bottom: 0.375rem;
+    content: "";
+    height: 1px;
+    inset-inline: 0.75rem;
+    position: absolute;
+  }
+
+  @media (width >= 40rem) {
+    [data-nav-link][aria-current="page"]::after,
+    [data-nav-link][data-active]::after {
+      bottom: -0.5rem;
+      inset-inline: 0;
+    }
+  }
+</style>
+
 <script>
   /**
    * Menu repliable sous 640px. Le même `<ul>` sert aux deux tailles : dupliquer
