@@ -27,11 +27,16 @@ export const technicalSkills: Skill[] = [
   { label: "Java", icon: "java", color: "#E76F00", lineArt: true },
   { label: "Python", icon: "simple-icons:python", color: "#3776AB" },
   { label: "SQL" },
+  // L'éléphant est un dessin au trait, comme la tasse Java : 19 % d'encre là où
+  // le Git et le GitHub de la même rangée en peignent 43 à 46 %. `lineArt` le
+  // remonte à 28 %. Il vient de simple-icons, donc déjà en viewBox 24 : la règle
+  // de SkillTile s'applique sans renormalisation.
   {
     label: "PostgreSQL",
     short: "PSQL",
     icon: "simple-icons:postgresql",
     color: "#4169E1",
+    lineArt: true,
   },
   // Le logo JetBrains est un dégradé noir/rose : on garde le rose.
   {
