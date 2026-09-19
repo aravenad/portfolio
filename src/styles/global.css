@@ -122,7 +122,7 @@ body::after {
  */
 @media (prefers-reduced-motion: no-preference) {
   .text-chrome {
-    animation: text-chrome-shine 6s linear infinite;
+    animation: text-chrome-shine 4s linear infinite;
     background-image: linear-gradient(
       110deg,
       var(--color-white) 32%,
@@ -177,9 +177,22 @@ body::after {
  * et laisserait le contenu invisible. Avec, il ignore le bloc et tout s'affiche
  * normalement — même repli que sous `prefers-reduced-motion`.
  *
- * `entry 8% entry 50%` : la révélation se joue pendant la première moitié de
- * l'entrée, donc bien avant que l'élément atteigne le centre. Plus tard, on a
- * l'impression que la page traîne derrière le défilement.
+ * ⚠️ LA PLAGE SE MESURE SUR `cover`, PAS SUR `entry`.
+ *
+ * La plage `entry` d'un bloc vaut sa propre hauteur : pour un titre de 96 px,
+ * `entry 8% entry 50%` jouait toute la révélation sur une quarantaine de pixels
+ * de défilement — dans l'épaisseur du bord bas de l'écran. L'animation existait,
+ * mais personne ne pouvait la voir.
+ *
+ * ⚠️ Ne pas chercher à vérifier cela avec `getComputedStyle().opacity` : ces
+ * animations sont jouées par le compositeur, et le fil principal n'en voit que
+ * quelques valeurs intermédiaires. La mesure annonçait 25 px là où les captures
+ * d'écran en montraient 280. Seul ce qui est peint fait foi.
+ *
+ * `cover` couvre toute la traversée de la fenêtre, hauteur du bloc comprise :
+ * la plage ne dépend donc plus de la taille du bloc. 35 % de cette traversée
+ * donne quelques centaines de pixels, le bloc achevant sa montée bien avant
+ * d'atteindre le centre.
  */
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
@@ -196,7 +209,7 @@ body::after {
       animation-duration: auto;
       animation-fill-mode: both;
       animation-name: reveal-in;
-      animation-range: entry 8% entry 50%;
+      animation-range: cover 0% cover 35%;
       animation-timeline: view();
       animation-timing-function: linear;
     }
@@ -206,7 +219,7 @@ body::after {
 @keyframes reveal-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(28px);
   }
 
   to {
