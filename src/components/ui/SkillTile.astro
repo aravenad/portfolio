@@ -66,9 +66,10 @@ const brand =
   }
 
   /*
-   * Correction de poids optique pour les logos dessinés au trait. Duke, le seul
-   * concerné aujourd'hui, ne peint que 16 % de sa boîte là où les glyphes pleins
-   * voisins en peignent 33 à 64 % : dans la grille, il paraît délavé.
+   * Correction de poids optique pour les logos dessinés au trait — la tasse Java
+   * et l'éléphant PostgreSQL. Ils peignent une fraction de leur boîte là où les
+   * glyphes pleins voisins en couvrent 33 à 64 % : dans la grille, ils
+   * paraissent délavés. Les mesures logo par logo sont dans skills.ts.
    *
    * Un filet de contour épaissit son trait sans toucher au dessin. Il est en
    * `currentColor`, donc il suit la couleur de marque au survol comme le
