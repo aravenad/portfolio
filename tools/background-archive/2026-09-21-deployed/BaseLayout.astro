@@ -1,6 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import chromeField from "../assets/chrome-original-hq.webp";
+import chromeField from "../assets/chrome.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
@@ -14,7 +14,6 @@ interface Props {
 }
 
 const { title, description = site.description } = Astro.props;
-const isHomePage = Astro.url.pathname.replace(/\/+$/, "") === url("/").replace(/\/+$/, "");
 
 /** URL absolues : les robots d'aperçu ignorent les chemins relatifs. */
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -140,7 +139,7 @@ const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
     </script>
   </head>
 
-  <body data-home={isHomePage} class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+  <body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-black"

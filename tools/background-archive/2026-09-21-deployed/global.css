@@ -11,13 +11,27 @@
 }
 
 /*
- * Les halos restent sur le document. La matière occupe un calque séparé,
- * dont le fondu est indépendant de la hauteur totale de la page.
+ * Matière du fond. Trois couches, toutes sur `body` :
+ *
+ * 1. Le marbrage « métal liquide » en haut de page, repris de la bannière
+ *    LinkedIn. L'image est opaque et fondue vers le noir ; elle est composée en
+ *    `screen`, où le noir laisse le fond intact et où seuls les rubans clairs
+ *    s'ajoutent. C'est ce qui évite un canal alpha, trente fois plus lourd à
+ *    encoder ici (8 Ko contre 265). Source et rendu : tools/chrome.svg, §5.
+ *    L'image vit dans src/assets/ et non public/ : Vite lui applique la base
+ *    du site et une empreinte, ce qu'un chemin absolu en CSS ne peut pas faire.
+ * 2. Un halo argent très dilué en haut, un gris neutre en bas à droite, pour
+ *    qu'aucune extrémité du document ne retombe dans le noir pur.
+ *
+ * `background-size: max(64rem, 100%)` garde au marbrage une largeur minimale :
+ * écrasé à 390 px sur un téléphone, son écoulement horizontal disparaîtrait.
+ *
+ * Pas de `background-attachment: fixed` : coûteux au défilement et capricieux
+ * sur iOS. Ces couches appartiennent au document, pas à la fenêtre.
  */
 body {
-  position: relative;
-  isolation: isolate;
   background-image:
+    url("../assets/chrome.webp"),
     radial-gradient(
       64rem 34rem at 50% -10rem,
       color-mix(in oklab, var(--color-accent) 7%, transparent),
@@ -29,74 +43,31 @@ body {
       transparent 70%
     );
   background-position:
+    top center,
     center,
     center;
   background-repeat: no-repeat;
   background-size:
+    max(64rem, 100%) 44rem,
     auto,
     auto;
+  background-blend-mode: screen, normal, normal;
 }
 
 /*
- * Source originale 1920 × 3770, convertie sans perte. Le décalage proportionnel
- * à sa largeur choisit le même départ de motif (y ≈ 1670 dans la source) à
- * chaque taille d'écran, sans déformer les plis.
- *
- * `screen` rend le noir de l'image neutre : il ne peut plus créer une nappe
- * plus noire que le fond zinc. Un masque à décroissance gaussienne, légèrement
- * irrégulier, évite une ligne horizontale dans les derniers reflets. Il ne
- * déforme que le fondu, jamais la matière. Il s'éteint avant le bord du calque.
- */
-body::before {
-  --chrome-width: max(64rem, 100vw);
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 64rem;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("../assets/chrome-original-hq.webp");
-  background-repeat: no-repeat;
-  background-position: center calc(var(--chrome-width) * -0.87);
-  background-size: var(--chrome-width) auto;
-  mix-blend-mode: screen;
-  opacity: 0.18;
-  mask-image: url("../assets/chrome-fade.svg");
-  mask-mode: alpha;
-  mask-repeat: no-repeat;
-  mask-size: 100% 64rem;
-}
-
-/* Sur l'accueil, l'espace au-dessus du hero laisse mieux voir la matière.
- * Les pages intérieures commencent par du petit texte : rester plus discret.
- */
-body[data-home="true"]::before {
-  opacity: 0.7;
-}
-
-/* Une fenêtre basse fait remonter le texte dans les reflets du haut :
- * avancer le fondu, sans flouter la matière ni déplacer le contenu.
- */
-@media (min-width: 40rem) and (max-height: 44rem) {
-  body[data-home="true"]::before {
-    mask-size: 100% 52rem;
-  }
-}
-
-/*
- * Grain fin, derrière le contenu : une seule octave évite les amas plus gros
- * que révélait le bruit précédent au zoom. Le même grain très léger continue
- * sur le fond uni, sans salir les caractères et les surfaces des boutons.
+ * Grain. Une tuile de bruit répétée par-dessus toute la page, inerte au clic.
+ * Il casse l'uniformité des aplats sombres, où les dégradés se voient par
+ * bandes sur certains écrans — y compris dans le fondu du marbrage.
  */
 body::after {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
   content: "";
   inset: 0;
-  opacity: 0.025;
+  opacity: 0.05;
   pointer-events: none;
   position: fixed;
-  z-index: -1;
+  z-index: 100;
 }
 
 /*

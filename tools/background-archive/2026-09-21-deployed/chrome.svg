@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 727" width="1600" height="727">
+  <!--
+    Source de public/chrome.webp — la matière « métal liquide » de la direction
+    artistique, reprise de la bannière LinkedIn. Commande de rendu : §5 de
+    DOCUMENTATION.md. Le fichier est rastérisé une fois et versionné : un filtre
+    SVG vivant de cette taille est coûteux au défilement, et Safari rend
+    feTurbulence et les primitives d'éclairage différemment de Chrome.
+
+    Principe : un bruit fractal étiré horizontalement (baseFrequency plus basse
+    en x qu'en y) passé dans une rampe en dents de scie. Chaque aller-retour de
+    la rampe transforme une ligne de niveau du bruit en un ruban clair : c'est ce
+    qui produit le marbrage coulé plutôt que des nuages.
+
+    Deux valeurs se règlent ensemble, et seulement en regardant le résultat à la
+    géométrie d'affichage réelle (1920 x 704 en plein écran) :
+
+    - L'ANISOTROPIE du bruit, ici 2,5:1. À 4,6:1, les rubans se lisaient comme
+      de longues traînées horizontales plutôt que comme des masses.
+    - Le FORMAT du cadre, ici 2,2:1. L'image est posée dans une boîte dont le
+      rapport varie avec la fenêtre (2,73:1 à 1920 px, 1,64:1 à la largeur
+      minimale) : 2,2:1 est le compromis qui garde l'étirement sous 1,25x aux
+      deux extrémités.
+  -->
+  <filter id="liquid" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0022 0.0055" numOctaves="6" seed="9" />
+
+    <!-- Le bruit RVB est réduit à un champ scalaire, porté par le canal alpha. -->
+    <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0.6 0.35 0 0" />
+
+    <!-- Rampe asymétrique : montée longue, redescente courte = ruban à bord net. -->
+    <feComponentTransfer>
+      <feFuncA type="table"
+        tableValues="0 .02 .1 .45 1 .55 .12 .02 0 .03 .14 .6 1 .4 .08 0 .02 .12 .5 1 .3 .05 0" />
+    </feComponentTransfer>
+
+    <!-- Écrase les gris intermédiaires : la matière doit retomber dans le noir. -->
+    <feComponentTransfer>
+      <feFuncA type="gamma" exponent="1.45" />
+    </feComponentTransfer>
+
+    <!--
+      Alpha -> couleur, avec une pointe de bleu dans les hautes lumières.
+
+      Les coefficients plafonnent le ruban le plus clair à 16 % de blanc. C'est
+      la limite haute tenable, mesurée et non estimée : à 20 %, le texte
+      `zinc-400` du hero tombait à 4,32:1 en fenêtre basse (1440 x 560), où la
+      ligne de texte remonte dans la partie dense du marbrage. L'image reste
+      opaque — elle est composée en `screen`, où le noir ne change rien au fond
+      (voir §5).
+    -->
+    <feColorMatrix type="matrix" values="0 0 0 .144 0  0 0 0 .149 0  0 0 0 .16 0  0 0 0 0 1" />
+  </filter>
+
+  <!-- Fondu vertical : la matière s'éteint avant le bas du cadre. -->
+  <mask id="fade">
+    <linearGradient id="fade-stops" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0.45" stop-color="#fff" />
+      <stop offset="1" stop-color="#000" />
+    </linearGradient>
+    <rect width="1600" height="727" fill="url(#fade-stops)" />
+  </mask>
+
+  <rect width="1600" height="727" fill="#000000" />
+  <rect width="1600" height="727" filter="url(#liquid)" mask="url(#fade)" />
+</svg>

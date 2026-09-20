@@ -20,8 +20,7 @@ const currentPath = normalize(Astro.url.pathname);
     n'aurait plus la page comme arrière-plan à flouter.
   */}
   <div
-    class="header-backdrop pointer-events-none absolute inset-x-0 top-0"
-    aria-hidden="true"
+    class="absolute inset-x-0 top-0 h-16 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur"
   >
   </div>
 
@@ -85,24 +84,6 @@ const currentPath = normalize(Astro.url.pathname);
 </header>
 
 <style>
-  /* Garder le fond lisible derrière la navigation, puis l'estomper au-delà
-   * de la barre : ni bordure ni arrêt brutal du flou à 64 pixels.
-   */
-  .header-backdrop {
-    height: 8rem;
-    background: rgb(9 9 11 / 88%);
-    backdrop-filter: blur(12px);
-    mask-image: linear-gradient(
-      to bottom,
-      #000 0,
-      #000 2.5rem,
-      rgb(0 0 0 / 88%) 3.5rem,
-      rgb(0 0 0 / 55%) 4.5rem,
-      rgb(0 0 0 / 18%) 6rem,
-      transparent 8rem
-    );
-  }
-
   /*
    * Marque du lien actif. L'accent argent est trop proche du `zinc-100` du
    * survol pour distinguer les deux états par la seule couleur : l'état actif
