@@ -10,8 +10,11 @@ import type { CareerEntry } from "../types";
  * - « Mois AAAA » pour une date unique, « Mois AAAA – mois AAAA » pour un
  *   intervalle. Toujours au mois, y compris les diplômes : une précision qui
  *   varie d'une ligne à l'autre se lit comme une négligence.
- * - Tiret demi-cadratin (–, U+2013) entouré d'espaces normales. Jamais de
- *   trait d'union, jamais d'espace insécable.
+ * - Tiret demi-cadratin (–, U+2013) entouré d'espaces normales : c'est là que
+ *   la ligne doit se couper si elle est trop longue. Jamais de trait d'union.
+ * - Espace insécable (U+00A0) entre le mois et l'année, pour qu'un « 2026 » ne
+ *   se retrouve jamais seul sur une deuxième ligne. Elle ne se voit pas dans
+ *   l'éditeur : copier celle d'une entrée existante.
  * - Capitale au premier mois seulement : il ouvre le libellé. Les suivants
  *   restent en minuscule, comme le veut le français.
  * - L'année n'est répétée que si elle change : « Mai – juin 2026 », mais
@@ -25,7 +28,7 @@ export const experiences: CareerEntry[] = [
   {
     organization: "Horizon Groupe",
     location: "Villard-Bonnot",
-    period: "Juillet 2025 – juin 2026",
+    period: "Juillet 2025 – juin 2026",
     description:
       "Groupe réunissant Microstore, Iso Rhône-Alpes et Chryséis, spécialisé dans le réemploi et l'infogérance de parcs informatiques.",
     initials: "HG",
@@ -33,28 +36,28 @@ export const experiences: CareerEntry[] = [
       {
         title: "Technicien informatique",
         contract: "CDI",
-        period: "Mai – juin 2026",
+        period: "Mai – juin 2026",
         description:
           "Masterisation et préparation du matériel informatique destiné au client grand compte Saint-Gobain, au sein du pôle technique. Configuration de matériels Lenovo, Microsoft, Honeywell et Cisco.",
       },
       {
         title: "Technicien diagnostic",
         contract: "CDI",
-        period: "Janvier – mai 2026",
+        period: "Janvier – mai 2026",
         description:
           "Audit et qualification du parc informatique destiné au réemploi pour différents clients : Capgemini, Saint-Gobain, Nexity.",
       },
       {
         title: "Technicien réception",
         contract: "CDI",
-        period: "Septembre 2025 – janvier 2026",
+        period: "Septembre 2025 – janvier 2026",
         description:
           "Gestion du flux entrant de matériel informatique chez Microstore (Green IT) — PC, tablettes, téléphones, accessoires — et suivi des stocks pour l'ensemble des clients.",
       },
       {
         title: "Assistant administratif — Technicien réception",
         contract: "CDD",
-        period: "Juillet – août 2025",
+        period: "Juillet – août 2025",
       },
     ],
   },
@@ -62,7 +65,7 @@ export const experiences: CareerEntry[] = [
     title: "Stage d'observation",
     organization: "Mentor Graphics (Siemens)",
     location: "Meylan",
-    period: "Juin 2018",
+    period: "Juin 2018",
     description:
       "Découverte des métiers de l'informatique en entreprise : échanges avec les salariés et accompagnement de l'un d'eux sur des tâches simples, sous sa supervision.",
     icon: "simple-icons:siemens",
@@ -72,7 +75,7 @@ export const experiences: CareerEntry[] = [
     organization:
       "Laboratoire de Linguistique et Didactique des Langues Étrangères et Maternelles — UGA",
     location: "Grenoble",
-    period: "Janvier 2017",
+    period: "Janvier 2017",
     description:
       "Découverte du fonctionnement d'un laboratoire de recherche, échanges avec les chercheurs et assistance dans leur travail quotidien.",
     initials: "UGA",
@@ -84,21 +87,21 @@ export const education: CareerEntry[] = [
     title: "BUT Informatique",
     organization: "IUT2 — Université Grenoble Alpes",
     location: "Grenoble",
-    period: "Septembre 2023 – juin 2028",
+    period: "Septembre 2023 – juin 2028",
     description: "Année de césure de septembre 2025 à juillet 2026.",
     initials: "IUT2",
   },
   {
     title: "Certification PIX",
     organization: "Compétences numériques",
-    period: "Avril 2022",
+    period: "Avril 2022",
     icon: "simple-icons:pix",
   },
   {
     title: "Classe préparatoire TSI",
     organization: "Lycée polyvalent Gaspard Monge",
     location: "Chambéry",
-    period: "Septembre 2020 – juin 2023",
+    period: "Septembre 2020 – juin 2023",
     description: "Technologie et sciences industrielles.",
     initials: "GM",
   },
@@ -106,7 +109,7 @@ export const education: CareerEntry[] = [
     title: "Baccalauréat STI2D",
     organization: "Lycée polyvalent Pablo Neruda",
     location: "Saint-Martin-d'Hères",
-    period: "Septembre 2018 – juin 2020",
+    period: "Septembre 2018 – juin 2020",
     description: "Mention bien.",
     initials: "PN",
   },
