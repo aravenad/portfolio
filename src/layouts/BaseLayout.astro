@@ -1,5 +1,19 @@
 ---
 import { ClientRouter } from "astro:transitions";
+/*
+ * Matière du fond, 1920 × 3770, encodée en WebP avec perte (qualité 80).
+ *
+ * Elle l'était en sans perte : 5,2 Mo, soit 319 ms de téléchargement mesurées
+ * sur le site déployé. Tant qu'elle n'était pas arrivée, le flou de la barre de
+ * navigation n'avait rien à flouter et n'apparaissait qu'en retard.
+ *
+ * La perte ne se voit pas : le calque est composé en `screen` et fortement
+ * masqué, si bien que l'erreur d'encodage, qui atteint 22/255 dans l'image
+ * elle-même, retombe à 6/255 au plus sur la page rendue.
+ *
+ * Régénérer depuis la source (tools/metal-study/, hors dépôt) :
+ * sharp(src).webp({ quality: 80, effort: 6 }).toFile("src/assets/chrome-original-hq.webp")
+ */
 import chromeField from "../assets/chrome-original-hq.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
