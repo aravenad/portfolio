@@ -26,6 +26,12 @@ export interface Skill {
   detail?: string;
   /** Couleur de marque appliquée au logo au survol. */
   color?: string;
+  /**
+   * Seconde couleur de marque, pour les rares logos bicolores. Elle est exposée
+   * au logo sous `--logo-accent` au survol ; à lui de décider quelles parties la
+   * prennent. Seul Java s'en sert aujourd'hui — sa vapeur.
+   */
+  color2?: string;
 }
 
 export interface CareerRole {

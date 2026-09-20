@@ -24,7 +24,20 @@ export const technicalSkills: Skill[] = [
   // l'en-tête du fichier. Comme toutes les tasses Java, c'est un dessin au
   // trait qui ne couvre que 12 % de sa boîte contre 33 à 64 % pour ses
   // voisins : d'où `lineArt`, qui le remonte à 18 %.
-  { label: "Java", icon: "java", color: "#E76F00", lineArt: true },
+  //
+  // Seule tuile bicolore de la grille, parce que le logo officiel l'est. Les
+  // deux valeurs viennent des « Java Branding and Licensing Guidelines »
+  // d'Oracle : Java Blue = Pantone 633 C / 314 U = #007396, Java Orange =
+  // Pantone 144 C / 130 U = #ED8B00. Ce sont les équivalents sRGB publiés par
+  // Oracle elle-même, pas une conversion maison. L'ancien #E76F00 était
+  // l'orange approché de devicon, pas celui de la marque.
+  {
+    label: "Java",
+    icon: "java",
+    color: "#007396",
+    color2: "#ED8B00",
+    lineArt: true,
+  },
   { label: "Python", icon: "simple-icons:python", color: "#3776AB" },
   // SQL n'a pas de logo — c'est une norme ISO. Le cylindre générique
   // (src/icons/database.svg) est le seul pictogramme non-marque de la grille,

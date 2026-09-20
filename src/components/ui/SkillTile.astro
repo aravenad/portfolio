@@ -7,12 +7,23 @@ interface Props {
 }
 
 const { skill } = Astro.props;
+
+// Les couleurs de marque ne sont que transportées ici : c'est la règle de survol
+// plus bas qui les allume. Une tuile non survolée reste zinc-100, logo bicolore
+// compris.
+const brand =
+  [
+    skill.color && `--skill-color: ${skill.color}`,
+    skill.color2 && `--skill-color-2: ${skill.color2}`,
+  ]
+    .filter(Boolean)
+    .join("; ") || undefined;
 ---
 
 <div
   title={skill.label}
   class="skill-tile surface-lit flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60 p-3 text-center transition hover:border-zinc-600 hover:from-zinc-800/80 hover:to-zinc-800/60"
-  style={skill.color ? `--skill-color: ${skill.color}` : undefined}
+  style={brand}
 >
   {
     skill.icon ? (
@@ -41,9 +52,17 @@ const { skill } = Astro.props;
 </div>
 
 <style>
-  /* Le logo reprend la couleur de sa marque au survol de la tuile. */
+  /*
+   * Le logo reprend la couleur de sa marque au survol de la tuile.
+   *
+   * `color` porte la couleur principale, que le tracé prend par `currentColor`.
+   * `--logo-accent` porte la seconde, pour les logos bicolores — elle n'est
+   * définie qu'ici, dans l'état survolé, exactement comme `color` : c'est ce qui
+   * garantit qu'un logo bicolore reste monochrome au repos comme ses voisins.
+   */
   .skill-tile:hover .skill-icon {
     color: var(--skill-color, currentColor);
+    --logo-accent: var(--skill-color-2, currentColor);
   }
 
   /*
