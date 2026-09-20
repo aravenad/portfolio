@@ -29,3 +29,8 @@ CLAUDE.md
 
 # documentation technique interne
 DOCUMENTATION.md
+
+# étude de direction artistique du fond métallique : 38 Mo de sources, de
+# rendus et de variantes, dont un GIF de comparaison de 19,6 Mo. Atelier, pas
+# livrable — seuls les fichiers retenus vivent dans src/assets/.
+tools/metal-study/
