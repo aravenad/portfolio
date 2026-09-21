@@ -1,0 +1,271 @@
+---
+import type { MarkdownHeading } from "astro";
+import { getTocEntries } from "../../lib/toc";
+import TocList from "./TocList.astro";
+
+interface Props {
+  /** Titres du Markdown rendu, dans l'ordre du document. */
+  headings: MarkdownHeading[];
+  class?: string;
+}
+
+const { headings, class: className } = Astro.props;
+
+const entries = getTocEntries(headings);
+
+/*
+ * Le titre est aligné sur les entrées, pas sur le bord du bloc : la gouttière
+ * qu'il laisse à gauche est celle où vient se poser le filet de l'entrée
+ * courante.
+ */
+const title = "pl-4 text-sm font-semibold text-zinc-100";
+---
+
+{
+  /*
+   * Une seule entrée n'est pas un sommaire : elle n'offre aucun choix et répète
+   * un titre déjà visible. Mieux vaut alors ne rien afficher.
+   */
+  entries.length > 1 && (
+    <div
+      class:list={[
+        /*
+         * ⚠️ `lg:self-start` fait partie du collant, ce n'est pas un réglage
+         * d'alignement. Ce bloc est une cellule de grille, et une cellule est
+         * étirée par défaut : il prenait toute la hauteur de la colonne de
+         * texte, or un élément aussi haut que son bloc conteneur n'a aucune
+         * course — il ne peut donc jamais coller. Ramené à la hauteur de son
+         * contenu, il retrouve la place de glisser. Le retirer ne casse rien de
+         * visible : le sommaire reste au bon endroit, il défile simplement avec
+         * le texte.
+         */
+        "lg:sticky lg:top-24 lg:self-start",
+        className,
+      ]}
+    >
+      {/*
+        ⚠️ DEUX RENDUS, ET C'EST VOULU. Sous `lg` le sommaire est replié : une
+        fiche fournie en compte huit entrées, qui repousseraient le premier
+        paragraphe sous la ligne de flottaison. Dans la colonne de droite, au
+        contraire, il doit rester ouvert — c'est tout son intérêt.
+
+        Un `<details>` ne peut pas être rouvert de force en CSS. `open` est un
+        attribut, pas une propriété de style, et la seule prise CSS existante
+        (`::details-content`) n'est pas encore comprise partout : un navigateur
+        qui l'ignore masquerait le sommaire sur grand écran, exactement là où on
+        veut le voir. Le déplier au chargement en JavaScript le ferait clignoter
+        et le perdrait si le script n'arrive pas.
+
+        Restent deux formes, dont une seule est rendue à la fois. `display: none`
+        les retire aussi de l'arbre d'accessibilité : un lecteur d'écran n'en
+        rencontre jamais deux. Leur contenu, lui, vient d'un seul `TocList` —
+        rien à maintenir en double.
+      */}
+      <nav data-toc="compact" aria-label="Sur cette page" class="lg:hidden">
+        {/*
+          Deux filets plutôt qu'une carte : c'est déjà la façon dont la fiche
+          sépare ses parties — sous l'en-tête, au-dessus des projets voisins —
+          et un encadré ferait du sommaire un objet à part sur la page.
+        */}
+        <details data-toc-details class="border-y border-zinc-900 py-3">
+          <summary
+            class:list={[
+              title,
+              "flex cursor-pointer list-none items-center justify-between gap-4 transition hover:text-white",
+            ]}
+          >
+            Sur cette page
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              class="toc-chevron size-3.5 shrink-0 text-zinc-600 transition"
+            >
+              <path d="m3.5 6 4.5 4.5L12.5 6" />
+            </svg>
+          </summary>
+
+          <TocList entries={entries} class="mt-2 max-h-[45vh]" />
+        </details>
+      </nav>
+
+      <nav data-toc="sidebar" aria-labelledby="toc-title" class="hidden lg:block">
+        <p id="toc-title" class:list={[title]}>Sur cette page</p>
+
+        {/*
+          La liste défile à part du titre, qui reste visible. Le plafond n'entre
+          en jeu qu'une fois la fiche bien fournie, mais un sommaire qui
+          dépasserait de la fenêtre serait pire que pas de sommaire du tout.
+        */}
+        <TocList entries={entries} class="mt-2 max-h-[calc(100vh-10rem)]" />
+      </nav>
+    </div>
+  )
+}
+
+<style>
+  /* Le triangle natif du navigateur, remplacé par le chevron. */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  [open] > summary .toc-chevron {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+  import {
+    activeHeadingIndex,
+    groupByAnchor,
+    lerp,
+    readingLine,
+    sectionRatio,
+  } from "../../lib/toc";
+
+  /**
+   * Surligne l'entrée de la dernière section commencée.
+   *
+   * La règle est dans src/lib/toc.ts, où elle est testée ; il ne reste ici que
+   * les mesures du navigateur.
+   *
+   * ⚠️ Les deux formes du sommaire sont dans le document, donc CHAQUE titre est
+   * visé par deux liens. Les parcourir à plat casserait le surlignage : les
+   * hauts de titres ne seraient plus croissants, et « le dernier passé sous la
+   * ligne » désignerait n'importe quoi. D'où le regroupement par ancre, qui
+   * rend un titre par section, dans l'ordre du document — et allume les deux
+   * liens d'un coup, puisqu'on ne sait pas lequel est affiché.
+   *
+   * `aria-current="location"` porte l'état pour le style et pour les lecteurs
+   * d'écran à la fois ; « location » plutôt que « page » car la fiche entière
+   * est la page — seule la position dans le document change.
+   *
+   * Sans JavaScript, seul le surlignage manque : les entrées du sommaire sont
+   * de simples ancres et continuent de mener où il faut.
+   */
+  onEachPage((signal) => {
+    const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")];
+
+    const sections = [
+      // `hash` est percent-encodé par le navigateur, alors que les ancres
+      // d'Astro gardent les accents des titres français.
+      ...groupByAnchor(links, (link) => decodeURIComponent(link.hash.slice(1))),
+    ]
+      .map(([anchor, group]) => ({ heading: document.getElementById(anchor), links: group }))
+      .filter(
+        (section): section is { heading: HTMLElement; links: HTMLAnchorElement[] } =>
+          section.heading !== null,
+      );
+
+    if (sections.length === 0) return;
+
+    /*
+     * La fin de la dernière section : le bas du corps de la fiche, pris sur le
+     * conteneur des titres. Sans elle, cette section n'aurait pas de longueur
+     * et le curseur s'y figerait dès le premier pixel.
+     */
+    const body = sections[0].heading.parentElement;
+
+    const cursors = [
+      ...document.querySelectorAll<HTMLElement>("[data-toc-cursor]"),
+    ];
+
+    const update = () => {
+      const viewport = window.innerHeight;
+      const remaining =
+        document.documentElement.scrollHeight - viewport - window.scrollY;
+
+      const line = readingLine(viewport, remaining);
+      const tops = sections.map(({ heading }) => heading.getBoundingClientRect().top);
+      const active = activeHeadingIndex(tops, line, viewport);
+
+      for (const [index, section] of sections.entries()) {
+        for (const link of section.links) {
+          if (index === active) {
+            link.setAttribute("aria-current", "location");
+          } else {
+            link.removeAttribute("aria-current");
+          }
+        }
+      }
+
+      // Rien à montrer tant que le lecteur est dans le chapeau de la fiche.
+      if (active === -1) {
+        for (const cursor of cursors) cursor.style.height = "0px";
+        return;
+      }
+
+      const next = sections[active + 1];
+      const end = next
+        ? tops[active + 1]
+        : (body?.getBoundingClientRect().bottom ?? tops[active]);
+
+      const ratio = sectionRatio(tops[active], end, line);
+
+      /*
+       * Le curseur glisse de l'entrée courante vers la suivante à mesure que la
+       * section est parcourue. À la fraction 1 il est exactement sur l'entrée
+       * suivante, qui devient courante au même instant : le passage est continu,
+       * il n'y a jamais de saut à masquer.
+       *
+       * Les deux formes du sommaire ont chacune leur curseur, et `groupByAnchor`
+       * range les liens d'une section dans l'ordre du document — le n-ième lien
+       * de chaque section appartient donc toujours à la même liste que le
+       * n-ième de la suivante.
+       *
+       * La dernière section n'a personne vers qui glisser : le curseur s'y
+       * arrête, ce qui est le comportement voulu en fin de fiche.
+       */
+      sections[active].links.forEach((link, form) => {
+        const cursor = link
+          .closest("[data-toc-list]")
+          ?.querySelector<HTMLElement>("[data-toc-cursor]");
+
+        if (!cursor) return;
+
+        const target = next?.links[form] ?? link;
+
+        cursor.style.top = `${lerp(link.offsetTop, target.offsetTop, ratio)}px`;
+        cursor.style.height = `${lerp(link.offsetHeight, target.offsetHeight, ratio)}px`;
+      });
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true, signal });
+    window.addEventListener("resize", update, { signal });
+
+    /*
+     * Replié, le sommaire compact ne mesure rien : ses entrées n'ont ni
+     * position ni hauteur, et son curseur resterait en haut. Le déploiement
+     * n'est pas un défilement — il faut le lui dire.
+     */
+    document
+      .querySelector("[data-toc-details]")
+      ?.addEventListener("toggle", update, { signal });
+  });
+
+  /**
+   * Referme le sommaire replié dès qu'on y choisit une section.
+   *
+   * Sans cela, il resterait déployé au-dessus du titre visé et occuperait le
+   * tiers de l'écran dont on vient de se servir pour en sortir. Le menu du
+   * header se referme pour la même raison.
+   *
+   * Le repli a lieu avant que le navigateur ne calcule le saut d'ancre : la
+   * page raccourcit d'abord, la position visée est mesurée ensuite.
+   */
+  onEachPage((signal) => {
+    const details = document.querySelector<HTMLDetailsElement>("[data-toc-details]");
+
+    if (!details) return;
+
+    for (const link of details.querySelectorAll("a")) {
+      link.addEventListener("click", () => details.removeAttribute("open"), { signal });
+    }
+  });
+</script>

@@ -33,11 +33,24 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
 }));
 
 /**
+ * Les titres du corps factice, tels qu'Astro les renverrait pour ce Markdown.
+ * Un `h1` et un `h4` encadrent les niveaux retenus : le sommaire doit les
+ * écarter, et seul un jeu qui les contient peut le prouver.
+ */
+export const fixtureHeadings = [
+  { depth: 1, slug: "titre-de-la-fiche", text: "Titre de la fiche" },
+  { depth: 2, slug: "contexte", text: "Contexte" },
+  { depth: 3, slug: "realisation", text: "Réalisation" },
+  { depth: 2, slug: "resultats", text: "Résultats" },
+  { depth: 4, slug: "note", text: "Note" },
+];
+
+/**
  * Remplaçant d'`astro:content`, module virtuel qui n'existe pas hors d'un rendu
  * Astro complet. `render` renvoie un corps factice : les tests de page portent
  * sur la mise en page, pas sur la compilation du Markdown.
  */
 export const contentModule = {
   getCollection: async () => fixtureProjects,
-  render: async () => ({ Content }),
+  render: async () => ({ Content, headings: fixtureHeadings }),
 };

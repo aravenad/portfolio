@@ -10,6 +10,7 @@ import Container from "../../src/components/ui/Container.astro";
 import Footer from "../../src/components/layout/Footer.astro";
 import Section from "../../src/components/ui/Section.astro";
 import SectionHeading from "../../src/components/ui/SectionHeading.astro";
+import TableOfContents from "../../src/components/ui/TableOfContents.astro";
 import { socialLinks } from "../../src/data/site";
 import { render } from "../helpers/render";
 
@@ -277,5 +278,158 @@ describe("Footer", () => {
   it("survit à la navigation client", async () => {
     const { body } = await render(Footer);
     expect(body.querySelector("footer")?.hasAttribute("data-astro-transition-persist")).toBe(true);
+  });
+});
+
+describe("TableOfContents", () => {
+  /** Les titres qu'Astro renverrait pour une fiche complète. */
+  const headings = [
+    { depth: 1, slug: "fiche", text: "Titre de la fiche" },
+    { depth: 2, slug: "contexte", text: "Contexte" },
+    { depth: 3, slug: "phase-1", text: "Phase 1" },
+    { depth: 4, slug: "note", text: "Note" },
+    { depth: 2, slug: "resultats", text: "Résultats" },
+  ];
+
+  /** Les libellés d'une des deux formes du sommaire. */
+  const labels = (body: HTMLElement, form: "compact" | "sidebar") =>
+    [...body.querySelectorAll(`[data-toc="${form}"] [data-toc-link]`)].map((link) =>
+      link.textContent?.trim(),
+    );
+
+  it("reprend les titres du corps, dans l'ordre", async () => {
+    const { body } = await render(TableOfContents, { props: { headings } });
+
+    expect(labels(body, "sidebar")).toEqual(["Contexte", "Phase 1", "Résultats"]);
+  });
+
+  it("dit la même chose sous les deux formes", async () => {
+    // Elles ne sont jamais visibles ensemble : une divergence donnerait deux
+    // sommaires différents selon la largeur de l'écran, sans que rien ne le
+    // signale. C'est ce que le `TocList` partagé doit rendre impossible.
+    const { body } = await render(TableOfContents, { props: { headings } });
+
+    expect(labels(body, "compact")).toEqual(labels(body, "sidebar"));
+  });
+
+  it("pointe sur les ancres du document, sans préfixe de base", async () => {
+    // Ce sont des ancres dans la page courante : `url()` y ajouterait
+    // « /portfolio/ » et ferait sortir de la fiche.
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const hrefs = [
+      ...body.querySelectorAll('[data-toc="sidebar"] [data-toc-link]'),
+    ].map((link) => link.getAttribute("href"));
+
+    expect(hrefs).toEqual(["#contexte", "#phase-1", "#resultats"]);
+  });
+
+  it("décale les sous-titres sous leur section", async () => {
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const [contexte, phase] = [
+      ...body.querySelectorAll('[data-toc="sidebar"] [data-toc-link]'),
+    ];
+
+    expect(contexte.getAttribute("class")).toContain("pl-4");
+    expect(phase.getAttribute("class")).toContain("pl-8");
+  });
+
+  it("nomme chaque forme pour les lecteurs d'écran", async () => {
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const compact = body.querySelector('[data-toc="compact"]')!;
+    const sidebar = body.querySelector('[data-toc="sidebar"]')!;
+    const label = body.querySelector(`#${sidebar.getAttribute("aria-labelledby")}`);
+
+    expect(compact.getAttribute("aria-label")).toBe("Sur cette page");
+    expect(label?.textContent?.trim()).toBe("Sur cette page");
+  });
+
+  it("n'expose qu'une forme à la fois", async () => {
+    // Les deux sont dans le document : sans ces bascules, un lecteur d'écran
+    // rencontrerait deux sommaires et le mot « Sommaire » s'afficherait en
+    // double.
+    const { body } = await render(TableOfContents, { props: { headings } });
+
+    expect(body.querySelector('[data-toc="compact"]')?.getAttribute("class")).toContain(
+      "lg:hidden",
+    );
+
+    const sidebar = body.querySelector('[data-toc="sidebar"]')?.getAttribute("class") ?? "";
+    expect(sidebar).toContain("hidden");
+    expect(sidebar).toContain("lg:block");
+  });
+
+  it("arrive replié sur les petits écrans", async () => {
+    // Huit entrées dépliées repousseraient le premier paragraphe sous la ligne
+    // de flottaison — c'est tout l'objet de cette forme.
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const details = body.querySelector("details")!;
+
+    expect(details.hasAttribute("open")).toBe(false);
+    expect(details.querySelector("summary")?.textContent?.trim()).toContain(
+      "Sur cette page",
+    );
+  });
+
+  it("ne s'affiche pas avec une seule entrée", async () => {
+    // Un sommaire d'un seul lien n'offre aucun choix et répète le titre de la
+    // fiche, affiché juste au-dessus.
+    const { body } = await render(TableOfContents, {
+      props: { headings: [headings[0], headings[1]] },
+    });
+
+    expect(body.querySelector("[data-toc]")).toBeNull();
+  });
+
+  it("ne s'affiche pas sur une fiche sans titre", async () => {
+    const { body } = await render(TableOfContents, { props: { headings: [] } });
+    expect(body.querySelector("[data-toc]")).toBeNull();
+  });
+
+  it("ajoute les classes reçues sans perdre les siennes", async () => {
+    const { body } = await render(TableOfContents, {
+      props: { headings, class: "lg:col-start-2" },
+    });
+
+    expect(body.firstElementChild?.getAttribute("class")).toContain("lg:col-start-2");
+  });
+
+  it("ne pose aucun filet permanent le long de la liste", async () => {
+    // Un filet continu ferait un cadre là où la page n'en a pas. La bordure
+    // n'est là que pour le survol ; l'entrée courante est marquée par la
+    // couleur du texte et par le curseur.
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const classes = body
+      .querySelector('[data-toc="sidebar"] [data-toc-link]')!
+      .getAttribute("class")!;
+
+    expect(classes).toContain("border-transparent");
+    expect(classes).toContain("aria-[current]:text-accent");
+  });
+
+  it("donne son curseur à chaque forme, invisible tant que rien ne le place", async () => {
+    // Le curseur est posé par le script. S'il n'arrive jamais, une hauteur nulle
+    // le laisse invisible plutôt que collé en haut de la liste.
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const cursors = [...body.querySelectorAll("[data-toc-cursor]")];
+
+    expect(cursors).toHaveLength(2);
+
+    for (const cursor of cursors) {
+      expect(cursor.getAttribute("style")).toContain("height: 0");
+      expect(cursor.getAttribute("aria-hidden")).toBe("true");
+      expect(cursor.closest("[data-toc-list]")).toBeTruthy();
+    }
+  });
+
+  it("garde de quoi coller", async () => {
+    // Assertion sur une classe, à contrecœur, parce que la panne est muette :
+    // étiré sur la hauteur de sa cellule de grille — l'alignement par défaut —
+    // le sommaire n'a aucune course et ne colle jamais, sans que rien ne bouge
+    // à l'écran. C'est exactement le bug qu'a eu la première version.
+    const { body } = await render(TableOfContents, { props: { headings } });
+    const classes = body.firstElementChild?.getAttribute("class") ?? "";
+
+    expect(classes).toContain("lg:sticky");
+    expect(classes).toContain("lg:self-start");
   });
 });
