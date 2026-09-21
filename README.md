@@ -14,10 +14,14 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
+npm test         # 356 tests
+npm run coverage # tests + rapport de couverture
 ```
 
 Node >= 22.12. Le site est publié sur <https://aravenad.github.io/portfolio/> à
-chaque push sur `main`, via le workflow `.github/workflows/deploy.yml`.
+chaque push sur `main`, via le workflow `.github/workflows/deploy.yml` — qui
+lance d'abord les tests et un `npm audit`, et ne construit rien si l'un des deux
+échoue.
 
 ## Structure
 
@@ -39,6 +43,7 @@ src/
 └── types/           interfaces partagées
 
 tools/               sources des images générées, non compilées
+tests/               Vitest : données, composants, pages
 ```
 
 ## Modifier le contenu
@@ -90,6 +95,24 @@ noir, matière métallique en haut de page, lettrage chromé. Elle tient dans
 `src/styles/global.css` (palette, calques, utilitaires), `src/assets/` (la
 matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Voir §5
 et §10 de la documentation technique.
+
+## Tests
+
+```sh
+npm test
+```
+
+Les composants sont rendus sans navigateur, par l'API Container d'Astro, et les
+assertions portent sur le DOM produit. La suite couvre les helpers, les données,
+les composants et les quatre routes ; elle tourne en moins de trois secondes.
+
+Elle sert surtout à vérifier ce qui ne se voit pas à la relecture : l'espace
+insécable des périodes du parcours, le contraste des couleurs de marque sur les
+tuiles, les métadonnées d'aperçu LinkedIn, et le marquage du lien de navigation
+courant. Un nouveau projet ou une nouvelle compétence est validé par les tests
+avant même le build. Voir §14 de la documentation technique.
+
+## Logos des compétences
 
 Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
 via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer un
