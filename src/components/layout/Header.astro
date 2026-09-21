@@ -295,8 +295,9 @@ const currentPath = normalize(Astro.url.pathname);
    * « la plus visible » est instable quand une section dépasse la hauteur de la
    * fenêtre.
    *
-   * Sans section observable (pages autres que l'accueil), rien ne se passe et
-   * l'état `aria-current="page"` rendu par le serveur reste seul en place.
+   * Sur une page sans section observable, seul l'`aria-current="page"` rendu par
+   * le serveur reste en place — mais encore faut-il effacer d'abord le
+   * surlignage de la page précédente : voir plus bas.
    */
   onEachPage((signal) => {
     const HEADER_HEIGHT = 64;
@@ -317,6 +318,20 @@ const currentPath = normalize(Astro.url.pathname);
     const sections = [...linkBySection.keys()]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => section !== null);
+
+    /*
+     * Repartir d'une ardoise nette à chaque navigation, AVANT de savoir s'il y a
+     * quelque chose à observer.
+     *
+     * Le header porte `transition:persist` : ses nœuds traversent l'échange de
+     * page. Un `data-active` posé au défilement de l'accueil survivait donc à
+     * l'arrivée sur /projects/, où l'absence de section empêchait toute mise à
+     * jour de l'effacer — deux liens se retrouvaient soulignés, celui de la
+     * section qu'on venait de quitter et celui de la page où l'on était.
+     */
+    for (const link of links) {
+      delete link.dataset.active;
+    }
 
     if (sections.length > 0) {
       sections.sort((a, b) =>
