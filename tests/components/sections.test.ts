@@ -145,6 +145,32 @@ describe("Contact", () => {
     expect(body.querySelector("section")?.getAttribute("id")).toBe("contact");
     expect(body.querySelector("#contact-title")).toBeTruthy();
   });
+
+  it("propose le CV au téléchargement, préfixé par la base du site", async () => {
+    // Sans `url()`, le lien viserait la racine du domaine et non /portfolio/.
+    const { body } = await render(Contact);
+    const cv = body.querySelector('a[href$=".pdf"]');
+
+    expect(cv?.textContent?.trim()).toBe("Télécharger mon CV");
+    expect(cv?.getAttribute("href")).toBe(
+      "/portfolio/cv-damien-aravena-bravo-public.pdf",
+    );
+    expect(cv?.getAttribute("download")).toBe("CV-Damien-Aravena-Bravo.pdf");
+  });
+
+  it("ne sert que la version publique du CV", async () => {
+    /*
+     * Le kit produit aussi un CV complet, qui porte le téléphone et l'adresse
+     * mail. Le dépôt est public et ce fichier est indexable : déposer l'autre à
+     * sa place publierait des coordonnées que le site n'affiche nulle part.
+     * Ce test ne peut pas lire le PDF, mais il verrouille le nom — et le nom
+     * est ce qui distingue les deux.
+     */
+    const { body } = await render(Contact);
+    const href = body.querySelector('a[href$=".pdf"]')?.getAttribute("href") ?? "";
+
+    expect(href).toContain("-public.pdf");
+  });
 });
 
 describe("ProjectsPreview", () => {
