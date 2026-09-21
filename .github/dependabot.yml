@@ -1,0 +1,19 @@
+# Deux écosystèmes à surveiller : les dépendances npm, et les actions du
+# workflow — épinglées par empreinte de commit, donc invisibles autrement.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Un seul lot par semaine pour les montées mineures : cinq pull requests
+      # ouvertes en permanence sur un portfolio ne seraient jamais relues.
+      mineures:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
