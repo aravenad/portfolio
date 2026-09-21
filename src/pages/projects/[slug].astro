@@ -5,6 +5,7 @@ import Arrow from "../../components/ui/Arrow.astro";
 import Badge from "../../components/ui/Badge.astro";
 import Breadcrumb from "../../components/ui/Breadcrumb.astro";
 import Container from "../../components/ui/Container.astro";
+import TableOfContents from "../../components/ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects, statusLabels } from "../../lib/projects";
 import { url } from "../../lib/url";
@@ -24,7 +25,7 @@ export const getStaticPaths = (async () => {
 
 const { project, previous, next } = Astro.props;
 const { title, summary, tags, status, team, year } = project.data;
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
 
 const meta = [team, year?.toString()].filter(Boolean);
 ---
@@ -69,8 +70,21 @@ const meta = [team, year?.toString()].filter(Boolean);
         </p>
       </header>
 
-      <div class="prose mt-14 max-w-3xl">
-        <Content />
+      {/*
+        Le sommaire occupe la marge droite à partir de `lg`, et passe au-dessus
+        du corps de texte en dessous — c'est aussi son ordre dans le document,
+        donc celui du clavier et des lecteurs d'écran : on sait ce que contient
+        la fiche avant d'y entrer.
+
+        Les deux blocs sont placés explicitement sur la même ligne : c'est la
+        hauteur du texte qui donne au sommaire collant sa course.
+      */}
+      <div class="mt-14 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
+        <TableOfContents headings={headings} class="lg:col-start-2 lg:row-start-1" />
+
+        <div class="prose mt-10 max-w-3xl lg:col-start-1 lg:row-start-1 lg:mt-0">
+          <Content />
+        </div>
       </div>
 
       {
