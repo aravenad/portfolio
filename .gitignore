@@ -36,3 +36,13 @@ DOCUMENTATION.md
 # rendus et de variantes, dont un GIF de comparaison de 19,6 Mo. Atelier, pas
 # livrable — seuls les fichiers retenus vivent dans src/assets/.
 tools/metal-study/
+
+# CV : la version complète porte le téléphone et l'adresse mail, que le site
+# n'affiche nulle part. Le dépôt est public et un commit est définitif — même
+# supprimé, le fichier resterait dans l'historique. Seule `cv-public.html` est
+# suivie, et c'est son export qui est servi depuis public/.
+tools/cv-kit/cv.html
+
+# sorties générées : PDF exportés et aperçus de contrôle
+output/
+tmp/
