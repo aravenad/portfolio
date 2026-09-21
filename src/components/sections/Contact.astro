@@ -3,6 +3,21 @@ import Button from "../ui/Button.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { site } from "../../data/site";
+import { url } from "../../lib/url";
+
+/*
+ * ⚠️ LA VERSION PUBLIQUE, ET ELLE SEULE. Le kit produit deux CV : celui-ci, et
+ * un complet qui porte le téléphone et l'adresse mail. Le dépôt est public et
+ * le fichier servi ici est indexable : le suffixe reste donc dans le nom du
+ * fichier, pour qu'on ne puisse pas déposer l'autre à sa place sans le voir.
+ *
+ * Le nom envoyé au lecteur, lui, n'a pas à porter cette précaution : `download`
+ * le rebaptise à l'enregistrement.
+ */
+const cv = {
+  href: url("/cv-damien-aravena-bravo-public.pdf"),
+  filename: "CV-Damien-Aravena-Bravo.pdf",
+};
 ---
 
 <Section id="contact" aria-labelledby="contact-title">
@@ -15,6 +30,11 @@ import { site } from "../../data/site";
 
   <div class="mt-12 flex flex-wrap gap-4">
     <Button href={`mailto:${site.email}`}>Envoyer un e-mail</Button>
+
+    <Button href={cv.href} download={cv.filename} variant="secondary">
+      Télécharger mon CV
+    </Button>
+
     <Button href={site.github} variant="secondary" rel="noreferrer">
       Voir mon GitHub
     </Button>
