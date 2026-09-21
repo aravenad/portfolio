@@ -4,13 +4,19 @@ import type { Skill } from "../types";
  * Langages et outils affichés en tuiles à côté du texte.
  *
  * `color` : couleur officielle de la marque, appliquée au logo au survol.
- * Trois marques ont un hex officiel noir ou très sombre (OpenJDK, JetBrains,
- * GitHub), illisible sur fond zinc : leur couleur est adaptée pour rester
- * visible, ce qui est signalé au cas par cas.
+ * Plusieurs marques ont un hex officiel noir ou très sombre, illisible sur le
+ * fond de la tuile : leur couleur est adaptée pour rester visible, ce qui est
+ * signalé au cas par cas.
+ *
+ * Le seuil est celui de la WCAG 1.4.11 pour un objet graphique — 3:1 sur le
+ * fond de la tuile, mesuré à #141415 — et il est vérifié par les tests. Une
+ * couleur en dessous n'allume pas le logo au survol : elle l'efface.
  */
 export const technicalSkills: Skill[] = [
   { label: "HTML", icon: "simple-icons:html5", color: "#E34F26" },
-  { label: "CSS", icon: "simple-icons:css", color: "#663399" },
+  // Le violet officiel du logo CSS (rebeccapurple, #663399) ne tient que 2,2:1
+  // sur la tuile : éclairci de 25 % vers le blanc, teinte inchangée.
+  { label: "CSS", icon: "simple-icons:css", color: "#8C66B3" },
   { label: "PHP", icon: "simple-icons:php", color: "#777BB4" },
   {
     label: "JavaScript",
@@ -18,7 +24,8 @@ export const technicalSkills: Skill[] = [
     icon: "simple-icons:javascript",
     color: "#F7DF1E",
   },
-  { label: "C++", icon: "simple-icons:cplusplus", color: "#00599C" },
+  // Même correction pour le bleu ISO C++ (#00599C), à 2,6:1.
+  { label: "C++", icon: "simple-icons:cplusplus", color: "#4083B5" },
   // Logo local (src/icons/java.svg) : simple-icons ne publie pas de logo Java,
   // la marque étant déposée. Celui-ci vient de devicon, sous licence MIT — voir
   // l'en-tête du fichier. Comme toutes les tasses Java, c'est un dessin au
