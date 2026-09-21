@@ -1,28 +1,47 @@
 <!doctype html>
 <meta charset="utf-8" />
 <!--
-  Source de public/og-v3.png. Rendue par Chrome headless plutôt qu'avec les
+  Source de public/og-v4.png. Rendue par Chrome headless plutôt qu'avec les
   primitives ImageMagick : la mise en page reprend telle quelle celle du site
-  (mêmes couleurs, même marbrage, même lettrage chromé), et le texte est composé
+  (mêmes couleurs, même matière, même lettrage chromé), et le texte est composé
   par un vrai moteur de rendu. C'est ce qui garantit que l'aperçu LinkedIn et la
   page d'accueil se ressemblent. Commande de rendu : §10 de DOCUMENTATION.md.
+
+  Le calque de matière transpose `body::before` de global.css : même image, même
+  `screen`, même opacité que l'accueil. Seule la largeur de référence change —
+  1200px, la largeur de la carte, là où le site prend `max(64rem, 100vw)`. Le
+  décalage vertical en découle par le même facteur -0.87, donc la carte cadre la
+  même portion du motif qu'un écran de 1200px : les plis y sont repris, pas
+  redessinés.
+
+  ⚠️ Le fondu est un dégradé CSS et non `chrome-fade.svg`, contrairement au site.
+  Rendue en `file://`, la page ne peut pas charger un masque SVG externe : Chrome
+  n'en fait pas un masque neutre, il masque tout, et la matière disparaît
+  entièrement sans le moindre avertissement. Un dégradé écrit sur place n'a pas
+  ce problème. Il est calé pour s'éteindre avant le titre : la matière occupe la
+  bande haute, le texte se pose sur du noir franc — c'est la composition de
+  l'accueil, où le hero commence sous les reflets.
+
+  Mesuré sur le rendu, contre le pixel le plus clair sous chaque bloc de texte :
+  titre 11,2:1 (7,6:1 sur le stop le plus sombre du lettrage chromé), sous-titre
+  6,7:1. La carte précédente, sur une matière beaucoup plus sombre, était à
+  13,8 / 9,4 / 6,5 : la nouvelle matière est bien plus lumineuse, et sans ce
+  fondu le sous-titre tombait à 2,6:1.
 -->
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
+    --chrome-width: 1200px;
+
     width: 1200px;
     height: 630px;
     overflow: hidden;
+    position: relative;
     background-color: #09090b;
-    background-image:
-      url("../src/assets/chrome.webp"),
-      radial-gradient(48rem 26rem at 50% -8rem, #cfe0f314, transparent 68%);
+    background-image: radial-gradient(48rem 26rem at 50% -8rem, #cfe0f314, transparent 68%);
     background-repeat: no-repeat;
     background-position: top center;
-    /* 2,2:1, le format natif de la matière : aucun étirement. */
-    background-size: 1200px 545px, auto;
-    background-blend-mode: screen, normal;
 
     display: flex;
     flex-direction: column;
@@ -34,6 +53,28 @@
     font: 400 46px/1.25 "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
+
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../src/assets/chrome-original-hq.webp");
+    background-repeat: no-repeat;
+    background-position: center calc(var(--chrome-width) * -0.87);
+    background-size: var(--chrome-width) auto;
+    mix-blend-mode: screen;
+    opacity: 0.7;
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 20%,
+      rgb(0 0 0 / 25%) 45%,
+      transparent 75%
+    );
+  }
+
+  /* Le texte repasse devant le calque, que `position: absolute` a détaché. */
+  .rule, h1, p { position: relative; }
 
   /* Le filet chromé, transposition du trait d'accent de l'ancienne version. */
   .rule {
@@ -59,7 +100,7 @@
   /*
    * Pas de grain ici, contrairement au site : un bruit par pixel sur 2400 px
    * fait passer le PNG de 0,1 à 1,2 Mo, et LinkedIn recompresse l'image de
-   * toute façon. Le marbrage seul suffit à casser l'aplat.
+   * toute façon. La matière seule suffit à casser l'aplat.
    */
 </style>
 

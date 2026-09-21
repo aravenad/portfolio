@@ -36,8 +36,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
  * Nom versionné : LinkedIn met en cache les images d'aperçu par URL et ne
  * retélécharge pas un fichier de même nom. Renommer à chaque refonte de
  * l'image est le seul moyen de forcer leur mise à jour.
+ *
+ * v4 : la carte reprend la matière photographique du fond. v3 montrait encore
+ * le marbrage procédural d'avant, et ne ressemblait plus à l'accueil. Les
+ * anciennes versions restent dans public/ : une publication déjà partagée
+ * continue de pointer vers le fichier qu'elle avait servi.
  */
-const ogImageURL = new URL(url("/og-v3.png"), Astro.site);
+const ogImageURL = new URL(url("/og-v4.png"), Astro.site);
 ---
 
 <!doctype html>
