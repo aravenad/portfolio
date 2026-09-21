@@ -56,6 +56,27 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       content="width=device-width, initial-scale=1"
     />
 
+    {/*
+      Ce qu'une politique de sécurité du contenu peut faire ici, et rien de plus.
+
+      GitHub Pages ne permet pas de poser d'en-têtes HTTP : il ne reste que la
+      balise `<meta>`, qui ignore `frame-ancestors`. Le CSP intégré d'Astro
+      (`security.csp`) hacherait les scripts et les styles, mais sa
+      documentation exclut explicitement `<ClientRouter />`, dont dépend toute
+      la navigation du site. Une directive `script-src` écrite à la main
+      devrait alors ouvrir `'unsafe-inline'`, ce qui ne protégerait plus de
+      rien.
+
+      Restent trois directives sans risque, qu'aucune page n'utilise et qui
+      ferment autant de portes : pas de `<base>` injecté qui détournerait tous
+      les liens relatifs, pas de greffon, et aucun formulaire — donc aucun
+      envoi de données possible vers l'extérieur.
+    */}
+    <meta
+      http-equiv="content-security-policy"
+      content="base-uri 'self'; object-src 'none'; form-action 'none'"
+    />
+
     <meta name="description" content={description} />
     <meta name="author" content={site.author} />
     <meta name="generator" content={Astro.generator} />
