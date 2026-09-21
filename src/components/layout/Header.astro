@@ -6,6 +6,25 @@ import { url } from "../../lib/url";
 /** Comparaison insensible au slash final ("/projects" et "/projects/"). */
 const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
 const currentPath = normalize(Astro.url.pathname);
+
+/**
+ * Deux états, deux valeurs ARIA.
+ *
+ * « page » pour la page elle-même. « true » — « l'élément courant d'un
+ * ensemble », sans en préciser la nature — pour la rubrique dont on consulte une
+ * sous-page : la fiche d'un projet, ou la deuxième page de la liste. Sans cela,
+ * « Projets » s'éteignait dès qu'on ouvrait un projet.
+ *
+ * Les liens à ancre ne peuvent jamais être des parents : « /portfolio/#skills »
+ * suivi d'une barre ne préfixe aucun chemin.
+ */
+const ariaCurrent = (href: string) => {
+  const path = normalize(url(href));
+
+  if (path === currentPath) return "page";
+  if (currentPath.startsWith(`${path}/`)) return "true";
+  return undefined;
+};
 ---
 
 {/*
@@ -69,10 +88,8 @@ const currentPath = normalize(Astro.url.pathname);
                 href={url(link.href)}
                 data-nav-link
                 data-sections={link.sections?.join(" ")}
-                aria-current={
-                  normalize(url(link.href)) === currentPath ? "page" : undefined
-                }
-                class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current=page]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
+                aria-current={ariaCurrent(link.href)}
+                class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
               >
                 {link.label}
               </a>
@@ -111,12 +128,12 @@ const currentPath = normalize(Astro.url.pathname);
    * Deux positions : sous le libellé une fois la barre horizontale, et calé sur
    * le bas du bouton tant que les liens sont des blocs empilés dans le menu.
    */
-  [data-nav-link][aria-current="page"],
+  [data-nav-link][aria-current],
   [data-nav-link][data-active] {
     position: relative;
   }
 
-  [data-nav-link][aria-current="page"]::after,
+  [data-nav-link][aria-current]::after,
   [data-nav-link][data-active]::after {
     background-image: linear-gradient(
       90deg,
@@ -132,7 +149,7 @@ const currentPath = normalize(Astro.url.pathname);
   }
 
   @media (width >= 40rem) {
-    [data-nav-link][aria-current="page"]::after,
+    [data-nav-link][aria-current]::after,
     [data-nav-link][data-active]::after {
       bottom: -0.5rem;
       inset-inline: 0;
@@ -196,10 +213,15 @@ const currentPath = normalize(Astro.url.pathname);
    * sur la page d'arrivée initiale — le filet chromé se retrouve sous le mauvais
    * lien, et un lecteur d'écran annonce la mauvaise page courante.
    *
-   * La comparaison reprend exactement celle du serveur : le `href` rendu, déjà
-   * préfixé de la base, débarrassé de son slash final. Les liens à ancre
+   * La comparaison reprend exactement celle du serveur, `ariaCurrent()` : le
+   * `href` rendu, déjà préfixé de la base, débarrassé de son slash final, avec
+   * la même distinction entre « page » et « true ». Les liens à ancre
    * (« /portfolio/#skills ») ne peuvent ainsi jamais correspondre à un chemin
    * seul, ce qui est voulu — le surlignage au défilement s'en charge.
+   *
+   * ⚠️ Cette logique existe en double, ici et dans le frontmatter. Le serveur
+   * peint le premier écran, ce script rattrape les suivants : aucun des deux ne
+   * peut appeler l'autre. Toute correction doit se faire aux deux endroits.
    */
   onEachPage(() => {
     const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
@@ -210,6 +232,8 @@ const currentPath = normalize(Astro.url.pathname);
 
       if (href === current) {
         link.setAttribute("aria-current", "page");
+      } else if (current.startsWith(`${href}/`)) {
+        link.setAttribute("aria-current", "true");
       } else {
         link.removeAttribute("aria-current");
       }
