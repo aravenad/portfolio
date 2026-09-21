@@ -3,8 +3,9 @@
 Portfolio personnel de Damien Aravena Bravo — étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique, sans JavaScript côté client hormis deux scripts de quelques
-centaines d'octets (navigation active au défilement, retour en haut de page).
+Site entièrement statique : dix pages HTML, une feuille de style, et ~21 Ko de
+JavaScript — le routeur de transitions d'Astro et une dizaine de petits
+comportements (menu, navigation active, apparition au défilement).
 
 ## Démarrer
 
@@ -15,13 +16,14 @@ npm run build    # génère ./dist
 npm run preview  # prévisualise le build
 ```
 
-Le site est publié sur <https://aravenad.github.io/portfolio/> à chaque push sur `main`,
-via le workflow `.github/workflows/deploy.yml`.
+Node >= 22.12. Le site est publié sur <https://aravenad.github.io/portfolio/> à
+chaque push sur `main`, via le workflow `.github/workflows/deploy.yml`.
 
 ## Structure
 
 ```text
 src/
+├── assets/          images traitées par Vite (la matière du fond)
 ├── components/
 │   ├── ui/          primitives réutilisables (Button, Card, Pagination…)
 │   ├── layout/      Header et Footer
@@ -29,10 +31,14 @@ src/
 │   └── ProjectCard.astro
 ├── content/projects/  une fiche Markdown par projet
 ├── data/            contenu éditable : site, compétences, parcours
-├── lib/             accès aux projets et pagination
+├── icons/           logos absents de Simple Icons, chargés par astro-icon
 ├── layouts/         BaseLayout
+├── lib/             accès aux projets, pagination, helpers
 ├── pages/           routes
-└── styles/          global.css (thème et rendu Markdown)
+├── styles/          global.css (thème et rendu Markdown)
+└── types/           interfaces partagées
+
+tools/               sources des images générées, non compilées
 ```
 
 ## Modifier le contenu
@@ -80,10 +86,13 @@ La couleur d'accent est définie une seule fois dans `src/styles/global.css` :
 ```
 
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
-noir, matière « métal liquide » en haut de page, lettrage chromé. Elle tient
-dans trois fichiers — `src/styles/global.css`, `tools/chrome.svg` (la matière)
-et `tools/og.html` (l'image d'aperçu). Voir §5 de la documentation technique.
+noir, matière métallique en haut de page, lettrage chromé. Elle tient dans
+`src/styles/global.css` (palette, calques, utilitaires), `src/assets/` (la
+matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Voir §5
+et §10 de la documentation technique.
 
 Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
-via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer le
-fichier dans `public/logos/` et renseigner `logo:` dans `src/data/career.ts`.
+via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer un
+SVG dans `src/icons/` et le référencer par son nom de fichier, sans préfixe — ou,
+pour un logo d'organisation du parcours, déposer le fichier dans `public/logos/`
+et renseigner `logo:` dans `src/data/career.ts`.
