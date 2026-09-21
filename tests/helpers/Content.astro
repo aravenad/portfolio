@@ -2,8 +2,18 @@
 /**
  * Corps de projet factice, rendu à la place du Markdown compilé quand les tests
  * remplacent `astro:content`.
+ *
+ * Les `id` sont ceux qu'Astro pose lui-même sur les titres : ils doivent
+ * correspondre aux `slug` de `contentModule.render`, sinon les ancres du
+ * sommaire pointeraient dans le vide — exactement ce que les tests vérifient.
  */
 ---
 
-<h2>Contexte</h2>
+<h2 id="contexte">Contexte</h2>
 <p>Corps du projet.</p>
+
+<h3 id="realisation">Réalisation</h3>
+<p>Détail de la réalisation.</p>
+
+<h2 id="resultats">Résultats</h2>
+<p>Ce que le projet a produit.</p>

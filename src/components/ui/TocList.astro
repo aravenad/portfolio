@@ -1,0 +1,55 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  /** Titres déjà filtrés par `getTocEntries`. */
+  entries: MarkdownHeading[];
+  class?: string;
+}
+
+const { entries, class: className } = Astro.props;
+---
+
+{/*
+  La liste du sommaire, rendue telle quelle par les deux formes du composant
+  parent. Elle existe à part pour qu'il n'y en ait qu'une à corriger : deux
+  copies divergentes afficheraient deux sommaires différents selon la largeur
+  de l'écran, et personne ne voit les deux à la fois.
+*/}
+<div data-toc-list class:list={["relative overflow-y-auto", className]}>
+  {/*
+    Le curseur de lecture. Il est posé hors de la liste — un `<ol>` n'admet que
+    des `<li>` — et positionné par le script : hauteur nulle tant qu'il n'a rien
+    à montrer, donc invisible si le JavaScript n'arrive jamais.
+
+    `z-10` le met au-dessus du filet gris que le survol pose au même endroit.
+  */}
+  <span
+    data-toc-cursor
+    aria-hidden="true"
+    style="height: 0"
+    class="pointer-events-none absolute left-0 z-10 w-px bg-accent"
+  ></span>
+
+  <ol>
+    {entries.map((heading) => (
+      <li>
+        {/*
+          Pas de filet permanent le long de la liste : il ferait un cadre là où
+          la page n'en a pas. La bordure n'est là que pour le survol — l'entrée
+          courante, elle, est marquée par le curseur et par la couleur du texte.
+        */}
+        <a
+          href={`#${heading.slug}`}
+          data-toc-link
+          class:list={[
+            "block border-l border-transparent py-2 text-sm leading-snug text-zinc-500 transition hover:border-zinc-700 hover:text-zinc-200 aria-[current]:text-accent",
+            heading.depth === 2 ? "pl-4" : "pl-8",
+          ]}
+        >
+          {heading.text}
+        </a>
+      </li>
+    ))}
+  </ol>
+</div>

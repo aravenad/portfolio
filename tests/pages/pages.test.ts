@@ -182,6 +182,65 @@ describe("fiche d'un projet", () => {
     expect(document.querySelector(".prose")?.textContent).toContain("Contexte");
   });
 
+  it("résume la fiche par un sommaire", async () => {
+    const props = await propsFor("projet-1");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props,
+    });
+    const links = [
+      ...document.querySelectorAll('[data-toc="sidebar"] [data-toc-link]'),
+    ];
+
+    expect(links.map((link) => link.textContent?.trim())).toEqual([
+      "Contexte",
+      "Réalisation",
+      "Résultats",
+    ]);
+  });
+
+  it("place le sommaire avant le corps du texte", async () => {
+    // Son ordre dans le document est aussi celui du clavier et des lecteurs
+    // d'écran : on doit savoir ce que contient la fiche avant d'y entrer, même
+    // quand la mise en page le renvoie dans la marge droite.
+    const props = await propsFor("projet-1");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props,
+    });
+
+    const prose = document.querySelector(".prose")!;
+    const order = [...prose.parentElement!.children];
+    const toc = order.find((node) => node.querySelector("[data-toc]"))!;
+
+    expect(order.indexOf(toc)).toBeLessThan(order.indexOf(prose));
+  });
+
+  it("ancre chaque entrée du sommaire sur un titre du corps", async () => {
+    // Le lien le plus fragile du dispositif : les ancres viennent des `slug`
+    // rendus par Astro, les cibles des `id` qu'il pose sur les titres. Que les
+    // deux divergent et le sommaire ne mène plus nulle part, sans rien casser
+    // d'autre — donc sans que rien ne le signale.
+    const props = await propsFor("projet-1");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props,
+    });
+    const prose = document.querySelector(".prose")!;
+
+    for (const link of document.querySelectorAll("[data-toc-link]")) {
+      // Les deux formes du sommaire sont parcourues : chacune doit mener au
+      // même endroit, et aucune ne doit rester en arrière lors d'un renommage.
+      const id = (link.getAttribute("href") ?? "").slice(1);
+
+      expect(id, "une entrée du sommaire sans ancre").not.toBe("");
+      expect(
+        prose.querySelector(`[id="${id}"]`),
+        `aucun titre #${id} dans le corps de la fiche`,
+      ).toBeTruthy();
+    }
+  });
+
   it("relie chaque projet à ses voisins", async () => {
     const props = await propsFor("projet-4");
     const { document } = await renderPage(ProjectDetail, {
