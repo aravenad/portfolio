@@ -2,6 +2,8 @@
 dist/
 # generated types
 .astro/
+# rapport de couverture des tests
+coverage/
 
 # dependencies
 node_modules/
