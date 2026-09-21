@@ -37,12 +37,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
  * retélécharge pas un fichier de même nom. Renommer à chaque refonte de
  * l'image est le seul moyen de forcer leur mise à jour.
  *
- * v4 : la carte reprend la matière photographique du fond. v3 montrait encore
- * le marbrage procédural d'avant, et ne ressemblait plus à l'accueil. Les
- * anciennes versions restent dans public/ : une publication déjà partagée
- * continue de pointer vers le fichier qu'elle avait servi.
+ * v5 : la carte reprend la matière photographique du fond. v3 montrait encore
+ * le marbrage procédural d'avant, et ne ressemblait plus à l'accueil. La v4,
+ * elle, laissait la matière passer derrière le texte : réduite par LinkedIn à
+ * ~520px puis réencodée en JPEG, elle paraissait floue. Elle n'a jamais servi
+ * ailleurs que dans l'inspecteur et n'est pas conservée. v3 reste dans public/ :
+ * les publications déjà partagées continuent de pointer dessus.
  */
-const ogImageURL = new URL(url("/og-v4.png"), Astro.site);
+const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
 ---
 
 <!doctype html>
