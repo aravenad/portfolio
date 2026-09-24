@@ -1,30 +1,13 @@
 ---
 import Container from "../ui/Container.astro";
 import { navLinks, site } from "../../data/site";
+import { ariaCurrentFor } from "../../lib/nav";
 import { url } from "../../lib/url";
 
-/** Comparaison insensible au slash final ("/projects" et "/projects/"). */
-const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
-const currentPath = normalize(Astro.url.pathname);
+const currentPath = Astro.url.pathname;
 
-/**
- * Deux états, deux valeurs ARIA.
- *
- * « page » pour la page elle-même. « true » — « l'élément courant d'un
- * ensemble », sans en préciser la nature — pour la rubrique dont on consulte une
- * sous-page : la fiche d'un projet, ou la deuxième page de la liste. Sans cela,
- * « Projets » s'éteignait dès qu'on ouvrait un projet.
- *
- * Les liens à ancre ne peuvent jamais être des parents : « /portfolio/#skills »
- * suivi d'une barre ne préfixe aucun chemin.
- */
-const ariaCurrent = (href: string) => {
-  const path = normalize(url(href));
-
-  if (path === currentPath) return "page";
-  if (currentPath.startsWith(`${path}/`)) return "true";
-  return undefined;
-};
+/** Règle partagée avec le script de resynchronisation : voir src/lib/nav.ts. */
+const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
 ---
 
 {/*
@@ -342,6 +325,7 @@ const ariaCurrent = (href: string) => {
 
 <script>
   import { onEachPage } from "../../lib/enhance";
+  import { ariaCurrentFor } from "../../lib/nav";
 
   /**
    * Resynchronise le lien de la page courante après chaque navigation.
@@ -351,36 +335,24 @@ const ariaCurrent = (href: string) => {
    * sur la page d'arrivée initiale — le filet chromé se retrouve sous le mauvais
    * lien, et un lecteur d'écran annonce la mauvaise page courante.
    *
-   * La comparaison reprend exactement celle du serveur, `ariaCurrent()` : le
-   * `href` rendu, déjà préfixé de la base, débarrassé de son slash final, avec
-   * la même distinction entre « page » et « true ». Les liens à ancre
+   * La règle est celle du rendu serveur, `ariaCurrentFor` (src/lib/nav.ts),
+   * appliquée au `href` rendu, déjà préfixé de la base. Les liens à ancre
    * (« /portfolio/#skills ») ne peuvent ainsi jamais correspondre à un chemin
    * seul, ce qui est voulu — le surlignage au défilement s'en charge.
-   *
-   * ⚠️ Cette logique existe en double, ici et dans le frontmatter. Le serveur
-   * peint le premier écran, ce script rattrape les suivants : aucun des deux ne
-   * peut appeler l'autre. Toute correction doit se faire aux deux endroits.
    */
   onEachPage(() => {
-    const normalize = (path: string) => path.replace(/\/+$/, "") || "/";
-    const current = normalize(window.location.pathname);
-
     for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]")) {
-      const href = normalize(link.getAttribute("href") ?? "");
+      const value = ariaCurrentFor(link.getAttribute("href") ?? "", window.location.pathname);
 
-      if (href === current) {
-        link.setAttribute("aria-current", "page");
-      } else if (current.startsWith(`${href}/`)) {
-        link.setAttribute("aria-current", "true");
-      } else {
-        link.removeAttribute("aria-current");
-      }
+      if (value) link.setAttribute("aria-current", value);
+      else link.removeAttribute("aria-current");
     }
   });
 </script>
 
 <script>
   import { onEachPage } from "../../lib/enhance";
+  import { barReturnThreshold, initialBarScrolled, nextBarScrolled } from "../../lib/nav";
 
   /**
    * Bascule la barre entre ses deux états selon le défilement.
@@ -402,10 +374,6 @@ const ariaCurrent = (href: string) => {
    * l'autre, et le voir se détendre en arrivant en haut d'une nouvelle page est
    * précisément l'effet voulu.
    */
-  const DOWN_THRESHOLD = 8;
-  const RETURN_MAX = 200;
-  /** Hauteur à laquelle le texte de la barre se tient : du 16e au 48e pixel. */
-  const BAR_TEXT_BOTTOM = 48;
   let firstPage = true;
 
   /** Haut du premier texte de la page, en coordonnées du document. */
@@ -433,26 +401,19 @@ const ariaCurrent = (href: string) => {
 
     if (!header) return;
 
-    const returnAt = Math.max(
-      DOWN_THRESHOLD,
-      Math.min(RETURN_MAX, firstTextTop() - BAR_TEXT_BOTTOM),
-    );
+    const returnAt = barReturnThreshold(firstTextTop());
     let lastY = window.scrollY;
 
     const set = (scrolled: boolean) => header.toggleAttribute("data-scrolled", scrolled);
 
     const update = () => {
       const y = window.scrollY;
-
-      if (y <= DOWN_THRESHOLD) set(false);
-      else if (y > lastY) set(true);
-      else if (y < lastY && y < returnAt) set(false);
-
+      set(nextBarScrolled({ scrolled: header.hasAttribute("data-scrolled"), y, lastY, returnAt }));
       lastY = y;
     };
 
     // Sans sens de défilement connu (chargement, navigation) : seul le seuil bas compte.
-    const sync = () => set(window.scrollY > DOWN_THRESHOLD);
+    const sync = () => set(initialBarScrolled(window.scrollY));
 
     if (firstPage) {
       firstPage = false;
@@ -533,6 +494,7 @@ const ariaCurrent = (href: string) => {
 
 <script>
   import { onEachPage } from "../../lib/enhance";
+  import { activeSectionIndex, readingLine } from "../../lib/nav";
   /**
    * Surligne le lien de la dernière section dont le haut a franchi une ligne de
    * lecture placée au premier tiers de la fenêtre, sous le header collant.
@@ -554,9 +516,6 @@ const ariaCurrent = (href: string) => {
    * surlignage de la page précédente : voir plus bas.
    */
   onEachPage((signal) => {
-    const HEADER_HEIGHT = 64;
-    const READING_LINE = 0.3;
-
     const links = [
       ...document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"),
     ];
@@ -593,29 +552,17 @@ const ariaCurrent = (href: string) => {
       );
 
       const update = () => {
-        const line =
-          HEADER_HEIGHT + (window.innerHeight - HEADER_HEIGHT) * READING_LINE;
-
         const atBottom =
           window.innerHeight + window.scrollY >=
           document.documentElement.scrollHeight - 1;
 
-        let current = atBottom ? sections[sections.length - 1] : undefined;
+        const index = activeSectionIndex(
+          sections.map((section) => section.getBoundingClientRect().top),
+          readingLine(window.innerHeight),
+          atBottom,
+        );
 
-        if (!current) {
-          let closest = -Infinity;
-
-          for (const section of sections) {
-            const { top } = section.getBoundingClientRect();
-
-            if (top <= line && top > closest) {
-              closest = top;
-              current = section;
-            }
-          }
-        }
-
-        const active = current ? linkBySection.get(current.id) : undefined;
+        const active = index >= 0 ? linkBySection.get(sections[index].id) : undefined;
 
         for (const link of links) {
           if (link === active) {
