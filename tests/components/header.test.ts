@@ -69,6 +69,16 @@ describe("Header", () => {
     expect(home?.textContent?.trim()).toBe(site.name);
   });
 
+  it("part dans son état « haut de page » : nu et élargi", async () => {
+    // C'est le script qui pose `data-scrolled` au défilement. Le HTML servi
+    // doit donc décrire le haut de page, celui de toute page ouverte par un lien.
+    const { document } = await render(Header, at("/portfolio/"));
+
+    expect(document.querySelector("header")?.hasAttribute("data-scrolled")).toBe(false);
+    expect(document.querySelector("header .header-bar")).toBeTruthy();
+    expect(document.querySelector("header .header-backdrop")).toBeTruthy();
+  });
+
   it("survit à la navigation client sans rejouer son animation", async () => {
     // `transition:persist` : sans lui, le header clignote à chaque page.
     const { document } = await render(Header, at("/portfolio/"));
