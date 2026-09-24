@@ -28,7 +28,7 @@ l'archivage des publications.
 
 Nous avons commencé par écrire les lexiques à la main. Chaque lexique liste les
 mots caractéristiques d'une catégorie, associés à un poids traduisant leur
-importance — le lexique « sports » contenait par exemple « match » ou
+importance. Le lexique « sports » contenait par exemple « match » ou
 « joueur ». Le programme charge ces lexiques en mémoire, calcule un score par
 dépêche à partir des mots qu'elle contient, et lui attribue la catégorie au
 score le plus élevé.

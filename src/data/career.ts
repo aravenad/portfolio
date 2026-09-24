@@ -52,10 +52,10 @@ export const experiences: CareerEntry[] = [
         contract: "CDI",
         period: "Septembre 2025 – janvier 2026",
         description:
-          "Gestion du flux entrant de matériel informatique chez Microstore (Green IT) — PC, tablettes, téléphones, accessoires — et suivi des stocks pour l'ensemble des clients.",
+          "Gestion du flux entrant de matériel informatique chez Microstore (Green IT) : PC, tablettes, téléphones et accessoires. Suivi des stocks pour l'ensemble des clients.",
       },
       {
-        title: "Assistant administratif — Technicien réception",
+        title: "Assistant administratif et technicien réception",
         contract: "CDD",
         period: "Juillet – août 2025",
       },
@@ -73,7 +73,7 @@ export const experiences: CareerEntry[] = [
   {
     title: "Stage d'observation",
     organization:
-      "Laboratoire de Linguistique et Didactique des Langues Étrangères et Maternelles — UGA",
+      "Laboratoire de Linguistique et Didactique des Langues Étrangères et Maternelles (UGA)",
     location: "Grenoble",
     period: "Janvier 2017",
     description:
@@ -85,7 +85,7 @@ export const experiences: CareerEntry[] = [
 export const education: CareerEntry[] = [
   {
     title: "BUT Informatique",
-    organization: "IUT2 — Université Grenoble Alpes",
+    organization: "IUT2 (Université Grenoble Alpes)",
     location: "Grenoble",
     period: "Septembre 2023 – juin 2028",
     description: "Année de césure de septembre 2025 à juillet 2026.",

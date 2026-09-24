@@ -26,7 +26,7 @@ contraintes et des risques.
 
 ## Réalisation
 
-### Phase 1 — Analyse et conception
+### Phase 1 : analyse et conception
 
 Collecte des besoins auprès des utilisateurs cibles (organisateurs de
 festivals, gérants de stands), puis distinction des besoins fonctionnels et non
@@ -34,7 +34,7 @@ fonctionnels. Nous avons formalisé les interactions par des diagrammes de cas
 d'utilisation, chacun décrit en détail, avant de définir l'architecture
 logicielle en UML : diagrammes de classes, de séquence et d'objets.
 
-### Phase 2 — Développement
+### Phase 2 : développement
 
 Implémentation des fonctionnalités principales, puis tests unitaires et
 fonctionnels pour vérifier la conformité aux spécifications. Le suivi des

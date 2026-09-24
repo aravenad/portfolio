@@ -13,7 +13,7 @@ featured: true
 
 Projet d'équipe intitulé « Recueil de besoins / Découverte de l'environnement
 économique et écologique ». Il s'agissait de créer un site web institutionnel
-présentant une entreprise du numérique — Capgemini — à un public d'élèves de
+présentant Capgemini, entreprise du numérique, à un public d'élèves de
 troisième, en analysant au passage sa transition numérique et écologique.
 
 ## Objectifs
@@ -28,7 +28,7 @@ troisième, en analysant au passage sa transition numérique et écologique.
 
 ## Réalisation
 
-### Phase 1 — Recueil des besoins
+### Phase 1 : recueil des besoins
 
 Recherches approfondies sur Capgemini à partir de sources variées, pour obtenir
 une vision complète et objective. Nous en avons tiré une fiche de présentation
@@ -37,7 +37,7 @@ de façon accessible au public visé. L'analyse a ensuite porté sur les
 initiatives de l'entreprise en matière de développement durable et
 d'écoconception.
 
-### Phase 2 — Conception et réalisation
+### Phase 2 : conception et réalisation
 
 Proposition d'une architecture de site à partir des informations recueillies,
 puis maquettage sur Whimsical en fonction des besoins exprimés par le client.
