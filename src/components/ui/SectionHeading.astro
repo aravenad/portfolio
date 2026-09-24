@@ -24,9 +24,12 @@ const {
   chrome = false,
 } = Astro.props;
 
-/* Le titre est découpé pour isoler son dernier mot. */
+/*
+ * Le titre est découpé pour isoler son dernier mot. `split` renvoie toujours au
+ * moins un élément, même pour une chaîne vide : `pop()` ne peut pas échouer.
+ */
 const words = title.trim().split(/\s+/);
-const lastWord = words.pop() ?? title;
+const lastWord = words.pop()!;
 const leading = words.join(" ");
 ---
 

@@ -156,6 +156,12 @@ describe("SectionHeading", () => {
     expect(body.querySelector(".text-chrome")?.textContent?.trim()).toBe("Projets");
   });
 
+  it("supporte un titre vide sans rien casser", async () => {
+    // `split` renvoie [""] : le dernier mot est vide, jamais absent.
+    const { body } = await render(SectionHeading, { props: { title: "", chrome: true } });
+    expect(body.querySelector(".text-chrome")?.textContent).toBe("");
+  });
+
   it("laisse le titre nu sans `chrome`", async () => {
     const { body } = await render(SectionHeading, { props: { title: "Mes projets" } });
     expect(body.querySelector(".text-chrome")).toBeNull();
