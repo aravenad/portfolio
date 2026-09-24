@@ -12,37 +12,16 @@ import Arrow from "./Arrow.astro";
 </button>
 
 <script>
+  import { wireBackToTop } from "../../lib/back-to-top";
   import { onEachPage } from "../../lib/enhance";
 
   /**
-   * Le bouton n'apparaît qu'une fois la première fenêtre dépassée : plus haut,
-   * le haut de page est déjà à portée de molette.
+   * Visibilité et retour en haut : voir src/lib/back-to-top.ts, où ils sont
+   * testés. Il ne reste ici qu'à trouver le bouton.
    */
   onEachPage((signal) => {
     const button = document.querySelector<HTMLButtonElement>("[data-back-to-top]");
 
-    if (!button) return;
-
-    const update = () => {
-      if (window.scrollY > window.innerHeight) {
-        button.dataset.visible = "";
-      } else {
-        delete button.dataset.visible;
-      }
-    };
-
-    button.addEventListener(
-      "click",
-      () => {
-        // Sans `behavior`, le défilement suit le `scroll-behavior` de la feuille
-        // de style, qui respecte déjà `prefers-reduced-motion`.
-        window.scrollTo({ top: 0 });
-      },
-      { signal },
-    );
-
-    update();
-    window.addEventListener("scroll", update, { passive: true, signal });
-    window.addEventListener("resize", update, { signal });
+    if (button) wireBackToTop(button, window, signal);
   });
 </script>

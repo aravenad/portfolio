@@ -14,7 +14,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 472 tests
+npm test         # 481 tests
 npm run coverage # tests + rapport de couverture
 ```
 
