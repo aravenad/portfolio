@@ -47,6 +47,9 @@ tools/cv-kit/cv.html
 # version publique est explicitement suivie.
 tools/cv-kit/cv-*.html
 !tools/cv-kit/cv-public.html
+# Journal de travail du CV : il décrit aussi les candidatures hors portfolio
+# (emplois à temps partiel, disponibilités), sans rapport avec ce dépôt public.
+tools/cv-kit/CV-NOTES.md
 
 # sorties générées : PDF exportés et aperçus de contrôle
 output/
