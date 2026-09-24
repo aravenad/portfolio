@@ -42,6 +42,11 @@ tools/metal-study/
 # supprimé, le fichier resterait dans l'historique. Seule `cv-public.html` est
 # suivie, et c'est son export qui est servi depuis public/.
 tools/cv-kit/cv.html
+# Même raison pour les variantes de candidature, qui portent elles aussi le
+# téléphone : toute nouvelle `cv-*.html` est écartée par défaut, et seule la
+# version publique est explicitement suivie.
+tools/cv-kit/cv-*.html
+!tools/cv-kit/cv-public.html
 
 # sorties générées : PDF exportés et aperçus de contrôle
 output/
