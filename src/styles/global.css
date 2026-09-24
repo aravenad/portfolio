@@ -46,6 +46,14 @@ body {
  * plus noire que le fond zinc. Un masque à décroissance gaussienne, légèrement
  * irrégulier, évite une ligne horizontale dans les derniers reflets. Il ne
  * déforme que le fondu, jamais la matière. Il s'éteint avant le bord du calque.
+ *
+ * ⚠️ Ce masque est une IMAGE, pas le SVG dont il est tiré. Le SVG
+ * (tools/chrome-fade/) obtient son bord irrégulier par deux filtres,
+ * `feTurbulence` et `feDisplacementMap`, et un SVG est redessiné à chaque palier
+ * de zoom : au pavé tactile, Firefox recalculait ces filtres sur tout le haut de
+ * page à chaque image, et fond comme contenu saccadaient. Rastérisé une fois
+ * pour toutes, il n'est plus que mis à l'échelle. Pour le retoucher : modifier
+ * le SVG, puis `node tools/chrome-fade/render.mjs`.
  */
 body::before {
   --chrome-width: max(64rem, 100vw);
@@ -61,7 +69,7 @@ body::before {
   background-size: var(--chrome-width) auto;
   mix-blend-mode: screen;
   opacity: 0.18;
-  mask-image: url("../assets/chrome-fade.svg");
+  mask-image: url("../assets/chrome-fade.webp");
   mask-mode: alpha;
   mask-repeat: no-repeat;
   mask-size: 100% 64rem;
