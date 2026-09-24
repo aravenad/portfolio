@@ -30,6 +30,13 @@ WebP sans perte, à 1600 × 1024.
 ## Vérifié
 
 Rendu sur la page d'accueil en 375, 1440 et 1920 px, le masque en image ne
-diffère du masque SVG que sur 25 à 81 pixels de plus de 2/255, tous dans les
-cinq premières lignes de la page, sous la barre de navigation. Une version
-réduite de moitié en faisait dix à vingt fois plus.
+différait du masque SVG que sur 25 à 81 pixels de plus de 2/255, tous dans les
+cinq premières lignes de la page. Une version réduite de moitié en faisait dix à
+vingt fois plus.
+
+Ces cinq lignes étaient justement un défaut du SVG : le filtre de déformation va
+chercher des pixels jusqu'à 32 unités plus loin, et au-dessus d'un rectangle qui
+commençait à 0 il ne trouvait que du vide, qui perçait des encoches noires le
+long du haut de la page. Le rectangle filtré part désormais 80 unités plus haut,
+avec un dégradé ancré sur le viewBox (`userSpaceOnUse`) : la bande ajoutée reste
+opaque, et seules ces cinq lignes ont changé.

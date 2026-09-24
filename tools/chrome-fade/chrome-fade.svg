@@ -3,7 +3,7 @@
        Low amplitude displacement breaks up horizontal bands without touching
        the source image or blurring its metallic detail. -->
   <defs>
-    <linearGradient id="falloff" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="falloff" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1024">
       <stop offset="0.0%" stop-color="white" stop-opacity="1.000000"/>
       <stop offset="2.5%" stop-color="white" stop-opacity="0.987024"/>
       <stop offset="5.0%" stop-color="white" stop-opacity="0.949096"/>
@@ -51,6 +51,10 @@
       <feDisplacementMap in="SourceGraphic" in2="warp" scale="64" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
-  <rect x="-160" y="-80" width="1920" height="80" fill="white"/>
-  <rect x="-160" width="1920" height="1024" fill="url(#falloff)" filter="url(#organic)"/>
+  <!-- The filtered rect starts 80 units above the viewBox. The displacement
+       samples up to 32 units away: from a rect starting at 0 it pulled empty
+       space into the top rows and punched black notches along the top of the
+       page. The gradient is anchored to the viewBox (userSpaceOnUse), so the
+       extra band simply stays opaque and the falloff itself is unchanged. -->
+  <rect x="-160" y="-80" width="1920" height="1104" fill="url(#falloff)" filter="url(#organic)"/>
 </svg>
