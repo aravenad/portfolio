@@ -146,3 +146,54 @@ export function groupByAnchor<T>(
 
   return groups;
 }
+
+/**
+ * Ancre visée par un lien du sommaire, à partir de son `hash`.
+ *
+ * ⚠️ Le navigateur percent-encode le `hash`, alors que les ancres d'Astro
+ * gardent les accents des titres français : sans décodage, « #présentation »
+ * devient « #pr%C3%A9sentation » et ne correspond plus à aucun titre.
+ */
+export function anchorFromHash(hash: string): string {
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    // Un « % » isolé dans une ancre écrite à la main : on la garde telle quelle.
+    return raw;
+  }
+}
+
+/**
+ * Bas de la section `active`, dans la fenêtre : le haut du titre suivant, ou,
+ * pour la dernière section, le bas du corps de la fiche.
+ *
+ * Sans cette fin, la dernière section n'aurait pas de longueur et le curseur
+ * s'y figerait dès le premier pixel. À défaut de corps mesurable, elle se
+ * termine où elle commence — le curseur reste alors sur son entrée.
+ */
+export function sectionEnd(tops: number[], active: number, bodyBottom?: number): number {
+  return tops[active + 1] ?? bodyBottom ?? tops[active];
+}
+
+/**
+ * Position et hauteur du curseur de lecture, glissé de l'entrée courante vers
+ * la suivante selon la fraction de section parcourue.
+ *
+ * À la fraction 1, il est exactement sur l'entrée suivante, qui devient
+ * courante au même instant : le passage est continu. La dernière section n'a
+ * personne vers qui glisser — sans `next`, le curseur reste sur son entrée.
+ */
+export function cursorBox(
+  current: { top: number; height: number },
+  next: { top: number; height: number } | undefined,
+  ratio: number,
+): { top: number; height: number } {
+  const target = next ?? current;
+
+  return {
+    top: lerp(current.top, target.top, ratio),
+    height: lerp(current.height, target.height, ratio),
+  };
+}

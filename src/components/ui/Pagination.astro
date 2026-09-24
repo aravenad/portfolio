@@ -153,6 +153,7 @@ const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
 
 <script>
   import { onEachPage } from "../../lib/enhance";
+  import { rememberPage, slideOffset, slideOrigin } from "../../lib/pagination";
 
   /**
    * Fait glisser le calque actif depuis la page que l'on vient de quitter.
@@ -170,43 +171,34 @@ const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
    * Tout est optionnel : sans `sessionStorage` (navigation privée), sans bouton
    * correspondant à l'ancienne page (l'ellipsis a bougé) ou sous
    * `prefers-reduced-motion`, le calque est simplement déjà en place.
+   *
+   * Les décisions sont dans src/lib/pagination.ts, où elles sont testées ; il
+   * ne reste ici que les mesures et l'animation.
    */
   onEachPage(() => {
     const nav = document.querySelector<HTMLElement>("[data-pagination]");
     const indicator = nav?.querySelector<HTMLElement>("[data-page-indicator]");
     const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
 
-    if (nav && indicator && current) {
-      const KEY = "pagination-from";
-      const page = current.dataset.page;
+    if (!nav || !indicator || !current) return;
 
-      let from: string | null = null;
+    const page = current.dataset.page;
+    const from = slideOrigin(rememberPage(() => sessionStorage, page), page);
+    const origin = from
+      ? nav.querySelector<HTMLElement>(`[data-page="${CSS.escape(from)}"]`)
+      : null;
 
-      try {
-        from = sessionStorage.getItem(KEY);
-        if (page) sessionStorage.setItem(KEY, page);
-      } catch {
-        /* Stockage indisponible : on se passe du glissement. */
-      }
+    const dx = slideOffset({
+      motionOk: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      originLeft: origin?.getBoundingClientRect().left,
+      currentLeft: current.getBoundingClientRect().left,
+    });
 
-      const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const origin =
-        from && from !== page
-          ? nav.querySelector<HTMLElement>(`[data-page="${CSS.escape(from)}"]`)
-          : null;
-
-      if (motionOk && origin && typeof indicator.animate === "function") {
-        const dx =
-          origin.getBoundingClientRect().left -
-          current.getBoundingClientRect().left;
-
-        if (dx !== 0) {
-          indicator.animate(
-            [{ transform: `translateX(${dx}px)` }, { transform: "none" }],
-            { duration: 250, easing: "cubic-bezier(0.34, 1.12, 0.64, 1)" },
-          );
-        }
-      }
+    if (dx !== null && typeof indicator.animate === "function") {
+      indicator.animate(
+        [{ transform: `translateX(${dx}px)` }, { transform: "none" }],
+        { duration: 250, easing: "cubic-bezier(0.34, 1.12, 0.64, 1)" },
+      );
     }
   });
 </script>
