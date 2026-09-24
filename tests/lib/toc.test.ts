@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   HEADER_HEIGHT,
   activeHeadingIndex,
+  anchorFromHash,
+  cursorBox,
   getTocEntries,
   groupByAnchor,
   lerp,
   readingLine,
+  sectionEnd,
   sectionRatio,
 } from "../../src/lib/toc";
 
@@ -318,3 +321,71 @@ describe("groupByAnchor", () => {
     expect(groupByAnchor([], () => "")).toEqual(new Map());
   });
 });
+
+describe("anchorFromHash", () => {
+  it("retrouve une ancre accentuée, que le navigateur percent-encode", () => {
+    // `new URL("#présentation", …).hash` vaut « #pr%C3%A9sentation ».
+    expect(anchorFromHash("#pr%C3%A9sentation")).toBe("présentation");
+  });
+
+  it("laisse intacte une ancre sans caractère spécial", () => {
+    expect(anchorFromHash("#phase-1--analyse")).toBe("phase-1--analyse");
+  });
+
+  it("accepte une ancre donnée sans son dièse", () => {
+    expect(anchorFromHash("r%C3%A9sultats")).toBe("résultats");
+  });
+
+  it("ne plante pas sur un « % » isolé", () => {
+    // decodeURIComponent lèverait une URIError et couperait tout le surlignage.
+    expect(anchorFromHash("#100%")).toBe("100%");
+  });
+
+  it("renvoie une chaîne vide pour un hash vide", () => {
+    expect(anchorFromHash("")).toBe("");
+    expect(anchorFromHash("#")).toBe("");
+  });
+});
+
+describe("sectionEnd", () => {
+  const tops = [100, 400, 900];
+
+  it("termine une section au titre suivant", () => {
+    expect(sectionEnd(tops, 0, 1500)).toBe(400);
+    expect(sectionEnd(tops, 1, 1500)).toBe(900);
+  });
+
+  it("termine la dernière section au bas du corps de la fiche", () => {
+    expect(sectionEnd(tops, 2, 1500)).toBe(1500);
+  });
+
+  it("donne une longueur nulle à la dernière section sans corps mesurable", () => {
+    // `sectionRatio` renvoie alors 0 : le curseur reste sur son entrée.
+    expect(sectionEnd(tops, 2)).toBe(900);
+    expect(sectionRatio(900, sectionEnd(tops, 2), 1200)).toBe(0);
+  });
+});
+
+describe("cursorBox", () => {
+  const current = { top: 0, height: 20 };
+  const next = { top: 40, height: 60 };
+
+  it("se pose sur l'entrée courante en début de section", () => {
+    expect(cursorBox(current, next, 0)).toEqual(current);
+  });
+
+  it("arrive exactement sur l'entrée suivante en fin de section", () => {
+    // C'est ce qui rend le passage continu : l'entrée suivante devient
+    // courante à l'instant où le curseur l'atteint.
+    expect(cursorBox(current, next, 1)).toEqual(next);
+  });
+
+  it("interpole la position et la hauteur ensemble", () => {
+    expect(cursorBox(current, next, 0.5)).toEqual({ top: 20, height: 40 });
+  });
+
+  it("reste sur la dernière entrée, qui n'a personne vers qui glisser", () => {
+    expect(cursorBox(current, undefined, 0.7)).toEqual(current);
+  });
+});
+

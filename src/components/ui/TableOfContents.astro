@@ -122,9 +122,11 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
   import { onEachPage } from "../../lib/enhance";
   import {
     activeHeadingIndex,
+    anchorFromHash,
+    cursorBox,
     groupByAnchor,
-    lerp,
     readingLine,
+    sectionEnd,
     sectionRatio,
   } from "../../lib/toc";
 
@@ -152,9 +154,7 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
     const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")];
 
     const sections = [
-      // `hash` est percent-encodé par le navigateur, alors que les ancres
-      // d'Astro gardent les accents des titres français.
-      ...groupByAnchor(links, (link) => decodeURIComponent(link.hash.slice(1))),
+      ...groupByAnchor(links, (link) => anchorFromHash(link.hash)),
     ]
       .map(([anchor, group]) => ({ heading: document.getElementById(anchor), links: group }))
       .filter(
@@ -201,10 +201,7 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
       }
 
       const next = sections[active + 1];
-      const end = next
-        ? tops[active + 1]
-        : (body?.getBoundingClientRect().bottom ?? tops[active]);
-
+      const end = sectionEnd(tops, active, body?.getBoundingClientRect().bottom);
       const ratio = sectionRatio(tops[active], end, line);
 
       /*
@@ -228,10 +225,15 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
 
         if (!cursor) return;
 
-        const target = next?.links[form] ?? link;
+        const target = next?.links[form];
+        const box = cursorBox(
+          { top: link.offsetTop, height: link.offsetHeight },
+          target && { top: target.offsetTop, height: target.offsetHeight },
+          ratio,
+        );
 
-        cursor.style.top = `${lerp(link.offsetTop, target.offsetTop, ratio)}px`;
-        cursor.style.height = `${lerp(link.offsetHeight, target.offsetHeight, ratio)}px`;
+        cursor.style.top = `${box.top}px`;
+        cursor.style.height = `${box.height}px`;
       });
     };
 
