@@ -11,7 +11,7 @@ order: 6
 ## Contexte
 
 Projet individuel consistant à rédiger, en anglais, un guide d'installation
-d'un serveur Debian 12 équipé d'Apache, PostgreSQL et PHP — serveur devant être
+d'un serveur Debian 12 équipé d'Apache, PostgreSQL et PHP. Le serveur devait être
 fonctionnel et interrogeable depuis la machine hôte. L'exercice associait
 administration système et rédaction technique.
 
@@ -25,16 +25,16 @@ administration système et rédaction technique.
 
 ## Réalisation
 
-### Phase 1 — Préparation
+### Phase 1 : préparation
 
 Installation de QEMU/KVM pour l'émulation, téléchargement de l'ISO de
 Debian 12 et vérification de son intégrité, puis installation en mode
 graphique : langue, localisation, clavier, hostname, mot de passe root et
 création de l'utilisateur. Le partitionnement a été suivi de l'installation des
-utilitaires système standards — sans environnement graphique — et du
+utilitaires système standards, sans environnement graphique, et du
 chargeur de démarrage GRUB.
 
-### Phase 2 — Installation des services
+### Phase 2 : installation des services
 
 - **Apache** : installation via `apt-get install apache2`, démarrage,
   vérification du statut du service et configuration de la redirection de port
@@ -45,7 +45,7 @@ chargeur de démarrage GRUB.
 - **PHP** : installation de `php`, `libapache2-mod-php` et `php-pgsql`, puis
   création d'un fichier `info.php` pour valider la configuration.
 
-### Phase 3 — Validation
+### Phase 3 : validation
 
 Accès au serveur Apache depuis l'hôte via `http://localhost:8080`, connexion à
 PostgreSQL depuis l'hôte et exécution de requêtes, puis gestion des bases via
