@@ -32,6 +32,16 @@ const ariaCurrent = (href: string) => {
   clignote pas pendant l'échange, et son animation d'entrée ne rejoue pas à
   chaque navigation — elle appartient à l'ouverture du site, pas à chaque page.
 */}
+{/*
+  Deux états, pilotés par `data-scrolled` (script plus bas) :
+
+  - en haut de page, la barre est nue — pas de fond — et le logo et les liens
+    sont écartés vers les bords ;
+  - dès qu'on descend, elle reprend la largeur du contenu et son fond flouté.
+
+  Le rendu serveur est l'état « en haut » : c'est celui de toute page ouverte
+  depuis un lien.
+*/}
 <header transition:persist class="page-enter page-enter-down sticky top-0 z-50">
   {/*
     Le fond flouté est un calque séparé : un élément portant `backdrop-filter`
@@ -44,7 +54,7 @@ const ariaCurrent = (href: string) => {
   >
   </div>
 
-  <Container class="relative flex h-16 items-center justify-between gap-4">
+  <Container class="header-bar relative flex h-16 items-center justify-between gap-4">
     <a
       href={url("/")}
       data-home-link
@@ -130,6 +140,113 @@ const ariaCurrent = (href: string) => {
       rgb(0 0 0 / 18%) 6rem,
       transparent 8rem
     );
+  }
+
+  /*
+   * Passage entre les deux états.
+   *
+   * ⚠️ Uniquement de l'opacité et des `transform` : le compositeur les anime
+   * seul, image par image, sans toucher à la mise en page. La première version
+   * animait `max-width` — chaque image relançait la mise en page de la barre
+   * pendant le défilement, et le texte, recalé au pixel, avançait par saccades.
+   *
+   * La barre garde donc toujours sa largeur de contenu (72rem). En haut de
+   * page, le logo et la liste de liens sont seulement décalés vers les bords,
+   * du même écart qu'une barre élargie à 84rem : `--spread`, nul sous 72rem.
+   *
+   * Une seule durée et une seule courbe pour tout — fond, positions, couleur
+   * des liens. La courbe démarre en douceur et ralentit à l'arrivée : une
+   * courbe de sortie (qui parcourt la moitié du trajet dans le premier tiers)
+   * donnait à la barre un départ brusque, perçu comme trop rapide.
+   */
+  header {
+    --bar-duration: 0.8s;
+    --bar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+
+  .header-backdrop {
+    transition: opacity var(--bar-duration) var(--bar-ease);
+  }
+
+  header:not([data-scrolled]) .header-backdrop {
+    opacity: 0;
+  }
+
+  /*
+   * Grand écran seulement, et pas par confort : un `transform`, même nul, fait
+   * de son élément le bloc conteneur des descendants en `position: fixed`. Posé
+   * sur la liste en mobile, il enfermerait le panneau déplié dans la barre.
+   */
+  @media (width >= 72rem) {
+    .header-bar {
+      --spread: calc((min(100vw, 84rem) - 72rem) / 2);
+    }
+
+    #nav-menu {
+      transition: transform var(--bar-duration) var(--bar-ease);
+    }
+
+    /* Le logo garde aussi son survol, que cette règle écraserait sinon. */
+    .header-bar > [data-home-link] {
+      transition:
+        transform var(--bar-duration) var(--bar-ease),
+        color 0.15s;
+    }
+
+    header:not([data-scrolled]) .header-bar > [data-home-link] {
+      transform: translateX(calc(-1 * var(--spread)));
+    }
+
+    header:not([data-scrolled]) #nav-menu {
+      transform: translateX(var(--spread));
+    }
+  }
+
+  /*
+   * Sans fond, les liens reposent directement sur la matière. Mesuré sur ses
+   * reflets les plus clairs (95e centile, de 1280 à 1920 px), le `zinc-400`
+   * habituel tombe à 2,5:1 — loin des 4,5:1 d'un texte. Le `zinc-200` en tient
+   * plus de 5. Le survol et le lien actif gardent leur propre couleur.
+   *
+   * La couleur suit le même rythme que le reste ; seul le survol reste vif.
+   *
+   * Grand écran seulement : sous 640 px, les liens vivent dans le panneau
+   * déplié, qui a son propre fond. Seul le bouton du menu reste sur la matière,
+   * et son `zinc-300` y tient déjà.
+   */
+  @media (width >= 40rem) {
+    [data-nav-link] {
+      transition:
+        color var(--bar-duration) var(--bar-ease),
+        background-color 0.15s;
+    }
+
+    [data-nav-link]:hover {
+      transition-duration: 0.15s;
+    }
+
+    header:not([data-scrolled])
+      [data-nav-link]:not(:hover, [aria-current], [data-active]) {
+      color: var(--color-zinc-200);
+    }
+  }
+
+  /* Premier affichage déjà défilé (rechargement, ancre) : pas d'animation. */
+  header[data-instant] .header-backdrop,
+  header[data-instant] .header-bar > [data-home-link],
+  header[data-instant] #nav-menu,
+  header[data-instant] [data-nav-link] {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header-backdrop,
+    .header-bar > [data-home-link],
+    #nav-menu,
+    [data-nav-link] {
+      transition: none;
+    }
   }
 
   /*
@@ -259,6 +376,98 @@ const ariaCurrent = (href: string) => {
         link.removeAttribute("aria-current");
       }
     }
+  });
+</script>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+
+  /**
+   * Bascule la barre entre ses deux états selon le défilement.
+   *
+   * Les deux sens n'ont pas le même seuil :
+   *
+   * - en descendant, la barre prend son fond dès 8 px — ce qui absorbe aussi le
+   *   rebond élastique des navigateurs mobiles, qui la ferait clignoter en haut ;
+   * - en remontant, elle se détend plus tôt, pour que ses 0,8 s de transition se
+   *   jouent pendant la remontée et non une fois arrivé en haut. Au plus 200 px
+   *   avant le haut, et jamais au-delà du premier texte de la page : nue, la
+   *   barre ne doit se poser sur aucun mot. Sur l'accueil, le hero laisse toute
+   *   la marge ; sur les pages projets, le fil d'Ariane la réduit à ~58 px.
+   *
+   * ⚠️ Le tout premier alignement se fait sans transition. Une page rechargée
+   * au milieu, ou ouverte sur une ancre, arrive déjà défilée : sans cela, la
+   * barre s'animerait toute seule sous les yeux du lecteur. Les navigations
+   * suivantes, elles, gardent l'animation — le header persiste d'une page à
+   * l'autre, et le voir se détendre en arrivant en haut d'une nouvelle page est
+   * précisément l'effet voulu.
+   */
+  const DOWN_THRESHOLD = 8;
+  const RETURN_MAX = 200;
+  /** Hauteur à laquelle le texte de la barre se tient : du 16e au 48e pixel. */
+  const BAR_TEXT_BOTTOM = 48;
+  let firstPage = true;
+
+  /** Haut du premier texte de la page, en coordonnées du document. */
+  function firstTextTop(): number {
+    const main = document.querySelector("main");
+    if (!main) return Infinity;
+
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!node.textContent?.trim()) continue;
+
+      range.selectNodeContents(node);
+      const rect = range.getBoundingClientRect();
+      if (rect.height > 0) return rect.top + window.scrollY;
+    }
+
+    return Infinity;
+  }
+
+  onEachPage((signal) => {
+    const header = document.querySelector("header");
+
+    if (!header) return;
+
+    const returnAt = Math.max(
+      DOWN_THRESHOLD,
+      Math.min(RETURN_MAX, firstTextTop() - BAR_TEXT_BOTTOM),
+    );
+    let lastY = window.scrollY;
+
+    const set = (scrolled: boolean) => header.toggleAttribute("data-scrolled", scrolled);
+
+    const update = () => {
+      const y = window.scrollY;
+
+      if (y <= DOWN_THRESHOLD) set(false);
+      else if (y > lastY) set(true);
+      else if (y < lastY && y < returnAt) set(false);
+
+      lastY = y;
+    };
+
+    // Sans sens de défilement connu (chargement, navigation) : seul le seuil bas compte.
+    const sync = () => set(window.scrollY > DOWN_THRESHOLD);
+
+    if (firstPage) {
+      firstPage = false;
+      header.setAttribute("data-instant", "");
+      sync();
+      // Deux images : la première applique l'état, la seconde rend la main
+      // aux transitions une fois cet état peint.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => header.removeAttribute("data-instant"));
+      });
+    } else {
+      sync();
+    }
+
+    window.addEventListener("scroll", update, { passive: true, signal });
   });
 </script>
 
