@@ -153,6 +153,17 @@ describe("Header", () => {
       expect(toggle?.getAttribute("aria-label")).toBeTruthy();
     });
 
+    it("prolonge la barre au lieu de s'ouvrir sous elle", async () => {
+      // Parti de 64 px, le panneau formait une marche visible à la jonction avec
+      // le fond de la barre. Il part du haut et passe sous le logo et le bouton.
+      const { document } = await render(Header, at("/portfolio/"));
+      const classes = document.getElementById("nav-menu")?.getAttribute("class")?.split(/\s+/);
+
+      expect(classes).toContain("top-0");
+      expect(classes).toContain("-z-10");
+      expect(classes).not.toContain("top-16");
+    });
+
     it("commande bien le panneau qu'il annonce", async () => {
       const { document } = await render(Header, at("/portfolio/"));
       const controls = document.querySelector("[data-nav-toggle]")?.getAttribute("aria-controls");

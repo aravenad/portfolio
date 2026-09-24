@@ -77,9 +77,21 @@ const ariaCurrent = (href: string) => {
         </svg>
       </button>
 
+      {/*
+        Déplié, le panneau est la surface de la barre elle-même, prolongée vers
+        le bas : il part du haut de l'écran et glisse sous le logo et le bouton
+        (`-z-10`). Il commençait à 64 px, avec un fond et un flou différents
+        posés sur le fondu de la barre : la jonction formait une marche visible.
+        `pt-20` = la hauteur de la barre plus le `p-4`.
+
+        ⚠️ Noir à 97 %, pas à 88 % comme la barre fermée. Le flou ne suffit pas
+        à effacer ce qui passe dessous : mesuré sur Chrome, le titre de
+        l'accueil restait net et lisible derrière les liens. Le fond doit donc
+        couvrir seul ; le flou n'est qu'un complément là où il s'applique.
+      */}
       <ul
         id="nav-menu"
-        class="fixed inset-x-0 top-16 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/80 p-4 text-sm backdrop-blur data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+        class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
       >
         {
           navLinks.map((link) => (
@@ -118,6 +130,15 @@ const ariaCurrent = (href: string) => {
       rgb(0 0 0 / 18%) 6rem,
       transparent 8rem
     );
+  }
+
+  /*
+   * Menu déplié : le panneau prend le relais du fond de la barre. Laissé en
+   * place, ce calque ajouterait son voile et son fondu par-dessus le panneau, et
+   * le haut du menu serait plus sombre que le reste.
+   */
+  header:has(#nav-menu[data-open]) .header-backdrop {
+    opacity: 0;
   }
 
   /*
