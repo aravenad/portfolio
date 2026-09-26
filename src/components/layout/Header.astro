@@ -14,9 +14,22 @@ const otherLang = lang === "fr" ? "en" : "fr";
 /** Règle partagée avec le script de resynchronisation : voir src/lib/nav.ts. */
 const ariaCurrent = (href: string) => ariaCurrentFor(localizedUrl(href, lang), currentPath);
 
-/** Les petits boutons de la barre : menu, langue, thème. */
+/**
+ * Les petits boutons de la barre : menu, langue, thème. Sous 640 px, ils sont
+ * seuls à côté du logo et marquent le survol d'un fond, comme le menu.
+ */
 const control =
   "flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white";
+
+/**
+ * Langue et thème au-delà de 640 px : ils rejoignent les liens de navigation et
+ * en prennent le survol (la couleur seule, sans fond) et le texte. Un pavé
+ * plein, posé sur la matière du haut de page, s'y lisait comme un autocollant.
+ */
+const setting = [
+  control,
+  "text-sm sm:text-zinc-400 sm:hover:bg-transparent sm:hover:text-zinc-100",
+];
 ---
 
 {/*
@@ -67,14 +80,14 @@ const control =
       langue, le thème, puis le bouton du menu, au bord. Au-delà, la navigation
       repasse en tête (`sm:order-first`).
     */}
-    <div class="header-end -mr-2 flex items-center gap-1 sm:gap-2">
+    <div class="header-end -mr-2 flex items-center gap-1 sm:gap-0">
       <a
         href={switchLangPath(currentPath, otherLang)}
         hreflang={otherLang}
         lang={otherLang}
         data-lang-switch
         aria-label={t.header.otherLang.label}
-        class:list={[control, "text-xs font-semibold tracking-wide"]}
+        class:list={setting}
       >
         {t.header.otherLang.short}
       </a>
@@ -84,7 +97,7 @@ const control =
         data-theme-toggle
         aria-pressed="false"
         aria-label={t.header.lightTheme}
-        class={control}
+        class:list={setting}
       >
         {/* Le soleil en sombre (passer au clair), la lune en clair : voir le style. */}
         <svg
@@ -105,7 +118,14 @@ const control =
         </svg>
       </button>
 
-      <nav aria-label={t.header.navLabel} class="sm:order-first sm:mr-4">
+      {/*
+        Au-delà de 640 px, un filet sépare la navigation des deux réglages : ce
+        sont des préférences, pas des destinations.
+      */}
+      <nav
+        aria-label={t.header.navLabel}
+        class="sm:order-first sm:flex sm:items-center sm:after:ml-4 sm:after:mr-1 sm:after:h-4 sm:after:w-px sm:after:bg-current sm:after:opacity-25 sm:after:content-['']"
+      >
         {/* Quatre liens ne tiennent pas à côté du logo sous 640px. */}
         <button
           type="button"
@@ -256,6 +276,9 @@ const control =
    * habituel tombe à 2,5:1 — loin des 4,5:1 d'un texte. Le `zinc-200` en tient
    * plus de 5. Le survol et le lien actif gardent leur propre couleur.
    *
+   * Les boutons de langue et de thème suivent exactement les mêmes règles que
+   * les liens : même couleur, même rythme, même survol.
+   *
    * La couleur suit le même rythme que le reste ; seul le survol reste vif.
    *
    * Grand écran seulement : sous 640 px, les liens vivent dans le panneau
@@ -263,18 +286,22 @@ const control =
    * et son `zinc-300` y tient déjà.
    */
   @media (width >= 40rem) {
-    [data-nav-link] {
+    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
       transition:
         color var(--bar-duration) var(--bar-ease),
         background-color 0.15s;
     }
 
-    [data-nav-link]:hover {
+    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):hover {
       transition-duration: 0.15s;
     }
 
     header:not([data-scrolled])
-      [data-nav-link]:not(:hover, [aria-current], [data-active]) {
+      :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):not(
+        :hover,
+        [aria-current],
+        [data-active]
+      ) {
       color: var(--color-zinc-200);
     }
   }
@@ -283,7 +310,7 @@ const control =
   header[data-instant] .header-backdrop,
   header[data-instant] .header-bar > [data-home-link],
   header[data-instant] .header-end,
-  header[data-instant] [data-nav-link] {
+  header[data-instant] :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
     transition: none;
   }
 
@@ -291,7 +318,7 @@ const control =
     .header-backdrop,
     .header-bar > [data-home-link],
     .header-end,
-    [data-nav-link] {
+    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
       transition: none;
     }
   }
