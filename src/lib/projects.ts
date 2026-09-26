@@ -1,3 +1,10 @@
+/**
+ * Accès aux fiches projet pour les pages et les sections.
+ *
+ * Tout passe par `getProjects()`, qui fixe l'ordre une fois pour toutes : la
+ * liste, l'accueil et les liens « précédent / suivant » d'une fiche suivent
+ * ainsi le même `order`.
+ */
 import { getCollection, type CollectionEntry } from "astro:content";
 
 import { url } from "./url";
@@ -45,7 +52,10 @@ export async function getProjects(): Promise<Project[]> {
   return projects.sort((a, b) => a.data.order - b.data.order);
 }
 
-/** Les projets mis en avant sur la page d'accueil. */
+/**
+ * Les projets mis en avant sur la page d'accueil. Sans aucun `featured`, les
+ * premiers projets prennent leur place : la section n'est jamais vide.
+ */
 export async function getFeaturedProjects(limit = 4): Promise<Project[]> {
   const projects = await getProjects();
   const featured = projects.filter((project) => project.data.featured);
