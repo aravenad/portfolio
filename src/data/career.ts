@@ -134,28 +134,28 @@ export const experiencesEn: CareerEntry[] = [
     roles: [
       {
         title: "IT technician",
-        contract: "Permanent",
+        contract: "Permanent contract",
         period: "May – June 2026",
         description:
           "Imaging and preparation of IT equipment for the key account Saint-Gobain, within the technical department. Configuration of Lenovo, Microsoft, Honeywell and Cisco hardware.",
       },
       {
         title: "Diagnostic technician",
-        contract: "Permanent",
+        contract: "Permanent contract",
         period: "January – May 2026",
         description:
           "Audit and grading of IT equipment intended for reuse, for several clients: Capgemini, Saint-Gobain, Nexity.",
       },
       {
         title: "Receiving technician",
-        contract: "Permanent",
+        contract: "Permanent contract",
         period: "September 2025 – January 2026",
         description:
           "Management of incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Stock tracking for all clients.",
       },
       {
         title: "Administrative assistant and receiving technician",
-        contract: "Fixed-term",
+        contract: "Fixed-term contract",
         period: "July – August 2025",
       },
     ],
