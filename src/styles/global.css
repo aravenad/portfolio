@@ -11,6 +11,49 @@
 }
 
 /*
+ * Thème clair, sur choix du visiteur (bouton du header, src/lib/theme.ts). Le
+ * sombre reste le thème par défaut : c'est la palette de Tailwind, intacte.
+ *
+ * LE CLAIR RETOURNE L'ÉCHELLE ZINC, IL NE LA REMPLACE PAS. Sur ce site, chaque
+ * nuance est un rôle : `zinc-950` est le fond, `zinc-100` les titres, `zinc-400`
+ * le texte courant, `zinc-800` les bordures… Leur redonner des valeurs claires
+ * suffit donc à éclairer tout le site sans toucher une seule classe, et chaque
+ * composant garde exactement la même hiérarchie dans les deux thèmes. Le blanc
+ * et le noir s'échangent de la même façon : le bouton plein devient graphite,
+ * et le lettrage chromé devient un reflet sombre sur le papier.
+ *
+ * Pensé pour ne pas fatiguer l'œil : pas de blanc pur (le fond est un gris
+ * perle à 94,6 % de luminance), pas de noir pur (les titres restent à 23,5 %),
+ * soit ~13:1 pour les titres et ~7:1 pour le texte courant — nets sans être
+ * durs. Les neutres gardent la teinte froide de la palette zinc (286).
+ *
+ * L'accent argent, illisible sur fond clair, devient un bleu acier de même
+ * teinte (250) : même rôle, même discrétion.
+ */
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-zinc-950: oklch(94.6% 0.004 286);
+  --color-zinc-900: oklch(90.6% 0.005 286);
+  --color-zinc-800: oklch(86% 0.006 286);
+  --color-zinc-700: oklch(76% 0.009 286);
+  --color-zinc-600: oklch(57% 0.014 286);
+  --color-zinc-500: oklch(49% 0.015 286);
+  --color-zinc-400: oklch(40% 0.014 286);
+  --color-zinc-300: oklch(33% 0.012 286);
+  --color-zinc-200: oklch(28% 0.01 286);
+  --color-zinc-100: oklch(23.5% 0.008 286);
+  --color-zinc-50: oklch(21% 0.006 286);
+  --color-white: oklch(18% 0.005 286);
+  --color-black: oklch(97% 0.003 286);
+  --color-accent: oklch(46% 0.08 250);
+}
+
+/*
  * Les halos restent sur le document. La matière occupe un calque séparé,
  * dont le fondu est indépendant de la hauteur totale de la page.
  */
@@ -81,6 +124,22 @@ body::before {
  */
 body[data-home="true"]::before {
   opacity: 0.7;
+}
+
+/*
+ * En clair, `screen` sur un fond clair ne laisserait rien voir. La matière est
+ * donc inversée puis composée en `multiply` : ses reflets deviennent des plis
+ * gris sur le papier, et elle ne peut plus rien éclaircir. Plus discrète qu'en
+ * sombre : du gris sur du clair se remarque plus vite que l'inverse.
+ */
+:root[data-theme="light"] body::before {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+  opacity: 0.12;
+}
+
+:root[data-theme="light"] body[data-home="true"]::before {
+  opacity: 0.4;
 }
 
 /* Une fenêtre basse fait remonter le texte dans les reflets du haut :
@@ -199,6 +258,14 @@ body::after {
  */
 .surface-lit {
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-white) 7%, transparent);
+}
+
+/*
+ * En clair, `--color-white` est l'encre graphite : l'arête doit rester une
+ * lumière, donc un vrai blanc, plus appuyé pour se voir sur une surface claire.
+ */
+:root[data-theme="light"] .surface-lit {
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 55%);
 }
 
 /*

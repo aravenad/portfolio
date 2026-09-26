@@ -3,11 +3,15 @@ import ProjectCard from "../ProjectCard.astro";
 import Container from "../ui/Container.astro";
 import Pagination from "../ui/Pagination.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
 import { getProjectsPageHref, type ProjectsPage } from "../../lib/projects";
 
 type Props = ProjectsPage;
 
 const { projects, currentPage, totalPages } = Astro.props;
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
 ---
 
 <section class="py-16 sm:py-20" aria-labelledby="projects-title">
@@ -15,9 +19,9 @@ const { projects, currentPage, totalPages } = Astro.props;
     <SectionHeading
       as="h1"
       headingId="projects-title"
-      title="Tous mes projets"
+      title={t.projects.listTitle}
       chrome
-      description="L'ensemble des projets réalisés durant ma formation, du plus ancien au plus récent."
+      description={t.projects.listDescription}
     />
 
     <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -30,11 +34,11 @@ const { projects, currentPage, totalPages } = Astro.props;
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            href={getProjectsPageHref}
+            href={(page) => getProjectsPageHref(page, lang)}
           />
 
           <p class="text-sm text-zinc-600">
-            Page {currentPage} sur {totalPages}
+            {t.projects.pageOf(currentPage, totalPages)}
           </p>
         </div>
       )

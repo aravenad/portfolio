@@ -4,19 +4,22 @@ import Arrow from "../ui/Arrow.astro";
 import Button from "../ui/Button.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang, localizedUrl } from "../../lib/i18n";
 import { getFeaturedProjects, getProjects } from "../../lib/projects";
-import { url } from "../../lib/url";
 
-const projects = await getProjects();
-const featuredProjects = await getFeaturedProjects(3);
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const projects = await getProjects(lang);
+const featuredProjects = await getFeaturedProjects(3, lang);
 ---
 
 <Section id="projects" aria-labelledby="projects-title">
   <SectionHeading
     headingId="projects-title"
-    title="Mes projets"
+    title={t.projects.previewTitle}
     chrome
-    description="Ces compétences se retrouvent dans les projets menés durant ma formation."
+    description={t.projects.previewDescription}
   />
 
   <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -26,8 +29,8 @@ const featuredProjects = await getFeaturedProjects(3);
   {
     projects.length > featuredProjects.length && (
       <div class="mt-12">
-        <Button href={url("/projects")} variant="secondary" class="group gap-2">
-          Voir tous les projets
+        <Button href={localizedUrl("/projects", lang)} variant="secondary" class="group gap-2">
+          {t.projects.seeAll}
           <Arrow class="transition group-hover:translate-x-1" />
         </Button>
       </div>

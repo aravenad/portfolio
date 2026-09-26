@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Header from "../../src/components/layout/Header.astro";
-import { navLinks, site } from "../../src/data/site";
+import { navLinks, navLinksEn, site } from "../../src/data/site";
 import { at, render } from "../helpers/render";
 
 /**
@@ -180,5 +180,75 @@ describe("Header", () => {
 
       expect(document.getElementById(controls!)).toBeTruthy();
     });
+  });
+});
+
+describe("Header en anglais", () => {
+  it("traduit les liens et les garde dans la version anglaise", async () => {
+    const { document } = await render(Header, at("/portfolio/en/"));
+    const links = [...document.querySelectorAll("[data-nav-link]")];
+
+    expect(links.map((node) => node.textContent?.trim())).toEqual(
+      navLinksEn.map((navLink) => navLink.label),
+    );
+    for (const node of links) expect(node.getAttribute("href")).toMatch(/^\/portfolio\/en\//);
+    expect(document.querySelector("[data-home-link]")?.getAttribute("href")).toBe("/portfolio/en/");
+  });
+
+  it("marque « Projects » sur la liste anglaise", async () => {
+    const { document } = await render(Header, at("/portfolio/en/projects"));
+    expect(marked(document)).toEqual(["Projects"]);
+  });
+
+  it("traduit les libellés du menu mobile, pour le script aussi", async () => {
+    const toggle = (await render(Header, at("/portfolio/en/"))).document.querySelector(
+      "[data-nav-toggle]",
+    );
+
+    expect(toggle?.getAttribute("aria-label")).toBe("Open the menu");
+    expect(toggle?.getAttribute("data-label-close")).toBe("Close the menu");
+  });
+
+  it("persiste séparément dans chaque langue", async () => {
+    // Un même nom garderait le header français en arrivant sur une page anglaise.
+    const fr = (await render(Header, at("/portfolio/"))).document.querySelector("header");
+    const en = (await render(Header, at("/portfolio/en/"))).document.querySelector("header");
+
+    expect(fr?.getAttribute("data-astro-transition-persist")).not.toBe(
+      en?.getAttribute("data-astro-transition-persist"),
+    );
+  });
+});
+
+describe("sélecteur de langue", () => {
+  it("mène à la même page en anglais depuis le français", async () => {
+    const { document } = await render(Header, at("/portfolio/projects/page/2"));
+    const link = document.querySelector("[data-lang-switch]");
+
+    expect(link?.getAttribute("href")).toBe("/portfolio/en/projects/page/2");
+    expect(link?.getAttribute("hreflang")).toBe("en");
+    expect(link?.getAttribute("lang")).toBe("en");
+    expect(link?.textContent?.trim()).toBe("EN");
+  });
+
+  it("ramène au français depuis l'anglais", async () => {
+    const { document } = await render(Header, at("/portfolio/en/"));
+    const link = document.querySelector("[data-lang-switch]");
+
+    expect(link?.getAttribute("href")).toBe("/portfolio/");
+    expect(link?.getAttribute("aria-label")).toBe("Version française");
+  });
+});
+
+describe("bouton de thème", () => {
+  it("est un bouton à bascule, nommé dans la langue de la page", async () => {
+    const fr = (await render(Header, at("/portfolio/"))).document.querySelector("[data-theme-toggle]");
+    const en = (await render(Header, at("/portfolio/en/"))).document.querySelector("[data-theme-toggle]");
+
+    expect(fr?.tagName).toBe("BUTTON");
+    // Le sombre est le thème par défaut : le bouton du clair part relâché.
+    expect(fr?.getAttribute("aria-pressed")).toBe("false");
+    expect(fr?.getAttribute("aria-label")).toBe("Thème clair");
+    expect(en?.getAttribute("aria-label")).toBe("Light theme");
   });
 });

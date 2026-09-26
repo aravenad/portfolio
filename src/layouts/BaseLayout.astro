@@ -19,6 +19,8 @@ import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
 import Header from "../components/layout/Header.astro";
 import { site } from "../data/site";
+import { useTranslations } from "../data/ui";
+import { defaultLang, getLang, languages, switchLangPath } from "../lib/i18n";
 import { url } from "../lib/url";
 import "../styles/global.css";
 
@@ -27,11 +29,27 @@ interface Props {
   description?: string;
 }
 
-const { title, description = site.description } = Astro.props;
-const isHomePage = Astro.url.pathname.replace(/\/+$/, "") === url("/").replace(/\/+$/, "");
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const { title, description = t.meta.description } = Astro.props;
+
+/** L'accueil, dans l'une ou l'autre langue : il montre davantage la matière. */
+const trimmed = (path: string) => path.replace(/\/+$/, "");
+const isHomePage =
+  trimmed(switchLangPath(Astro.url.pathname, defaultLang)) === trimmed(url("/"));
 
 /** URL absolues : les robots d'aperçu ignorent les chemins relatifs. */
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+/**
+ * La même page dans chaque langue, pour les moteurs de recherche. Le français,
+ * langue par défaut, sert aussi pour les visiteurs d'une autre langue
+ * (`x-default`).
+ */
+const alternates = languages.map((code) => ({
+  code,
+  href: new URL(switchLangPath(Astro.url.pathname, code), Astro.site),
+}));
 /*
  * Nom versionné : LinkedIn met en cache les images d'aperçu par URL et ne
  * retélécharge pas un fichier de même nom. Renommer à chaque refonte de
@@ -48,7 +66,7 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={t.htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -82,10 +100,16 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     <meta name="generator" content={Astro.generator} />
 
     <link rel="canonical" href={canonicalURL} />
+    {alternates.map(({ code, href }) => <link rel="alternate" hreflang={code} href={href} />)}
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={alternates.find(({ code }) => code === defaultLang)?.href}
+    />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.title} />
-    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale" content={t.ogLocale} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -94,7 +118,7 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     <meta property="og:image:height" content="1260" />
     <meta
       property="og:image:alt"
-      content="Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble"
+      content={t.meta.ogImageAlt}
     />
 
     <meta name="twitter:card" content="summary_large_image" />
@@ -143,6 +167,35 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       tout seul et tout redevient visible. Rien ne doit pouvoir rendre la moitié
       du site invisible de façon permanente.
     */}
+    {/*
+      Thème, posé AVANT le premier rendu pour ne jamais montrer le mauvais : même
+      raison que le script d'apparition ci-dessous. Le sombre est le thème par
+      défaut (celui de la feuille de style) ; le clair n'est appliqué que si le
+      visiteur l'a choisi (bouton du header, src/lib/theme.ts).
+
+      La lecture est dupliquée ici, en quatre lignes, parce qu'un script en
+      ligne ne peut rien importer. La clé et les valeurs sont celles de
+      `THEME_KEY` et `Theme` dans src/lib/theme.ts.
+
+      ⚠️ L'échange de vue recopie les attributs de `<html>` depuis le document
+      entrant, qui n'a pas de thème : il faut le lui reporter à chaque
+      navigation, sur `event.newDocument`.
+    */}
+    <script is:inline>
+      (() => {
+        let theme = "dark";
+        try {
+          if (localStorage.getItem("theme") === "light") theme = "light";
+        } catch {}
+        document.documentElement.dataset.theme = theme;
+
+        document.addEventListener("astro:before-swap", (event) => {
+          event.newDocument.documentElement.dataset.theme =
+            document.documentElement.dataset.theme;
+        });
+      })();
+    </script>
+
     <script is:inline>
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         /*

@@ -203,3 +203,40 @@ describe("BaseLayout", () => {
     expect(html).toContain("prefers-reduced-motion");
   });
 });
+
+describe("BaseLayout, langues et thème", () => {
+  it("annonce la page dans chaque langue aux moteurs de recherche", async () => {
+    const { document } = await renderPage(BaseLayout, options("/portfolio/en/projects"));
+    const alternates = Object.fromEntries(
+      [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map((link) => [
+        link.getAttribute("hreflang"),
+        link.getAttribute("href"),
+      ]),
+    );
+
+    expect(alternates).toEqual({
+      fr: `${SITE_ORIGIN}/portfolio/projects`,
+      en: `${SITE_ORIGIN}/portfolio/en/projects`,
+      "x-default": `${SITE_ORIGIN}/portfolio/projects`,
+    });
+  });
+
+  it("déclare l'anglais sur une page anglaise", async () => {
+    const { document } = await renderPage(BaseLayout, options("/portfolio/en/"));
+
+    expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(meta(document, "og:locale")).toBe("en_US");
+  });
+
+  it("pose le thème avant le premier rendu, sombre par défaut", async () => {
+    // Un script différé laisserait voir le mauvais thème avant de basculer.
+    const { document } = await renderPage(BaseLayout, options());
+    const inline = [...document.head.querySelectorAll("script:not([type=module])")]
+      .map((script) => script.textContent ?? "")
+      .find((text) => text.includes("dataset.theme"));
+
+    expect(inline, "script de thème absent du <head>").toBeTruthy();
+    expect(inline).toContain('let theme = "dark"');
+    expect(inline).toContain('localStorage.getItem("theme")');
+  });
+});

@@ -1,15 +1,23 @@
 ---
 import Container from "../ui/Container.astro";
 import { site, socialLinks } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
 
 const year = new Date().getFullYear();
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
 ---
 
-<footer transition:persist class="page-enter border-t border-zinc-900 py-10" style="--index: 3">
+{/*
+  Persisté d'une page à l'autre, mais par langue : changer de langue remplace
+  le pied de page au lieu de garder l'ancien texte.
+*/}
+<footer transition:persist={`footer-${lang}`} class="page-enter border-t border-zinc-900 py-10" style="--index: 3">
   <Container
     class="flex flex-col items-start justify-between gap-4 text-sm text-zinc-500 sm:flex-row sm:items-center"
   >
-    <p>© {year} {site.name}. Tous droits réservés.</p>
+    <p>© {year} {site.name}. {t.footer.rights}</p>
 
     <ul class="flex items-center gap-6">
       {

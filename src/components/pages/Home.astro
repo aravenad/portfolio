@@ -1,0 +1,48 @@
+---
+import Career from "../sections/Career.astro";
+import Contact from "../sections/Contact.astro";
+import Hero from "../sections/Hero.astro";
+import ProjectsPreview from "../sections/ProjectsPreview.astro";
+import Skills from "../sections/Skills.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { softSkills, softSkillsEn, technicalSkills } from "../../data/skills";
+import { site } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { getLang, localized } from "../../lib/i18n";
+
+/**
+ * L'accueil, dans la langue de l'URL. Rendu par src/pages/index.astro et
+ * src/pages/en/index.astro.
+ */
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+---
+
+{/*
+  Les `id` des sections sont des ancres de la navigation : ils doivent rester
+  ceux de `navLinks[].sections` (src/data/site.ts), qui surligne le lien de la
+  section en cours de lecture. L'ordre des sections est celui des liens.
+*/}
+<BaseLayout title={t.meta.title} description={t.meta.description}>
+  <Hero intro={t.hero.intro} name={site.name} description={t.hero.description} />
+
+  <Skills id="skills" title={t.skills.technical.title} skills={technicalSkills}>
+    {t.skills.technical.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </Skills>
+
+  <Skills
+    id="soft-skills"
+    title={t.skills.soft.title}
+    skills={localized(lang, { fr: softSkills, en: softSkillsEn })}
+    variant="list"
+    reverse
+  >
+    {t.skills.soft.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+  </Skills>
+
+  <Career />
+
+  <ProjectsPreview />
+
+  <Contact />
+</BaseLayout>

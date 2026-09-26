@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { navLinks, site, socialLinks } from "../../src/data/site";
+import { navLinks, navLinksEn, site, socialLinks } from "../../src/data/site";
 
 describe("informations du site", () => {
   it("renseigne les champs repris dans les métadonnées", () => {
@@ -73,5 +73,18 @@ describe("liens sociaux", () => {
     expect(socialLinks.map((link) => link.href)).toContain(site.github);
     expect(socialLinks.map((link) => link.href)).toContain(site.linkedin);
     expect(socialLinks.map((link) => link.href)).toContain(`mailto:${site.email}`);
+  });
+});
+
+describe("navigation en anglais", () => {
+  it("mène aux mêmes destinations, dans le même ordre", () => {
+    // Seuls les libellés changent : le header ajoute lui-même le préfixe /en.
+    expect(navLinksEn.map(({ href, sections }) => ({ href, sections }))).toEqual(
+      navLinks.map(({ href, sections }) => ({ href, sections })),
+    );
+  });
+
+  it("n'a pas de libellé en double", () => {
+    expect(new Set(navLinksEn.map((link) => link.label)).size).toBe(navLinksEn.length);
   });
 });

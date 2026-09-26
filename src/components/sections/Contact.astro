@@ -3,7 +3,11 @@ import Button from "../ui/Button.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { site } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
 import { url } from "../../lib/url";
+
+const t = useTranslations(getLang(Astro.url.pathname));
 
 /*
  * ⚠️ LA VERSION PUBLIQUE, ET ELLE SEULE. Le kit produit deux CV : celui-ci, et
@@ -13,6 +17,9 @@ import { url } from "../../lib/url";
  *
  * Le nom envoyé au lecteur, lui, n'a pas à porter cette précaution : `download`
  * le rebaptise à l'enregistrement.
+ *
+ * Le CV n'existe qu'en français : la version anglaise du site sert le même
+ * fichier, et son bouton le signale.
  */
 const cv = {
   href: url("/cv-damien-aravena-bravo-public.pdf"),
@@ -23,20 +30,20 @@ const cv = {
 <Section id="contact" aria-labelledby="contact-title">
   <SectionHeading
     headingId="contact-title"
-    title="Me contacter"
+    title={t.contact.title}
     chrome
-    description="Je recherche un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet, pour valider ma deuxième année de BUT Informatique. Une question, une opportunité ? Écris-moi."
+    description={t.contact.description}
   />
 
   <div class="mt-12 flex flex-wrap gap-4">
-    <Button href={`mailto:${site.email}`}>Envoyer un e-mail</Button>
+    <Button href={`mailto:${site.email}`}>{t.contact.email}</Button>
 
     <Button href={cv.href} download={cv.filename} variant="secondary">
-      Télécharger mon CV
+      {t.contact.cv}
     </Button>
 
     <Button href={site.github} variant="secondary" rel="noreferrer">
-      Voir mon GitHub
+      {t.contact.github}
     </Button>
   </div>
 </Section>

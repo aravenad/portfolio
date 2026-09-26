@@ -3,9 +3,13 @@
 Portfolio personnel de Damien Aravena Bravo — étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : dix pages HTML, une feuille de style, et ~25 Ko de
-JavaScript (8 Ko compressé) — le routeur de transitions d'Astro et une dizaine
-de petits comportements (menu, navigation active, apparition au défilement).
+Site entièrement statique : vingt pages HTML (dix en français, dix en anglais),
+une feuille de style, et ~26 Ko de JavaScript (9 Ko compressé) — le routeur de
+transitions d'Astro et une dizaine de petits comportements (menu, navigation
+active, apparition au défilement, thème).
+
+Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
+choix du visiteur, mémorisé d'une visite à l'autre.
 
 Architecture, fonctionnement, évolutions et workflow de publication :
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -17,7 +21,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 482 tests
+npm test         # 561 tests
 npm run coverage # tests + rapport de couverture
 ```
 
@@ -34,15 +38,16 @@ src/
 ├── components/
 │   ├── ui/          primitives réutilisables (Button, Card, Pagination…)
 │   ├── layout/      Header et Footer
-│   ├── sections/    blocs de la page d'accueil
+│   ├── sections/    blocs de page (hero, compétences, parcours…)
+│   ├── pages/       contenu des pages, commun aux deux langues
 │   └── ProjectCard.astro
-├── content/projects/  une fiche Markdown par projet
+├── content/projects/  une fiche Markdown par projet (en/ : en anglais)
 ├── content.config.ts  schéma des fiches, vérifié au build
-├── data/            contenu éditable : site, compétences, parcours
+├── data/            contenu éditable : site, compétences, parcours, textes (ui.ts)
 ├── icons/           logos absents de Simple Icons, chargés par astro-icon
 ├── layouts/         BaseLayout
-├── lib/             accès aux projets, pagination, helpers
-├── pages/           routes
+├── lib/             langues, thème, projets, pagination, helpers
+├── pages/           routes (en/ : les mêmes en anglais)
 ├── styles/          global.css (thème et rendu Markdown)
 └── types/           interfaces partagées
 
@@ -55,17 +60,26 @@ docs/                architecture du projet
 
 ## Modifier le contenu
 
-| Quoi | Où |
-| :--- | :--- |
-| Coordonnées, navigation | `src/data/site.ts` |
-| Compétences techniques et transversales | `src/data/skills.ts` |
-| Expérience et formation | `src/data/career.ts` |
-| Projets | `src/content/projects/*.md` |
+Chaque contenu existe en français et en anglais : modifier l'un, c'est modifier
+l'autre. Les tests signalent une version anglaise qui ne suit plus la française.
+
+| Quoi | Français | Anglais |
+| :--- | :--- | :--- |
+| Textes de l'interface (titres, boutons, accueil, contact…) | `src/data/ui.ts` (`fr`) | `src/data/ui.ts` (`en`) |
+| Coordonnées | `src/data/site.ts` | commun |
+| Navigation | `navLinks` dans `src/data/site.ts` | `navLinksEn` |
+| Compétences techniques | `technicalSkills` dans `src/data/skills.ts` | commun |
+| Compétences transversales | `softSkills` | `softSkillsEn` |
+| Expérience et formation | `experiences`, `education` dans `src/data/career.ts` | `experiencesEn`, `educationEn` |
+| Projets | `src/content/projects/*.md` | `src/content/projects/en/*.md` |
 
 ### Ajouter un projet
 
-Créer un fichier dans `src/content/projects/`. Le nom du fichier devient l'URL
-(`/projects/mon-projet`), le corps est du Markdown libre.
+Créer un fichier dans `src/content/projects/`, et sa traduction **sous le même
+nom** dans `src/content/projects/en/`. Le nom du fichier devient l'URL
+(`/projects/mon-projet` et `/en/projects/mon-projet`), le corps est du Markdown
+libre. `order`, `status`, `year` et `featured` doivent être identiques dans les
+deux versions.
 
 ```md
 ---
@@ -89,7 +103,9 @@ mal typé arrête la compilation.
 
 ## Personnaliser
 
-La couleur d'accent est définie une seule fois dans `src/styles/global.css` :
+Les couleurs sont définies dans `src/styles/global.css` : l'accent du thème
+sombre dans `@theme`, et toute la palette du thème clair dans le bloc
+`:root[data-theme="light"]`.
 
 ```css
 @theme {
@@ -98,7 +114,8 @@ La couleur d'accent est définie une seule fois dans `src/styles/global.css` :
 ```
 
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
-noir, matière métallique en haut de page, lettrage chromé. Elle tient dans
+noir, matière métallique en haut de page, lettrage chromé. Le thème clair en
+est le négatif doux : fond gris perle, matière en plis gris, lettrage graphite. Elle tient dans
 `src/styles/global.css` (palette, calques, utilitaires), `src/assets/` (la
 matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Pour
 les modifier, voir §6 de l'architecture.
@@ -111,12 +128,14 @@ npm test
 
 Les composants sont rendus sans navigateur, par l'API Container d'Astro, et les
 assertions portent sur le DOM produit. La suite couvre les helpers, les données,
-les composants et les quatre routes ; elle tourne en moins de trois secondes.
+les composants et les quatre routes, dans les deux langues ; elle tourne en
+quelques secondes.
 
 Elle sert surtout à vérifier ce qui ne se voit pas à la relecture : l'espace
 insécable des périodes du parcours, le contraste des couleurs de marque sur les
-tuiles, les métadonnées d'aperçu LinkedIn, et le marquage du lien de navigation
-courant. Un nouveau projet ou une nouvelle compétence est validé par les tests
+tuiles dans les deux thèmes, les métadonnées d'aperçu LinkedIn, le marquage du
+lien de navigation courant, et l'alignement des contenus anglais sur les
+français. Un nouveau projet ou une nouvelle compétence est validé par les tests
 avant même le build. Voir §5 de l'architecture.
 
 ## Logos des compétences

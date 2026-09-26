@@ -1,5 +1,7 @@
 ---
 import Arrow from "./Arrow.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
 
 interface Props {
   currentPage: number;
@@ -10,11 +12,13 @@ interface Props {
   label?: string;
 }
 
+const t = useTranslations(getLang(Astro.url.pathname));
+
 const {
   currentPage,
   totalPages,
   href,
-  label = "Pagination",
+  label = t.pagination.label,
 } = Astro.props;
 
 /**
@@ -61,8 +65,8 @@ const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
             class:list={[linkBase, stepWidth, hasPrevious ? inactive : disabled]}
           >
             <Arrow direction="left" />
-            <span class="hidden sm:inline">Précédent</span>
-            <span class="sr-only sm:hidden">Page précédente</span>
+            <span class="hidden sm:inline">{t.pagination.previous}</span>
+            <span class="sr-only sm:hidden">{t.pagination.previousPage}</span>
           </a>
         </li>
 
@@ -81,7 +85,7 @@ const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
                 href={href(item)}
                 data-page={item}
                 aria-current={item === currentPage ? "page" : undefined}
-                aria-label={`Page ${item}`}
+                aria-label={t.pagination.page(item)}
                 class:list={[
                   linkBase,
                   "relative min-w-10 tabular-nums",
@@ -114,8 +118,8 @@ const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
             tabindex={hasNext ? undefined : -1}
             class:list={[linkBase, stepWidth, hasNext ? inactive : disabled]}
           >
-            <span class="hidden sm:inline">Suivant</span>
-            <span class="sr-only sm:hidden">Page suivante</span>
+            <span class="hidden sm:inline">{t.pagination.next}</span>
+            <span class="sr-only sm:hidden">{t.pagination.nextPage}</span>
             <Arrow />
           </a>
         </li>

@@ -114,3 +114,102 @@ export const education: CareerEntry[] = [
     initials: "PN",
   },
 ];
+
+/*
+ * Le même parcours en anglais, entrée pour entrée et dans le même ordre : les
+ * tests vérifient que les deux versions restent alignées.
+ *
+ * Mêmes règles de période qu'en français (espace insécable, tiret
+ * demi-cadratin entouré d'espaces, année répétée seulement si elle change),
+ * mais tous les mois prennent la capitale, comme le veut l'anglais.
+ */
+export const experiencesEn: CareerEntry[] = [
+  {
+    organization: "Horizon Groupe",
+    location: "Villard-Bonnot",
+    period: "July 2025 – June 2026",
+    description:
+      "Group bringing together Microstore, Iso Rhône-Alpes and Chryséis, specializing in the reuse and managed services of IT equipment fleets.",
+    initials: "HG",
+    roles: [
+      {
+        title: "IT technician",
+        contract: "Permanent",
+        period: "May – June 2026",
+        description:
+          "Imaging and preparation of IT equipment for the key account Saint-Gobain, within the technical department. Configuration of Lenovo, Microsoft, Honeywell and Cisco hardware.",
+      },
+      {
+        title: "Diagnostic technician",
+        contract: "Permanent",
+        period: "January – May 2026",
+        description:
+          "Audit and grading of IT equipment intended for reuse, for several clients: Capgemini, Saint-Gobain, Nexity.",
+      },
+      {
+        title: "Receiving technician",
+        contract: "Permanent",
+        period: "September 2025 – January 2026",
+        description:
+          "Management of incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Stock tracking for all clients.",
+      },
+      {
+        title: "Administrative assistant and receiving technician",
+        contract: "Fixed-term",
+        period: "July – August 2025",
+      },
+    ],
+  },
+  {
+    title: "Observation internship",
+    organization: "Mentor Graphics (Siemens)",
+    location: "Meylan",
+    period: "June 2018",
+    description:
+      "Discovering IT jobs in a company: talks with employees, and shadowing one of them on simple tasks under their supervision.",
+    icon: "simple-icons:siemens",
+  },
+  {
+    title: "Observation internship",
+    organization:
+      "Laboratory of Linguistics and Didactics of Foreign and Native Languages (UGA)",
+    location: "Grenoble",
+    period: "January 2017",
+    description:
+      "Discovering how a research laboratory works, talking with researchers and assisting them in their daily work.",
+    initials: "UGA",
+  },
+];
+
+export const educationEn: CareerEntry[] = [
+  {
+    title: "Bachelor of Technology in Computer Science (BUT)",
+    organization: "IUT2 (Université Grenoble Alpes)",
+    location: "Grenoble",
+    period: "September 2023 – June 2028",
+    description: "Gap year from September 2025 to July 2026.",
+    initials: "IUT2",
+  },
+  {
+    title: "PIX certification",
+    organization: "Digital skills",
+    period: "April 2022",
+    icon: "simple-icons:pix",
+  },
+  {
+    title: "TSI preparatory class",
+    organization: "Gaspard Monge High School",
+    location: "Chambéry",
+    period: "September 2020 – June 2023",
+    description: "Technology and industrial sciences.",
+    initials: "GM",
+  },
+  {
+    title: "STI2D Baccalaureate",
+    organization: "Pablo Neruda High School",
+    location: "Saint-Martin-d'Hères",
+    period: "September 2018 – June 2020",
+    description: "With honors (mention bien).",
+    initials: "PN",
+  },
+];

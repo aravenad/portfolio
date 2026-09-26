@@ -1,0 +1,45 @@
+---
+import ProjectsList from "../sections/ProjectsList.astro";
+import Breadcrumb from "../ui/Breadcrumb.astro";
+import Container from "../ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
+import { getProjectsPage } from "../../lib/projects";
+
+interface Props {
+  /** Numéro de page, à partir de 1. La première vit sur `/projects`. */
+  page: number;
+}
+
+/**
+ * Une page de la liste des projets, dans la langue de l'URL. Rendue par
+ * `projects/index.astro` (page 1) et `projects/page/[page].astro` (les
+ * suivantes), en français comme en anglais.
+ */
+const { page: currentPage } = Astro.props;
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const page = await getProjectsPage(currentPage, lang);
+const first = currentPage <= 1;
+---
+
+<BaseLayout
+  title={first ? t.projects.listMetaTitle : t.projects.pageMetaTitle(currentPage)}
+  description={first
+    ? t.projects.listMetaDescription
+    : t.projects.pageMetaDescription(currentPage)}
+>
+  <Container class="pt-10">
+    <Breadcrumb
+      items={first
+        ? [{ label: t.breadcrumb.projects }]
+        : [
+            { label: t.breadcrumb.projects, href: "/projects" },
+            { label: t.breadcrumb.page(currentPage) },
+          ]}
+    />
+  </Container>
+
+  <ProjectsList {...page} />
+</BaseLayout>

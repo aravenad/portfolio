@@ -1,6 +1,8 @@
 ---
 import Button from "../ui/Button.astro";
 import Container from "../ui/Container.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
 
 interface Props {
   /** Texte précédant le prénom mis en couleur. */
@@ -10,6 +12,7 @@ interface Props {
 }
 
 const { intro, name, description } = Astro.props;
+const t = useTranslations(getLang(Astro.url.pathname));
 ---
 
 <section class="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-24 sm:py-32">
@@ -23,8 +26,8 @@ const { intro, name, description } = Astro.props;
     </p>
 
     <div class="page-enter mt-10 flex flex-wrap gap-4" style="--index: 2">
-      <Button href="#projects">Voir mes projets</Button>
-      <Button href="#contact" variant="secondary">Me contacter</Button>
+      <Button href="#projects">{t.hero.projects}</Button>
+      <Button href="#contact" variant="secondary">{t.hero.contact}</Button>
     </div>
   </Container>
 </section>

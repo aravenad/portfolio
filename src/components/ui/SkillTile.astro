@@ -66,6 +66,17 @@ const brand =
   }
 
   /*
+   * Thème clair : les couleurs de marque éclaircies pour le fond sombre (le
+   * blanc de GitHub, le jaune de JavaScript) s'effaceraient sur la tuile claire.
+   * Leur luminance est plafonnée à 55 %, teinte et saturation intactes : chaque
+   * logo garde au moins 3:1, vérifié par tests/data/skills.test.ts.
+   */
+  :global(:root[data-theme="light"]) .skill-tile:hover .skill-icon {
+    color: oklch(from var(--skill-color, currentColor) min(l, 0.55) c h);
+    --logo-accent: oklch(from var(--skill-color-2, currentColor) min(l, 0.55) c h);
+  }
+
+  /*
    * Correction de poids optique pour les logos dessinés au trait — la tasse Java
    * et l'éléphant PostgreSQL. Ils peignent une fraction de leur boîte là où les
    * glyphes pleins voisins en couvrent 33 à 64 % : dans la grille, ils
