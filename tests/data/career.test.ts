@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { education, experiences } from "../../src/data/career";
+import { education, educationEn, experiences, experiencesEn } from "../../src/data/career";
 import type { CareerEntry } from "../../src/types";
 
 /**
@@ -205,6 +205,60 @@ describe("cohérence du parcours", () => {
       });
 
       expect(starts).toEqual([...starts].sort((a, b) => b - a));
+    }
+  });
+});
+
+describe("parcours en anglais", () => {
+  const MONTHS_EN = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const pairs = [
+    ...experiences.map((entry, index) => [entry, experiencesEn[index]] as const),
+    ...education.map((entry, index) => [entry, educationEn[index]] as const),
+  ];
+
+  it("traduit chaque entrée, dans le même ordre", () => {
+    expect(experiencesEn).toHaveLength(experiences.length);
+    expect(educationEn).toHaveLength(education.length);
+  });
+
+  it("garde les mêmes pastilles et les mêmes postes", () => {
+    // Les logos, initiales et icônes ne se traduisent pas : une différence
+    // trahirait deux entrées décalées.
+    for (const [fr, en] of pairs) {
+      expect(en?.initials, fr.organization).toBe(fr.initials);
+      expect(en?.icon, fr.organization).toBe(fr.icon);
+      expect(en?.logo, fr.organization).toBe(fr.logo);
+      expect(en?.roles?.length, fr.organization).toBe(fr.roles?.length);
+    }
+  });
+
+  it("écrit les périodes à l'anglaise, avec les mêmes espaces qu'en français", () => {
+    // « July 2025 – June 2026 » : mois en capitale, espace insécable avant
+    // l'année, tiret demi-cadratin entouré d'espaces normales.
+    const month = `(?:${MONTHS_EN.join("|")})`;
+    const endpoint = `${month}(?:${NBSP}\\d{4})?`;
+    const format = new RegExp(`^${endpoint}(?: ${EN_DASH} ${endpoint})?$`);
+
+    const periods = [...experiencesEn, ...educationEn].flatMap((entry) => [
+      entry.period,
+      ...(entry.roles ?? []).map((role) => role.period),
+    ]);
+
+    for (const period of periods) expect(period, visible(period)).toMatch(format);
+  });
+
+  it("garde les mêmes années que la version française", () => {
+    for (const [fr, en] of pairs) {
+      const years = (period: string) => period.match(/\d{4}/g);
+
+      expect(years(en!.period), fr.organization).toEqual(years(fr.period));
+      fr.roles?.forEach((role, index) => {
+        expect(years(en!.roles![index].period), role.title).toEqual(years(role.period));
+      });
     }
   });
 });

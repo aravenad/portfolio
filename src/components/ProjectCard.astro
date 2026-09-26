@@ -2,8 +2,9 @@
 import Arrow from "./ui/Arrow.astro";
 import Badge from "./ui/Badge.astro";
 import Card from "./ui/Card.astro";
-import { statusLabels, type Project } from "../lib/projects";
-import { url } from "../lib/url";
+import { useTranslations } from "../data/ui";
+import { getLang } from "../lib/i18n";
+import { getProjectHref, type Project } from "../lib/projects";
 
 interface Props {
   project: Project;
@@ -13,9 +14,11 @@ interface Props {
 
 const { project, showTags = true } = Astro.props;
 const { title, summary, tags, status } = project.data;
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
 ---
 
-<Card href={url(`/projects/${project.id}`)} class="flex h-full flex-col p-6">
+<Card href={getProjectHref(project, lang)} class="flex h-full flex-col p-6">
   <h3 class="font-medium text-zinc-100 transition group-hover:text-white">
     {title}
   </h3>
@@ -36,7 +39,7 @@ const { title, summary, tags, status } = project.data;
     <span
       class="flex items-center gap-2 text-sm text-zinc-500 transition group-hover:text-accent"
     >
-      Découvrir le projet
+      {t.projects.discover}
       <Arrow class="transition group-hover:translate-x-1" />
     </span>
 
@@ -46,7 +49,7 @@ const { title, summary, tags, status } = project.data;
         status === "en-cours" ? "text-accent/80" : "text-zinc-600",
       ]}
     >
-      {statusLabels[status]}
+      {t.projects.status[status]}
     </span>
   </div>
 </Card>

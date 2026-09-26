@@ -13,11 +13,22 @@ export const site = {
   linkedin: "https://www.linkedin.com/in/aravenad/",
 } as const;
 
-/** Même ordre que les sections de l'accueil. */
+/**
+ * Même ordre que les sections de l'accueil. Les `href` sont neutres : le header
+ * y ajoute le préfixe de la langue (`localizedUrl`).
+ */
 export const navLinks: NavLink[] = [
   { label: "Compétences", href: "/#skills", sections: ["skills", "soft-skills"] },
   { label: "Parcours", href: "/#career", sections: ["career"] },
   { label: "Projets", href: "/projects", sections: ["projects"] },
+  { label: "Contact", href: "/#contact", sections: ["contact"] },
+];
+
+/** Les mêmes liens en anglais : seuls les libellés changent. */
+export const navLinksEn: NavLink[] = [
+  { label: "Skills", href: "/#skills", sections: ["skills", "soft-skills"] },
+  { label: "Background", href: "/#career", sections: ["career"] },
+  { label: "Projects", href: "/projects", sections: ["projects"] },
   { label: "Contact", href: "/#contact", sections: ["contact"] },
 ];
 

@@ -1,0 +1,9 @@
+---
+import type { GetStaticPaths } from "astro";
+import ProjectsListPage from "../../../../components/pages/ProjectsListPage.astro";
+import { getProjectsPagePaths } from "../../../../lib/projects";
+
+export const getStaticPaths = (() => getProjectsPagePaths("en")) satisfies GetStaticPaths;
+---
+
+<ProjectsListPage page={Number(Astro.params.page)} />

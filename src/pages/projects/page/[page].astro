@@ -1,41 +1,9 @@
 ---
 import type { GetStaticPaths } from "astro";
-import ProjectsList from "../../../components/sections/ProjectsList.astro";
-import Breadcrumb from "../../../components/ui/Breadcrumb.astro";
-import Container from "../../../components/ui/Container.astro";
-import BaseLayout from "../../../layouts/BaseLayout.astro";
-import {
-  getProjects,
-  getProjectsPage,
-  PROJECTS_PER_PAGE,
-} from "../../../lib/projects";
+import ProjectsListPage from "../../../components/pages/ProjectsListPage.astro";
+import { getProjectsPagePaths } from "../../../lib/projects";
 
-/** La première page vit sur `/projects` : on ne génère que les suivantes. */
-export const getStaticPaths = (async () => {
-  const projects = await getProjects();
-  const totalPages = Math.ceil(projects.length / PROJECTS_PER_PAGE);
-
-  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
-    params: { page: String(index + 2) },
-  }));
-}) satisfies GetStaticPaths;
-
-const currentPage = Number(Astro.params.page);
-const page = await getProjectsPage(currentPage);
+export const getStaticPaths = (() => getProjectsPagePaths("fr")) satisfies GetStaticPaths;
 ---
 
-<BaseLayout
-  title={`Projets, page ${currentPage} — Damien`}
-  description={`Les projets réalisés par Damien Aravena Bravo en BUT Informatique : développement web, applications Java, bases de données et services réseau (page ${currentPage}).`}
->
-  <Container class="pt-10">
-    <Breadcrumb
-      items={[
-        { label: "Projets", href: "/projects" },
-        { label: `Page ${currentPage}` },
-      ]}
-    />
-  </Container>
-
-  <ProjectsList {...page} />
-</BaseLayout>
+<ProjectsListPage page={Number(Astro.params.page)} />

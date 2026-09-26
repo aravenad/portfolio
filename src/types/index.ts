@@ -1,3 +1,6 @@
+/** Avancement d'un projet, tel qu'écrit dans l'en-tête des fiches. */
+export type ProjectStatus = "termine" | "en-cours" | "a-venir";
+
 export interface NavLink {
   label: string;
   href: string;

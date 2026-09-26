@@ -1,5 +1,6 @@
 ---
-import { url } from "../../lib/url";
+import { useTranslations } from "../../data/ui";
+import { getLang, localizedUrl } from "../../lib/i18n";
 
 interface Crumb {
   label: string;
@@ -8,15 +9,20 @@ interface Crumb {
 }
 
 interface Props {
-  /** Niveaux à afficher après l'accueil, du plus général au plus précis. */
+  /**
+   * Niveaux à afficher après l'accueil, du plus général au plus précis. Les
+   * `href` sont neutres : la langue de la page y est ajoutée.
+   */
   items: Crumb[];
 }
 
 const { items } = Astro.props;
-const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
 ---
 
-<nav aria-label="Fil d'Ariane" class="text-sm">
+<nav aria-label={t.breadcrumb.label} class="text-sm">
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500">
     {
       crumbs.map((crumb, index) => (
@@ -37,7 +43,7 @@ const crumbs: Crumb[] = [{ label: "Accueil", href: "/" }, ...items];
           )}
 
           {crumb.href ? (
-            <a href={url(crumb.href)} class="transition hover:text-zinc-200">
+            <a href={localizedUrl(crumb.href, lang)} class="transition hover:text-zinc-200">
               {crumb.label}
             </a>
           ) : (

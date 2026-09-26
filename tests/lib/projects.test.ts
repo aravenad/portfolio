@@ -6,10 +6,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * maîtrisé — ce qui est de toute façon préférable, puisque les tests portent ici
  * sur le tri et le découpage, pas sur le contenu réel du dossier.
  */
-const entries = vi.hoisted(() => ({ value: [] as unknown[] }));
+const entries = vi.hoisted(() => ({ value: [] as unknown[], collection: "" }));
 
 vi.mock("astro:content", () => ({
-  getCollection: async () => entries.value,
+  getCollection: async (name: string) => {
+    entries.collection = name;
+    return entries.value;
+  },
 }));
 
 const {
@@ -17,8 +20,10 @@ const {
   getFeaturedProjects,
   getProjects,
   getProjectsPage,
+  getProjectHref,
+  getProjectPaths,
   getProjectsPageHref,
-  statusLabels,
+  getProjectsPagePaths,
 } = await import("../../src/lib/projects");
 
 /** Projet minimal : seuls `order` et `featured` comptent pour ces fonctions. */
@@ -117,8 +122,49 @@ describe("getFeaturedProjects", () => {
   });
 });
 
-describe("statusLabels", () => {
-  it("couvre les trois statuts du schéma, sans clé morte", () => {
-    expect(Object.keys(statusLabels).sort()).toEqual(["a-venir", "en-cours", "termine"]);
+describe("langue", () => {
+  it("lit la collection française par défaut, l'anglaise sur demande", async () => {
+    await getProjects();
+    expect(entries.collection).toBe("projects");
+
+    await getProjects("en");
+    expect(entries.collection).toBe("projectsEn");
+  });
+
+  it("préfixe les URL anglaises", () => {
+    entries.value = projects(1);
+
+    expect(getProjectsPageHref(1, "en")).toBe("/portfolio/en/projects");
+    expect(getProjectsPageHref(2, "en")).toBe("/portfolio/en/projects/page/2");
+    expect(getProjectHref(project("p1", 1) as never, "en")).toBe("/portfolio/en/projects/p1");
+    expect(getProjectHref(project("p1", 1) as never)).toBe("/portfolio/projects/p1");
+  });
+});
+
+describe("getProjectPaths", () => {
+  it("donne à chaque fiche ses voisines, dans l'ordre de la liste", async () => {
+    entries.value = [project("b", 2), project("a", 1), project("c", 3)];
+    const paths = await getProjectPaths();
+
+    expect(paths.map((path) => path.params.slug)).toEqual(["a", "b", "c"]);
+    expect(paths[1].props.previous?.id).toBe("a");
+    expect(paths[1].props.next?.id).toBe("c");
+    expect(paths[0].props.previous).toBeUndefined();
+    expect(paths[2].props.next).toBeUndefined();
+  });
+});
+
+describe("getProjectsPagePaths", () => {
+  it("ne génère que les pages à partir de la deuxième", async () => {
+    entries.value = projects(PROJECTS_PER_PAGE * 2 + 1);
+    const paths = await getProjectsPagePaths("en");
+
+    expect(paths.map((path) => path.params.page)).toEqual(["2", "3"]);
+    expect(entries.collection).toBe("projectsEn");
+  });
+
+  it("n'en génère aucune quand tout tient sur une page", async () => {
+    entries.value = projects(PROJECTS_PER_PAGE);
+    expect(await getProjectsPagePaths()).toEqual([]);
   });
 });

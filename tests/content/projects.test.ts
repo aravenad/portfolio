@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { load } from "js-yaml";
 import { describe, expect, it, vi } from "vitest";
@@ -24,14 +25,19 @@ vi.mock("astro/loaders", () => ({ glob: () => ({}) }));
 const { collections } = await import("../../src/content.config");
 const schema = (collections.projects as { schema: { safeParse: (input: unknown) => { success: boolean; error?: unknown } } }).schema;
 
-const DIRECTORY = new URL("../../src/content/projects", import.meta.url).pathname;
+/*
+ * `fileURLToPath` et non `.pathname` : sous Windows, `.pathname` donne
+ * « /C:/… », que `readdirSync` transforme en « C:\C:\… ».
+ */
+const DIRECTORY = fileURLToPath(new URL("../../src/content/projects", import.meta.url));
+const DIRECTORY_EN = join(DIRECTORY, "en");
 
-/** Chaque fiche du dossier, avec son en-tête YAML déjà décodé. */
-const fiches = readdirSync(DIRECTORY)
+/** Chaque fiche d'un dossier, avec son en-tête YAML déjà décodé. */
+const read = (directory: string) => readdirSync(directory)
   .filter((file) => file.endsWith(".md"))
   .sort()
   .map((file) => {
-    const raw = readFileSync(join(DIRECTORY, file), "utf8");
+    const raw = readFileSync(join(directory, file), "utf8");
     const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
 
     expect(match, `${file} n'a pas d'en-tête YAML`).not.toBeNull();
@@ -43,6 +49,9 @@ const fiches = readdirSync(DIRECTORY)
       body: match![2],
     };
   });
+
+const fiches = read(DIRECTORY);
+const fichesEn = read(DIRECTORY_EN);
 
 describe("fiches de projet", () => {
   it("il y en a au moins une", () => {
@@ -118,5 +127,37 @@ describe("fiches de projet", () => {
     for (const fiche of fiches) {
       expect(["termine", "en-cours", "a-venir"]).toContain(fiche.data.status);
     }
+  });
+});
+
+describe("fiches de projet en anglais", () => {
+  /*
+   * Le sélecteur de langue passe d'une fiche à la même en changeant seulement
+   * le préfixe de l'URL : chaque fiche doit exister dans les deux langues, sous
+   * le même nom. Seul le texte change ; le classement, lui, doit rester le même
+   * pour que les deux versions du site se ressemblent.
+   */
+  it("traduit chaque fiche française, et rien de plus", () => {
+    expect(fichesEn.map((fiche) => fiche.file)).toEqual(fiches.map((fiche) => fiche.file));
+  });
+
+  describe.each(fichesEn)("$file", ({ data, slug }) => {
+    it("satisfait le schéma de la collection", () => {
+      const result = schema.safeParse(data);
+      expect(result.success, JSON.stringify(result.error)).toBe(true);
+    });
+
+    it("garde l'ordre, le statut, l'année et la mise en avant de la version française", () => {
+      const original = fiches.find((fiche) => fiche.slug === slug)!.data;
+
+      for (const key of ["order", "status", "year", "featured"]) {
+        expect(data[key], key).toEqual(original[key]);
+      }
+    });
+
+    it("garde autant d'étiquettes que la version française", () => {
+      const original = fiches.find((fiche) => fiche.slug === slug)!.data;
+      expect((data.tags as string[]).length).toBe((original.tags as string[]).length);
+    });
   });
 });

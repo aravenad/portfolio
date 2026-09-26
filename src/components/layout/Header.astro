@@ -1,19 +1,31 @@
 ---
 import Container from "../ui/Container.astro";
-import { navLinks, site } from "../../data/site";
+import { navLinks, navLinksEn, site } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { getLang, localized, localizedUrl, switchLangPath } from "../../lib/i18n";
 import { ariaCurrentFor } from "../../lib/nav";
-import { url } from "../../lib/url";
 
 const currentPath = Astro.url.pathname;
+const lang = getLang(currentPath);
+const t = useTranslations(lang);
+const links = localized(lang, { fr: navLinks, en: navLinksEn });
+const otherLang = lang === "fr" ? "en" : "fr";
 
 /** Règle partagée avec le script de resynchronisation : voir src/lib/nav.ts. */
-const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
+const ariaCurrent = (href: string) => ariaCurrentFor(localizedUrl(href, lang), currentPath);
+
+/** Les petits boutons de la barre : menu, langue, thème. */
+const control =
+  "flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white";
 ---
 
 {/*
   `transition:persist` garde le header en place d'une page à l'autre : il ne
   clignote pas pendant l'échange, et son animation d'entrée ne rejoue pas à
   chaque navigation — elle appartient à l'ouverture du site, pas à chaque page.
+
+  Le nom inclut la langue : passer à l'autre langue remplace le header, au lieu
+  de garder des liens et des libellés qui ne sont plus les bons.
 */}
 {/*
   Deux états, pilotés par `data-scrolled` (script plus bas) :
@@ -25,7 +37,10 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
   Le rendu serveur est l'état « en haut » : c'est celui de toute page ouverte
   depuis un lien.
 */}
-<header transition:persist class="page-enter page-enter-down sticky top-0 z-50">
+<header
+  transition:persist={`header-${lang}`}
+  class="page-enter page-enter-down sticky top-0 z-50"
+>
   {/*
     Le fond flouté est un calque séparé : un élément portant `backdrop-filter`
     isole ses descendants, et le panneau du menu — s'il était à l'intérieur —
@@ -39,70 +54,117 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
 
   <Container class="header-bar relative flex h-16 items-center justify-between gap-4">
     <a
-      href={url("/")}
+      href={localizedUrl("/", lang)}
       data-home-link
       class="font-medium tracking-tight transition hover:text-white"
     >
       {site.name}
     </a>
 
-    <nav aria-label="Navigation principale">
-      {/* Quatre liens ne tiennent pas à côté du logo sous 640px. */}
+    {/*
+      Navigation, langue et thème, écartés ensemble vers le bord en haut de page.
+      Sous 640 px, les liens vivent dans le panneau déplié : restent visibles la
+      langue, le thème, puis le bouton du menu, au bord. Au-delà, la navigation
+      repasse en tête (`sm:order-first`).
+    */}
+    <div class="header-end -mr-2 flex items-center gap-1 sm:gap-2">
+      <a
+        href={switchLangPath(currentPath, otherLang)}
+        hreflang={otherLang}
+        lang={otherLang}
+        data-lang-switch
+        aria-label={t.header.otherLang.label}
+        class:list={[control, "text-xs font-semibold tracking-wide"]}
+      >
+        {t.header.otherLang.short}
+      </a>
+
       <button
         type="button"
-        data-nav-toggle
-        aria-controls="nav-menu"
-        aria-expanded="false"
-        aria-label="Ouvrir le menu"
-        class="-mr-2 flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white sm:hidden"
+        data-theme-toggle
+        aria-pressed="false"
+        aria-label={t.header.lightTheme}
+        class={control}
       >
+        {/* Le soleil en sombre (passer au clair), la lune en clair : voir le style. */}
         <svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="1.75"
           stroke-linecap="round"
+          stroke-linejoin="round"
           aria-hidden="true"
           class="size-5"
         >
-          <path class="nav-icon-open" d="M4 7h16M4 12h16M4 17h16"></path>
-          <path class="nav-icon-close hidden" d="m6 6 12 12M18 6 6 18"></path>
+          <g class="theme-icon-sun">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
+          </g>
+          <path class="theme-icon-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path>
         </svg>
       </button>
 
-      {/*
-        Déplié, le panneau est la surface de la barre elle-même, prolongée vers
-        le bas : il part du haut de l'écran et glisse sous le logo et le bouton
-        (`-z-10`). Il commençait à 64 px, avec un fond et un flou différents
-        posés sur le fondu de la barre : la jonction formait une marche visible.
-        `pt-20` = la hauteur de la barre plus le `p-4`.
+      <nav aria-label={t.header.navLabel} class="sm:order-first sm:mr-4">
+        {/* Quatre liens ne tiennent pas à côté du logo sous 640px. */}
+        <button
+          type="button"
+          data-nav-toggle
+          aria-controls="nav-menu"
+          aria-expanded="false"
+          aria-label={t.header.openMenu}
+          data-label-open={t.header.openMenu}
+          data-label-close={t.header.closeMenu}
+          class:list={[control, "sm:hidden"]}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            aria-hidden="true"
+            class="size-5"
+          >
+            <path class="nav-icon-open" d="M4 7h16M4 12h16M4 17h16"></path>
+            <path class="nav-icon-close hidden" d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
 
-        ⚠️ Noir à 97 %, pas à 88 % comme la barre fermée. Le flou ne suffit pas
-        à effacer ce qui passe dessous : mesuré sur Chrome, le titre de
-        l'accueil restait net et lisible derrière les liens. Le fond doit donc
-        couvrir seul ; le flou n'est qu'un complément là où il s'applique.
-      */}
-      <ul
-        id="nav-menu"
-        class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
-      >
-        {
-          navLinks.map((link) => (
-            <li>
-              <a
-                href={url(link.href)}
-                data-nav-link
-                data-sections={link.sections?.join(" ")}
-                aria-current={ariaCurrent(link.href)}
-                class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+        {/*
+          Déplié, le panneau est la surface de la barre elle-même, prolongée vers
+          le bas : il part du haut de l'écran et glisse sous le logo et le bouton
+          (`-z-10`). Il commençait à 64 px, avec un fond et un flou différents
+          posés sur le fondu de la barre : la jonction formait une marche visible.
+          `pt-20` = la hauteur de la barre plus le `p-4`.
+
+          ⚠️ Fond opaque à 97 %, pas à 88 % comme la barre fermée. Le flou ne
+          suffit pas à effacer ce qui passe dessous : mesuré sur Chrome, le titre
+          de l'accueil restait net et lisible derrière les liens. Le fond doit
+          donc couvrir seul ; le flou n'est qu'un complément là où il s'applique.
+        */}
+        <ul
+          id="nav-menu"
+          class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+        >
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={localizedUrl(link.href, lang)}
+                  data-nav-link
+                  data-sections={link.sections?.join(" ")}
+                  aria-current={ariaCurrent(link.href)}
+                  class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
   </Container>
 </header>
 
@@ -112,7 +174,8 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
    */
   .header-backdrop {
     height: 8rem;
-    background: rgb(9 9 11 / 88%);
+    /* La couleur du fond de page, qui suit le thème. */
+    background: color-mix(in oklab, var(--color-zinc-950) 88%, transparent);
     backdrop-filter: blur(12px);
     mask-image: linear-gradient(
       to bottom,
@@ -159,14 +222,15 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
   /*
    * Grand écran seulement, et pas par confort : un `transform`, même nul, fait
    * de son élément le bloc conteneur des descendants en `position: fixed`. Posé
-   * sur la liste en mobile, il enfermerait le panneau déplié dans la barre.
+   * sur le groupe de droite en mobile, il enfermerait le panneau déplié du menu
+   * dans la barre.
    */
   @media (width >= 72rem) {
     .header-bar {
       --spread: calc((min(100vw, 84rem) - 72rem) / 2);
     }
 
-    #nav-menu {
+    .header-end {
       transition: transform var(--bar-duration) var(--bar-ease);
     }
 
@@ -181,7 +245,7 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
       transform: translateX(calc(-1 * var(--spread)));
     }
 
-    header:not([data-scrolled]) #nav-menu {
+    header:not([data-scrolled]) .header-end {
       transform: translateX(var(--spread));
     }
   }
@@ -218,7 +282,7 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
   /* Premier affichage déjà défilé (rechargement, ancre) : pas d'animation. */
   header[data-instant] .header-backdrop,
   header[data-instant] .header-bar > [data-home-link],
-  header[data-instant] #nav-menu,
+  header[data-instant] .header-end,
   header[data-instant] [data-nav-link] {
     transition: none;
   }
@@ -226,10 +290,24 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
   @media (prefers-reduced-motion: reduce) {
     .header-backdrop,
     .header-bar > [data-home-link],
-    #nav-menu,
+    .header-end,
     [data-nav-link] {
       transition: none;
     }
+  }
+
+  /*
+   * Icône du bouton de thème : le soleil en sombre, pour passer au clair, et la
+   * lune en clair. Choisie en CSS d'après `data-theme`, déjà posé avant le
+   * premier rendu : aucune icône ne clignote au chargement.
+   */
+  .theme-icon-moon,
+  :global(:root[data-theme="light"]) .theme-icon-sun {
+    display: none;
+  }
+
+  :global(:root[data-theme="light"]) .theme-icon-moon {
+    display: inline;
   }
 
   /*
@@ -449,7 +527,11 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
       const setOpen = (open: boolean) => {
         menu.toggleAttribute("data-open", open);
         toggle.setAttribute("aria-expanded", String(open));
-        toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+        // Libellés rendus par le serveur dans la langue de la page.
+        toggle.setAttribute(
+          "aria-label",
+          (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? "",
+        );
         iconOpen?.classList.toggle("hidden", open);
         iconClose?.classList.toggle("hidden", !open);
       };
@@ -577,5 +659,49 @@ const ariaCurrent = (href: string) => ariaCurrentFor(url(href), currentPath);
       window.addEventListener("scroll", update, { passive: true, signal });
       window.addEventListener("resize", update, { signal });
     }
+  });
+</script>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+  import { switchLangPath, type Lang } from "../../lib/i18n";
+  import { wireThemeToggle } from "../../lib/theme";
+
+  /**
+   * Bouton de thème : voir src/lib/theme.ts, où il est testé. Le thème lui-même
+   * est posé avant le premier rendu par le script en ligne de BaseLayout.
+   */
+  onEachPage((signal) => {
+    const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+
+    if (button) {
+      wireThemeToggle(button, document.documentElement, () => localStorage, signal);
+    }
+  });
+
+  /**
+   * Garde le lien de langue sur la page courante.
+   *
+   * Le header persiste d'une page à l'autre dans une même langue : le lien rendu
+   * par le serveur viserait sinon toujours l'équivalent de la page d'arrivée.
+   * Au clic, il emporte aussi l'ancre (`#career`…) : les sections portent les
+   * mêmes `id` dans les deux langues.
+   */
+  onEachPage((signal) => {
+    const link = document.querySelector<HTMLAnchorElement>("[data-lang-switch]");
+    const target = link?.getAttribute("hreflang") as Lang | null;
+
+    if (!link || !target) return;
+
+    const targetPath = () => switchLangPath(window.location.pathname, target);
+
+    link.href = targetPath();
+    link.addEventListener(
+      "click",
+      () => {
+        link.href = targetPath() + window.location.hash;
+      },
+      { signal },
+    );
   });
 </script>

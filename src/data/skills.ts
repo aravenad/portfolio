@@ -86,3 +86,16 @@ export const softSkills: Skill[] = [
   { label: "Documentation", detail: "Choix de conception justifiés" },
   { label: "Analyse de données", detail: "Nettoyage SQL, visualisations" },
 ];
+
+/** Les mêmes compétences en anglais, dans le même ordre. */
+export const softSkillsEn: Skill[] = [
+  { label: "Teamwork", detail: "Projects with 2 to 7 people" },
+  { label: "Project management", detail: "Task breakdown, planning, deadlines" },
+  { label: "Requirements gathering", detail: "Client interviews, specifications" },
+  { label: "Popularization", detail: "Non-technical audiences" },
+  { label: "Technical writing", detail: "Installation guides, reports" },
+  { label: "English", detail: "B2 level · guides and reports written" },
+  { label: "Autonomy", detail: "Projects led alone from start to finish" },
+  { label: "Documentation", detail: "Justified design choices" },
+  { label: "Data analysis", detail: "SQL cleaning, visualizations" },
+];
