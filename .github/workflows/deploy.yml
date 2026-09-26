@@ -1,3 +1,6 @@
+# Tests, build, puis publication sur GitHub Pages. Un job qui échoue arrête la
+# chaîne : le site en ligne reste alors la version précédente.
+# Vue d'ensemble : §7 de docs/ARCHITECTURE.md.
 name: Deploy to GitHub Pages
 
 on:

@@ -4,7 +4,7 @@ Les valeurs du portfolio, sous une forme utilisable hors du code. La DA est
 monochrome, calquée sur la bannière LinkedIn : noir profond, métal liquide,
 aucune teinte franche.
 
-Référence complète et justifications : §5 de `DOCUMENTATION.md`.
+Les justifications sont en commentaire dans `src/styles/global.css`.
 
 ---
 
@@ -88,14 +88,15 @@ lisible à cette intensité — pas au-delà.
 ⚠️ **Ne pas l'étirer horizontalement.** Son format est 2,2:1. Au-delà d'environ
 1,25× d'étirement, l'écoulement se lit comme des traînées et l'effet tombe.
 
-Pour la régénérer autrement (autre graine, autre densité) : `tools/chrome.svg`
-et la commande de §5 de `DOCUMENTATION.md`.
+Pour la régénérer autrement (autre graine, autre densité) : `tools/chrome.svg`,
+rendu par Chrome en mode headless comme `tools/og.html` (§6 de
+`docs/ARCHITECTURE.md`).
 
 ---
 
 ## 4. Le grain
 
-Le site pose un bruit gris désaturé à **5 % d'opacité** par-dessus toute la page.
+Le site pose un bruit gris désaturé à **2,5 % d'opacité** sur toute la page.
 Il casse l'uniformité des aplats sombres, où les dégradés se voient par bandes.
 
 Sur un CV **écran**, il vaut le coup : même raison, mêmes bandes.
@@ -120,7 +121,7 @@ Ce qui compte plus que la police :
 | Interlettrage des grands titres | serré, `-0.035em` |
 | Interlettrage du texte | normal |
 | Interligne du texte | 1,6 à 1,75 |
-| Libellés de catégorie | capitales, `+0.06em`, corps réduit, gris `#71717A` |
+| Libellés de catégorie | capitales, `+0.1em`, corps réduit, gris `#71717A` |
 
 L'interlettrage serré sur les grands titres est une part réelle de l'identité :
 sans lui, le nom en très grand corps paraît lâche et générique.

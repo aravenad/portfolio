@@ -10,6 +10,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProjects, statusLabels } from "../../lib/projects";
 import { url } from "../../lib/url";
 
+/**
+ * Une page par fiche. Les voisins viennent de la liste déjà triée par `order` :
+ * « précédent » et « suivant » suivent l'ordre de la page des projets.
+ */
 export const getStaticPaths = (async () => {
   const projects = await getProjects();
 

@@ -9,6 +9,11 @@ import { site } from "../data/site";
 import { softSkills, technicalSkills } from "../data/skills";
 ---
 
+{/*
+  Les `id` des sections sont des ancres de la navigation : ils doivent rester
+  ceux de `navLinks[].sections` (src/data/site.ts), qui surligne le lien de la
+  section en cours de lecture. L'ordre des sections est celui des liens.
+*/}
 <BaseLayout title={site.title} description={site.description}>
   <Hero
     intro="Bonjour, moi c'est"

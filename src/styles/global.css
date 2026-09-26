@@ -38,7 +38,8 @@ body {
 }
 
 /*
- * Source originale 1920 × 3770, convertie sans perte. Le décalage proportionnel
+ * Source originale 1920 × 3770, encodée en WebP avec perte (voir BaseLayout,
+ * où elle est préchargée). Le décalage proportionnel
  * à sa largeur choisit le même départ de motif (y ≈ 1670 dans la source) à
  * chaque taille d'écran, sans déformer les plis.
  *

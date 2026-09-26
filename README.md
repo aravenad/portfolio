@@ -3,9 +3,12 @@
 Portfolio personnel de Damien Aravena Bravo — étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : dix pages HTML, une feuille de style, et ~21 Ko de
-JavaScript — le routeur de transitions d'Astro et une dizaine de petits
-comportements (menu, navigation active, apparition au défilement).
+Site entièrement statique : dix pages HTML, une feuille de style, et ~25 Ko de
+JavaScript (8 Ko compressé) — le routeur de transitions d'Astro et une dizaine
+de petits comportements (menu, navigation active, apparition au défilement).
+
+Architecture, fonctionnement, évolutions et workflow de publication :
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Démarrer
 
@@ -21,7 +24,7 @@ npm run coverage # tests + rapport de couverture
 Node >= 22.12. Le site est publié sur <https://aravenad.github.io/portfolio/> à
 chaque push sur `main`, via le workflow `.github/workflows/deploy.yml` — qui
 lance d'abord les tests et un `npm audit`, et ne construit rien si l'un des deux
-échoue.
+échoue. Détail : §7 de l'architecture.
 
 ## Structure
 
@@ -34,6 +37,7 @@ src/
 │   ├── sections/    blocs de la page d'accueil
 │   └── ProjectCard.astro
 ├── content/projects/  une fiche Markdown par projet
+├── content.config.ts  schéma des fiches, vérifié au build
 ├── data/            contenu éditable : site, compétences, parcours
 ├── icons/           logos absents de Simple Icons, chargés par astro-icon
 ├── layouts/         BaseLayout
@@ -42,8 +46,11 @@ src/
 ├── styles/          global.css (thème et rendu Markdown)
 └── types/           interfaces partagées
 
+public/              servi tel quel : CV, favicon, images d'aperçu
 tools/               sources des images générées, non compilées
 tests/               Vitest : données, composants, pages
+docs/                architecture du projet
+.github/             workflow de publication et Dependabot
 ```
 
 ## Modifier le contenu
@@ -93,8 +100,8 @@ La couleur d'accent est définie une seule fois dans `src/styles/global.css` :
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
 noir, matière métallique en haut de page, lettrage chromé. Elle tient dans
 `src/styles/global.css` (palette, calques, utilitaires), `src/assets/` (la
-matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Voir §5
-et §10 de la documentation technique.
+matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Pour
+les modifier, voir §6 de l'architecture.
 
 ## Tests
 
@@ -110,7 +117,7 @@ Elle sert surtout à vérifier ce qui ne se voit pas à la relecture : l'espace
 insécable des périodes du parcours, le contraste des couleurs de marque sur les
 tuiles, les métadonnées d'aperçu LinkedIn, et le marquage du lien de navigation
 courant. Un nouveau projet ou une nouvelle compétence est validé par les tests
-avant même le build. Voir §14 de la documentation technique.
+avant même le build. Voir §5 de l'architecture.
 
 ## Logos des compétences
 

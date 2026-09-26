@@ -21,6 +21,10 @@ antérieur sans dépendre de cette archive.
 
 ## Nouveau fond
 
+> État au 21 septembre 2026. Depuis, le WebP est encodé avec perte (qualité 80)
+> et le masque est une image, `src/assets/chrome-fade.webp` : voir
+> `tools/chrome-fade/README.md`.
+
 La version retenue utilise `src/assets/chrome-original-hq.webp`, issue de
 l'image fournie `a6630457502c9a3dcee8832287cf9b96.png` (1920 × 3770).
 Le WebP est sans perte, sans agrandissement, et pèse 5 453 882 octets : la
