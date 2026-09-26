@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 727" width="1600" height="727">
   <!--
-    Source de public/chrome.webp — la matière « métal liquide » de la direction
-    artistique, reprise de la bannière LinkedIn. Commande de rendu : §5 de
-    DOCUMENTATION.md. Le fichier est rastérisé une fois et versionné : un filtre
+    Ancienne matière « métal liquide » du site, reprise de la bannière LinkedIn.
+    Le site utilise désormais une photo (src/assets/chrome-original-hq.webp) ;
+    ce fichier reste la source des bandeaux de tools/cv-kit/. Le fichier est
+    rastérisé une fois et versionné : un filtre
     SVG vivant de cette taille est coûteux au défilement, et Safari rend
     feTurbulence et les primitives d'éclairage différemment de Chrome.
 
