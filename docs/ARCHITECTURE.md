@@ -37,6 +37,7 @@ justifie : ce document n'en donne que la carte.
 | `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS ou le code importent |
 | `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) | Nom stable : c'est lui qui fait l'URL |
 | `tests/` | Vitest, rangé comme `src/` | Voir §5 |
+| `e2e/` | Playwright : le site construit, dans Chromium | Voir §5 |
 | `tools/` | Sources des images générées, archives | Jamais compilé ni servi |
 
 ## 3. Du contenu à la page
@@ -97,6 +98,8 @@ chargement. Tout comportement doit donc passer par `onEachPage()`
 (`src/lib/enhance.ts`), qui le rejoue à chaque page et fournit un `AbortSignal`
 à poser sur chaque écouteur, pour qu'aucun ne survive à la page suivante.
 
+Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
+
 | Comportement | Script | Règle testée |
 | :--- | :--- | :--- |
 | Menu mobile, barre qui se détend, lien actif au défilement | `layout/Header.astro` | `lib/nav.ts` |
@@ -149,7 +152,22 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
 ```sh
 npm test          # 576 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
+npm run test:e2e  # 31 tests de bout en bout, une quinzaine de secondes
 ```
+
+Deux niveaux, qui se complètent :
+
+- **Vitest (`tests/`)** vérifie les règles et le HTML produit, couverts à
+  100 %. Il ne voit pas les `<script>` des composants : Vite les compile à part,
+  pour le navigateur.
+- **Playwright (`e2e/`)** vérifie ce câblage sur le site construit, servi sous
+  `/portfolio`, dans Chromium : barre de navigation, menu mobile, thème,
+  langue et position de lecture, apparition au défilement, sommaire, retour en
+  haut, pagination. Bureau pour tout, gabarit de téléphone pour
+  `mobile.spec.ts`. Chaque test échoue aussi sur une erreur de console.
+  Première fois : `npx playwright install --only-shell chromium`.
+
+Côté Vitest :
 
 - **Composants et pages** sont rendus sans navigateur par l'API Container
   d'Astro, puis interrogés comme un DOM (`linkedom`). Les aides sont dans
@@ -174,11 +192,11 @@ npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 | **Ajouter une section à l'accueil** | Un composant dans `sections/` basé sur `ui/Section.astro` avec un `id`, ses textes dans `ui.ts`, placé dans `components/pages/Home.astro`. Pour un lien dans la barre : l'ajouter dans `navLinks` et `navLinksEn` (`src/data/site.ts`), dans l'ordre des sections, avec l'`id` dans `sections`. |
 | **Ajouter une page** | Son contenu dans `components/pages/`, enveloppé dans `BaseLayout`, liens via `localizedUrl()` ; puis un fichier qui le rend dans `src/pages/` et un dans `src/pages/en/`. Ajouter un test dans `tests/pages/`. |
 | **Ajouter une langue** | L'ajouter à `languages` (`src/lib/i18n.ts`), lui donner un dictionnaire dans `ui.ts`, ses contenus (`…De`…), une collection dans `content.config.ts`, et ses fichiers dans `src/pages/<code>/`. Le sélecteur du header, prévu pour deux langues, devient alors une liste. |
-| **Ajouter un comportement JS** | La règle dans `src/lib/` avec son test, le câblage dans le `<script>` du composant via `onEachPage((signal) => …)`. |
+| **Ajouter un comportement JS** | La règle dans `src/lib/` avec son test, le câblage dans le `<script>` du composant via `onEachPage((signal) => …)`, et un test de ce que voit le visiteur dans `e2e/`. |
 | **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind. |
 | **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
-| **Changer le nom du dépôt** | Le dossier de publication change : mettre à jour `base` dans `astro.config.mjs`, puis remplacer `/portfolio` dans `tests/` (`helpers/render.ts` et les tests qui vérifient des URL). |
+| **Changer le nom du dépôt** | Le dossier de publication change : mettre à jour `base` dans `astro.config.mjs`, puis remplacer `/portfolio` dans `tests/` (`helpers/render.ts` et les tests qui vérifient des URL), dans `e2e/` et dans `playwright.config.ts`. |
 
 Rendu de l'image d'aperçu, depuis la racine du projet. Sous Windows, remplacer
 `chrome` par le chemin complet de `chrome.exe` et l'URL par
@@ -198,14 +216,17 @@ de le publier.
 request vers `main`, ou à la main (onglet Actions, « Run workflow »).
 
 ```text
-test ──> build ──> deploy
+        ┌──> build ──┐
+test ───┤            ├──> deploy
+        └──> e2e ────┘
 ```
 
 | Job | Fait | Échoue si |
 | :--- | :--- | :--- |
 | `test` | `npm ci`, `npm audit --omit=dev --audit-level=high`, `npm run coverage` | Faille haute ou critique dans une dépendance de production, test rouge, couverture sous 80 % |
 | `build` | `withastro/action` : installe, construit, dépose `dist/` comme artefact Pages | Erreur de build, dont une fiche projet invalide |
-| `deploy` | `actions/deploy-pages` publie l'artefact | Jamais lancé sur une pull request |
+| `e2e` | `npm ci`, installe Chromium, `npm run test:e2e` (construit et sert le site lui-même) | Test de bout en bout rouge ; une relance est tentée avant d'échouer |
+| `deploy` | `actions/deploy-pages` publie l'artefact de `build`, une fois `e2e` passé | Jamais lancé sur une pull request |
 
 - **Un échec n'abîme rien** : tant que `deploy` ne s'est pas exécuté, le site en
   ligne reste la version précédente.
