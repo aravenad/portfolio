@@ -162,10 +162,16 @@ const setting = [
           suffit pas à effacer ce qui passe dessous : mesuré sur Chrome, le titre
           de l'accueil restait net et lisible derrière les liens. Le fond doit
           donc couvrir seul ; le flou n'est qu'un complément là où il s'applique.
+
+          ⚠️ `sm:z-auto` N'EST PAS DÉCORATIF. La `<nav>` est un conteneur flex au-delà
+          de 640 px (pour son filet), ce qui fait de cette liste un élément flex :
+          son `-z-10`, fait pour le panneau mobile, s'appliquerait alors aussi en
+          position statique. Les liens passaient derrière la barre, qui prenait
+          leurs clics et les recouvrait de son fond au défilement.
         */}
         <ul
           id="nav-menu"
-          class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+          class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:z-auto sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
         >
           {
             links.map((link) => (
@@ -692,27 +698,43 @@ const setting = [
 <script>
   import { onEachPage } from "../../lib/enhance";
   import { switchLangPath, type Lang } from "../../lib/i18n";
-  import { wireThemeToggle } from "../../lib/theme";
+  import { readingPosition, restoredScrollY, type ReadingPosition } from "../../lib/lang-switch";
+  import { wireThemeToggle, withViewTransition } from "../../lib/theme";
+
+  const motionOk = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /**
-   * Bouton de thème : voir src/lib/theme.ts, où il est testé. Le thème lui-même
-   * est posé avant le premier rendu par le script en ligne de BaseLayout.
+   * Bouton de thème : voir src/lib/theme.ts, où il est testé. Le changement se
+   * fait dans un fondu enchaîné de toute la page. Le thème lui-même est posé
+   * avant le premier rendu par le script en ligne de BaseLayout.
    */
   onEachPage((signal) => {
     const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
 
     if (button) {
-      wireThemeToggle(button, document.documentElement, () => localStorage, signal);
+      wireThemeToggle(button, document.documentElement, () => localStorage, signal, (update) =>
+        withViewTransition(document, motionOk(), update),
+      );
     }
   });
 
+  /*
+   * Changer de langue sans perdre sa place : voir src/lib/lang-switch.ts.
+   *
+   * Le module vit tant que le document vit, navigations comprises : la position
+   * notée au clic attend donc ici l'échange de page, sans passer par un stockage.
+   */
+  let pending: ReadingPosition | null = null;
+
+  /** Défilement maximal de la page courante. */
+  const maxScroll = () => document.documentElement.scrollHeight - window.innerHeight;
+
   /**
-   * Garde le lien de langue sur la page courante.
+   * Garde le lien de langue sur la page courante, et note la position de
+   * lecture au clic.
    *
    * Le header persiste d'une page à l'autre dans une même langue : le lien rendu
    * par le serveur viserait sinon toujours l'équivalent de la page d'arrivée.
-   * Au clic, il emporte aussi l'ancre (`#career`…) : les sections portent les
-   * mêmes `id` dans les deux langues.
    */
   onEachPage((signal) => {
     const link = document.querySelector<HTMLAnchorElement>("[data-lang-switch]");
@@ -720,15 +742,67 @@ const setting = [
 
     if (!link || !target) return;
 
-    const targetPath = () => switchLangPath(window.location.pathname, target);
-
-    link.href = targetPath();
+    link.href = switchLangPath(window.location.pathname, target);
     link.addEventListener(
       "click",
       () => {
-        link.href = targetPath() + window.location.hash;
+        // Les sections de l'accueil : les seuls repères communs aux deux langues.
+        const landmarks = [...document.querySelectorAll<HTMLElement>("main section[id]")].map(
+          (section) => ({ id: section.id, top: section.getBoundingClientRect().top }),
+        );
+
+        pending = readingPosition(landmarks, window.scrollY, maxScroll());
       },
       { signal },
     );
+  });
+
+  /*
+   * Sur la page d'arrivée, et seulement après un changement de langue : pas
+   * d'animation d'entrée du gabarit, qui ferait rejouer au header et au hero
+   * une ouverture de site. Le drapeau est posé sur le document entrant, dont
+   * les attributs de `<html>` remplacent ceux de la page quittée.
+   */
+  document.addEventListener("astro:before-swap", (event) => {
+    if (pending) event.newDocument.documentElement.setAttribute("data-lang-switch", "");
+  });
+
+  /*
+   * Rétablit la position avant que la nouvelle page ne soit peinte : le fondu
+   * du routeur passe ainsi d'un texte à sa traduction, au même endroit.
+   *
+   * Les blocs déjà à l'écran sont révélés d'office : sans cela, ils
+   * rejoueraient leur apparition au défilement comme si on arrivait sur la page.
+   * Révélés SANS transition : mesurer leur position leur a déjà donné leur style
+   * masqué, et l'attribut seul les ferait remonter en fondu depuis l'opacité 0.
+   */
+  document.addEventListener("astro:after-swap", () => {
+    if (!pending) return;
+
+    const position = pending;
+    pending = null;
+
+    const landmark = position.id ? document.getElementById(position.id) : null;
+    const landmarkTop = landmark
+      ? landmark.getBoundingClientRect().top + window.scrollY
+      : undefined;
+
+    window.scrollTo({
+      top: restoredScrollY(position, landmarkTop, maxScroll()),
+      behavior: "instant",
+    });
+
+    const visible = [...document.querySelectorAll<HTMLElement>(".reveal")].filter(
+      (block) => block.getBoundingClientRect().top < window.innerHeight,
+    );
+
+    for (const block of visible) {
+      block.style.transition = "none";
+      block.setAttribute("data-revealed", "");
+    }
+
+    // Lire une mesure applique le nouvel état ; les transitions reviennent ensuite.
+    void document.body.offsetHeight;
+    for (const block of visible) block.style.removeProperty("transition");
   });
 </script>

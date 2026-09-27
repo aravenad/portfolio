@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { THEME_KEY, saveTheme, toggledTheme, wireThemeToggle } from "../../src/lib/theme";
+import {
+  THEME_KEY,
+  saveTheme,
+  toggledTheme,
+  wireThemeToggle,
+  withViewTransition,
+} from "../../src/lib/theme";
 
 /** Un bouton qui retient ses attributs et son écouteur de clic. */
 function fakeButton() {
@@ -94,5 +100,103 @@ describe("wireThemeToggle", () => {
     wireThemeToggle(button as never, { dataset: {} } as never, () => fakeStore(), signal);
 
     expect(spy).toHaveBeenCalledWith("click", expect.any(Function), { signal });
+  });
+});
+
+describe("wireThemeToggle, avec une transition", () => {
+  it("applique le thème à l'intérieur de la transition", () => {
+    const button = fakeButton();
+    const root = { dataset: {} } as { dataset: DOMStringMap };
+    const seen: (string | undefined)[] = [];
+
+    wireThemeToggle(button as never, root, () => fakeStore(), new AbortController().signal, (update) => {
+      seen.push(root.dataset.theme);
+      update();
+      seen.push(root.dataset.theme);
+    });
+
+    button.click();
+    // Avant l'appel : encore sombre ; après : clair. La transition enrobe bien le changement.
+    expect(seen).toEqual(["dark", "light"]);
+  });
+});
+
+describe("withViewTransition", () => {
+  /** Un document dont on suit les attributs de <html> et les fondus lancés. */
+  function fakeDocument(supported = true) {
+    const attributes = new Set<string>();
+    let finish!: () => void;
+    const calls: string[] = [];
+
+    const doc = {
+      documentElement: {
+        setAttribute: (name: string) => attributes.add(name),
+        removeAttribute: (name: string) => attributes.delete(name),
+      },
+      startViewTransition: supported
+        ? (update: () => void) => {
+            calls.push("start");
+            update();
+            return { finished: new Promise<void>((resolve) => (finish = resolve)) };
+          }
+        : undefined,
+    };
+
+    return { doc, attributes, calls, finish: () => finish() };
+  }
+
+  it("lance un fondu et marque <html> le temps du fondu", async () => {
+    const { doc, attributes, calls, finish } = fakeDocument();
+    const update = vi.fn();
+
+    withViewTransition(doc, true, update);
+
+    expect(calls).toEqual(["start"]);
+    expect(update).toHaveBeenCalledOnce();
+    expect(attributes.has("data-theme-switching")).toBe(true);
+
+    finish();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(attributes.has("data-theme-switching")).toBe(false);
+  });
+
+  it("reste silencieux et nettoie <html> quand le fondu est interrompu", async () => {
+    // Un second clic pendant le fondu l'abandonne : `finished` est alors rejeté.
+    const attributes = new Set<string>();
+    const doc = {
+      documentElement: {
+        setAttribute: (name: string) => attributes.add(name),
+        removeAttribute: (name: string) => attributes.delete(name),
+      },
+      startViewTransition: (update: () => void) => {
+        update();
+        return { finished: Promise.reject(new Error("AbortError")) };
+      },
+    };
+
+    expect(() => withViewTransition(doc, true, () => {})).not.toThrow();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(attributes.has("data-theme-switching")).toBe(false);
+  });
+
+  it("applique directement quand le visiteur préfère réduire les animations", () => {
+    const { doc, attributes, calls } = fakeDocument();
+    const update = vi.fn();
+
+    withViewTransition(doc, false, update);
+
+    expect(calls).toEqual([]);
+    expect(update).toHaveBeenCalledOnce();
+    expect(attributes.size).toBe(0);
+  });
+
+  it("applique directement sur un navigateur sans View Transitions", () => {
+    const { doc, calls } = fakeDocument(false);
+    const update = vi.fn();
+
+    withViewTransition(doc, true, update);
+
+    expect(calls).toEqual([]);
+    expect(update).toHaveBeenCalledOnce();
   });
 });

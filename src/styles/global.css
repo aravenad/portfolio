@@ -365,6 +365,28 @@ body::after {
   }
 }
 
+/*
+ * Après un changement de langue, la page n'est pas « ouverte » : on lit la même
+ * chose dans l'autre langue. Le gabarit arrive donc sans son animation d'entrée.
+ * Le drapeau est posé par le script du header et ne vit que sur cette page.
+ */
+:root[data-lang-switch] .page-enter {
+  animation: none;
+}
+
+/*
+ * Changement de thème : un fondu enchaîné de toute la page (View Transitions,
+ * voir `withViewTransition` dans src/lib/theme.ts), un peu plus long que celui
+ * du navigateur pour qu'on voie le fond basculer plutôt que clignoter. Le
+ * drapeau limite la règle au thème : les fondus de navigation du routeur
+ * gardent leur propre durée.
+ */
+:root[data-theme-switching]::view-transition-old(root),
+:root[data-theme-switching]::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 html {
   scroll-behavior: smooth;
 }

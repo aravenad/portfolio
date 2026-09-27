@@ -174,6 +174,17 @@ describe("Header", () => {
       expect(classes).not.toContain("top-16");
     });
 
+    it("ne passe pas derrière la barre sur grand écran", async () => {
+      // Le `-z-10` du panneau mobile s'appliquait aussi au-delà de 640 px dès
+      // que la liste était un élément flex : les liens passaient sous la barre,
+      // qui prenait leurs clics et les masquait au défilement.
+      const { document } = await render(Header, at("/portfolio/"));
+      const classes = document.getElementById("nav-menu")?.getAttribute("class")?.split(/\s+/);
+
+      expect(classes).toContain("-z-10");
+      expect(classes).toContain("sm:z-auto");
+    });
+
     it("commande bien le panneau qu'il annonce", async () => {
       const { document } = await render(Header, at("/portfolio/"));
       const controls = document.querySelector("[data-nav-toggle]")?.getAttribute("aria-controls");
