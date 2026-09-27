@@ -17,6 +17,9 @@ on:
 # exécute le code des dépendances.
 permissions: {}
 
+# Les jobs visent une version d'Ubuntu nommée, pas `ubuntu-latest` : le système
+# ne change que quand on le décide, ici, et non au gré de GitHub.
+
 # Un seul déploiement à la fois, sans annuler celui qui est en cours.
 concurrency:
   group: pages
@@ -24,7 +27,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -57,7 +60,7 @@ jobs:
   # les tests unitaires ne voient pas. En parallèle du build, qui n'en dépend pas.
   e2e:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -84,7 +87,7 @@ jobs:
 
   build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -100,7 +103,7 @@ jobs:
     needs: [build, e2e]
     # Une pull request est vérifiée et construite, mais jamais publiée.
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       pages: write
       id-token: write

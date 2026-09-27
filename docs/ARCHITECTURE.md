@@ -237,6 +237,10 @@ test ───┤            ├──> deploy
   montées de version des actions et des dépendances npm.
 - **Un déploiement à la fois** (`concurrency: pages`), sans annuler celui en
   cours.
+- **Ubuntu nommé** (`ubuntu-26.04`), pas `ubuntu-latest` : changer de version
+  est un commit, pas une bascule imposée par GitHub. Pour monter, remplacer le
+  label dans les quatre jobs, puis vérifier que le job `e2e` installe toujours
+  Chromium (Playwright doit connaître la version).
 - **Côté GitHub** : Pages a pour source « GitHub Actions », et l'environnement
   `github-pages` n'accepte que la branche `main`. Déployer depuis une autre
   branche demande de l'y autoriser (Settings → Environments).
