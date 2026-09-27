@@ -1,4 +1,13 @@
-import { afterNavigation, expect, navLink, scrollToId, scrollToY, scrollY, test } from "./helpers";
+import {
+  afterNavigation,
+  clickInPlace,
+  expect,
+  navLink,
+  scrollToId,
+  scrollToY,
+  scrollY,
+  test,
+} from "./helpers";
 
 /**
  * La barre du haut, sur bureau : liens, lien actif, état « défilé » et logo.
@@ -10,12 +19,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 // Régression : un `-z-10` prévu pour le panneau mobile faisait passer les liens
-// derrière la barre, qui prenait leurs clics. `click()` échoue si un autre
-// élément se trouve au point visé, ce qui suffit à le détecter.
+// derrière la barre, qui prenait leurs clics. `clickInPlace()` attend que le
+// point visé appartienne au lien, ce qui suffit à le détecter.
 test("les liens de la barre sont cliquables, en haut de page comme après défilement", async ({
   page,
 }) => {
-  await navLink(page, "Parcours").click();
+  await clickInPlace(page, navLink(page, "Parcours"));
   await expect(page).toHaveURL(/#career$/);
   await expect(page.locator("#career")).toBeInViewport();
 
@@ -23,7 +32,7 @@ test("les liens de la barre sont cliquables, en haut de page comme après défil
   await expect(page.locator("header")).toHaveAttribute("data-scrolled");
   await expect(navLink(page, "Contact")).toBeVisible();
 
-  await navLink(page, "Contact").click();
+  await clickInPlace(page, navLink(page, "Contact"));
   await expect(page).toHaveURL(/#contact$/);
   await expect(page.locator("#contact")).toBeInViewport();
 });
@@ -54,7 +63,7 @@ test("le logo remonte en haut de l'accueil sans recharger la page", async ({ pag
   await page.goto("#career");
   await expect(page.locator("#career")).toBeInViewport();
 
-  await page.locator("[data-home-link]").click();
+  await clickInPlace(page, page.locator("[data-home-link]"));
 
   await expect.poll(() => scrollY(page)).toBe(0);
   expect(new URL(page.url()).hash).toBe("");
@@ -73,7 +82,7 @@ test("la page courante est marquée dans la barre", async ({ page }) => {
 test("une ancre de l'accueil atteinte depuis une autre page est rejointe", async ({ page }) => {
   await page.goto("projects");
 
-  await afterNavigation(page, () => navLink(page, "Contact").click());
+  await afterNavigation(page, () => clickInPlace(page, navLink(page, "Contact")));
 
   await expect(page).toHaveURL(/\/portfolio\/#contact$/);
   await expect(page.locator("#contact")).toBeInViewport();

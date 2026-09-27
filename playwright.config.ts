@@ -15,6 +15,10 @@ const port = 4321;
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
+  // Plafonné : au-delà, les navigateurs se disputent le processeur et Chrome
+  // abandonne des défilements doux en route (mesuré avec 10 workers). La CI,
+  // avec 2 workers par défaut, n'y est pas exposée.
+  workers: 4,
   forbidOnly: !!process.env.CI,
   // Une relance absorbe un aléa de la machine de CI ; un vrai bug échoue deux fois.
   retries: process.env.CI ? 1 : 0,
