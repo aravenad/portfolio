@@ -2,7 +2,10 @@ import type { NavLink, SocialLink } from "../types";
 
 /** Informations globales du site. */
 export const site = {
+  /** Prénom : l'accroche du hero, le pied de page, les titres d'onglet. */
   name: "Damien",
+  /** Nom affiché en logo dans la barre de navigation. */
+  brand: "Damien Aravena",
   author: "Damien Aravena Bravo",
   title: "Damien — Portfolio",
   // Les aperçus LinkedIn demandent au moins 100 caractères de description.

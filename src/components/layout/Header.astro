@@ -28,7 +28,7 @@ const control =
  */
 const setting = [
   control,
-  "text-sm sm:text-zinc-400 sm:hover:bg-transparent sm:hover:text-zinc-100",
+  "text-sm font-medium sm:text-zinc-400 sm:hover:bg-transparent sm:hover:text-zinc-100",
 ];
 ---
 
@@ -69,9 +69,9 @@ const setting = [
     <a
       href={localizedUrl("/", lang)}
       data-home-link
-      class="font-medium tracking-tight transition hover:text-white"
+      class="font-semibold tracking-tight transition hover:text-white"
     >
-      {site.name}
+      {site.brand}
     </a>
 
     {/*
@@ -181,7 +181,7 @@ const setting = [
                   data-nav-link
                   data-sections={link.sections?.join(" ")}
                   aria-current={ariaCurrent(link.href)}
-                  class="block rounded-lg px-3 py-2.5 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
+                  class="block rounded-lg px-3 py-2.5 font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
                 >
                   {link.label}
                 </a>
