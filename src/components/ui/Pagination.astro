@@ -1,5 +1,6 @@
 ---
 import Arrow from "./Arrow.astro";
+import { outlineButton } from "./button-styles";
 import { useTranslations } from "../../data/ui";
 import { getLang } from "../../lib/i18n";
 
@@ -48,8 +49,8 @@ const linkBase =
   "inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition";
 /* Même largeur pour Précédent et Suivant : sans ça, le bloc des numéros est décentré. */
 const stepWidth = "sm:min-w-32";
-const inactive =
-  "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-900 hover:text-zinc-100";
+/* Le même contour que les boutons, qui se remplit de même au survol. */
+const inactive = `${outlineButton} text-zinc-300 hover:text-zinc-100`;
 const disabled = "border-zinc-900 text-zinc-700 pointer-events-none";
 ---
 

@@ -11,6 +11,10 @@ import type { Skill } from "../types";
  * Le seuil est celui de la WCAG 1.4.11 pour un objet graphique — 3:1 sur le
  * fond de la tuile, mesuré à #141415 — et il est vérifié par les tests. Une
  * couleur en dessous n'allume pas le logo au survol : elle l'efface.
+ *
+ * En thème clair, les logos gardent ces mêmes couleurs vives. Seule une marque
+ * dont la couleur disparaîtrait sur la tuile claire en porte une autre,
+ * `colorLight` : c'est le cas du blanc de GitHub.
  */
 export const technicalSkills: Skill[] = [
   { label: "HTML", icon: "simple-icons:html5", color: "#E34F26" },
@@ -71,8 +75,14 @@ export const technicalSkills: Skill[] = [
     color: "#FF318C",
   },
   { label: "Git", icon: "simple-icons:git", color: "#F05032" },
-  // GitHub s'affiche en blanc sur fond sombre, son noir serait invisible.
-  { label: "GitHub", icon: "simple-icons:github", color: "#FFFFFF" },
+  // GitHub s'affiche en blanc sur fond sombre, son noir serait invisible ; en
+  // thème clair, c'est l'inverse : il reprend le noir officiel de la marque.
+  {
+    label: "GitHub",
+    icon: "simple-icons:github",
+    color: "#FFFFFF",
+    colorLight: "#181717",
+  },
 ];
 
 export const softSkills: Skill[] = [

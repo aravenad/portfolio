@@ -35,6 +35,12 @@ export interface Skill {
    * prennent. Seul Java s'en sert aujourd'hui — sa vapeur.
    */
   color2?: string;
+  /**
+   * Couleur de marque en thème clair, pour la seule marque dont la couleur du
+   * thème sombre disparaîtrait sur une tuile claire (le blanc de GitHub). Les
+   * autres gardent leur couleur vive dans les deux thèmes.
+   */
+  colorLight?: string;
 }
 
 export interface CareerRole {
