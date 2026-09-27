@@ -762,9 +762,13 @@ const setting = [
    * d'animation d'entrée du gabarit, qui ferait rejouer au header et au hero
    * une ouverture de site. Le drapeau est posé sur le document entrant, dont
    * les attributs de `<html>` remplacent ceux de la page quittée.
+   *
+   * ⚠️ `data-lang-switching`, pas `data-lang-switch` : sous le nom du lien, le
+   * drapeau était trouvé avant lui par le `querySelector` ci-dessus, et le lien
+   * de la page d'arrivée n'était plus câblé.
    */
   document.addEventListener("astro:before-swap", (event) => {
-    if (pending) event.newDocument.documentElement.setAttribute("data-lang-switch", "");
+    if (pending) event.newDocument.documentElement.setAttribute("data-lang-switching", "");
   });
 
   /*

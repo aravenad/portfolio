@@ -388,7 +388,7 @@ body::after {
  * chose dans l'autre langue. Le gabarit arrive donc sans son animation d'entrée.
  * Le drapeau est posé par le script du header et ne vit que sur cette page.
  */
-:root[data-lang-switch] .page-enter {
+:root[data-lang-switching] .page-enter {
   animation: none;
 }
 
