@@ -52,51 +52,9 @@ const TILE_BACKGROUND = "#141415";
 /**
  * Le fond d'une tuile survolée en thème clair : `zinc-800` à 80 % sur le fond,
  * avec la palette claire de global.css. C'est là que la couleur de marque
- * apparaît, et le point le plus sombre de la tuile.
+ * apparaît.
  */
 const LIGHT_TILE_BACKGROUND = "#D6D6DA";
-
-/**
- * Reproduit la règle de SkillTile en thème clair :
- * `oklch(from <couleur> min(l, 0.55) c h)`, la luminance OKLab plafonnée.
- */
-function clampLightness(hex: string, max = 0.55) {
-  const value = Number.parseInt(hex.slice(1), 16);
-  const toLinear = (c: number) => {
-    const s = c / 255;
-    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  };
-  const [r, g, b] = [(value >> 16) & 255, (value >> 8) & 255, value & 255].map(toLinear);
-
-  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-
-  const L = Math.min(0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, max);
-  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
-  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
-
-  const l3 = (L + 0.3963377774 * A + 0.2158037573 * B) ** 3;
-  const m3 = (L - 0.1055613458 * A - 0.0638541728 * B) ** 3;
-  const s3 = (L - 0.0894841775 * A - 1.291485548 * B) ** 3;
-
-  const toByte = (c: number) => {
-    const v = Math.min(Math.max(c, 0), 1);
-    const e = v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055;
-    return Math.round(e * 255);
-  };
-
-  return (
-    "#" +
-    [
-      4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3,
-      -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3,
-      -0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3,
-    ]
-      .map((c) => toByte(c).toString(16).padStart(2, "0"))
-      .join("")
-  );
-}
 
 describe("compétences techniques", () => {
   it("n'affiche jamais deux fois le même libellé", () => {
@@ -127,7 +85,7 @@ describe("compétences techniques", () => {
 
   it("écrit les couleurs en hexadécimal à six chiffres, en capitales", () => {
     for (const skill of technicalSkills) {
-      for (const color of [skill.color, skill.color2]) {
+      for (const color of [skill.color, skill.color2, skill.colorLight]) {
         if (color) expect(color, skill.label).toMatch(/^#[0-9A-F]{6}$/);
       }
     }
@@ -149,20 +107,30 @@ describe("compétences techniques", () => {
     }
   });
 
-  it("garde le logo lisible sur la tuile claire, une fois sa luminance plafonnée", () => {
-    // Le blanc de GitHub et le jaune de JavaScript disparaîtraient sur le fond
-    // clair : SkillTile les assombrit, et le plafond doit suffire à tous.
+  it("donne une couleur de thème clair à tout logo blanc ou presque", () => {
+    // En clair, les logos gardent leurs couleurs vives du thème sombre. Seul
+    // un logo quasi blanc disparaîtrait sur la tuile : il lui faut `colorLight`.
     for (const skill of technicalSkills) {
-      for (const color of [skill.color, skill.color2]) {
-        if (!color) continue;
-
-        const shown = clampLightness(color);
-
-        expect(
-          contrast(shown, LIGHT_TILE_BACKGROUND),
-          `${skill.label} : ${color} → ${shown} sur ${LIGHT_TILE_BACKGROUND}`,
-        ).toBeGreaterThanOrEqual(3);
+      if (skill.color && luminance(skill.color) > 0.85) {
+        expect(skill.colorLight, `${skill.label} : ${skill.color}`).toBeTruthy();
       }
+    }
+  });
+
+  it("garde la couleur de thème clair lisible sur la tuile claire", () => {
+    for (const skill of technicalSkills) {
+      if (!skill.colorLight) continue;
+
+      expect(
+        contrast(skill.colorLight, LIGHT_TILE_BACKGROUND),
+        `${skill.label} : ${skill.colorLight} sur ${LIGHT_TILE_BACKGROUND}`,
+      ).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("ne pose une couleur de thème clair que sur un logo qui a déjà une couleur", () => {
+    for (const skill of technicalSkills) {
+      if (skill.colorLight) expect(skill.color, skill.label).toBeTruthy();
     }
   });
 

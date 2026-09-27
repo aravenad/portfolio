@@ -21,7 +21,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 574 tests
+npm test         # 576 tests
 npm run coverage # tests + rapport de couverture
 ```
 
@@ -66,7 +66,7 @@ l'autre. Les tests signalent une version anglaise qui ne suit plus la française
 | Quoi | Français | Anglais |
 | :--- | :--- | :--- |
 | Textes de l'interface (titres, boutons, accueil, contact…) | `src/data/ui.ts` (`fr`) | `src/data/ui.ts` (`en`) |
-| Coordonnées | `src/data/site.ts` | commun |
+| Coordonnées, nom affiché dans la barre (`brand`) | `src/data/site.ts` | commun |
 | Navigation | `navLinks` dans `src/data/site.ts` | `navLinksEn` |
 | Compétences techniques | `technicalSkills` dans `src/data/skills.ts` | commun |
 | Compétences transversales | `softSkills` | `softSkillsEn` |

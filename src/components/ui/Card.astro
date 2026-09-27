@@ -11,8 +11,12 @@ const { href, class: className, ...rest } = Astro.props;
 const base =
   "reveal surface-lit group block rounded-xl border border-zinc-800 bg-zinc-900/40 transition";
 
+/*
+ * La montée au survol glisse (transition courte, voir `.reveal` dans
+ * global.css) et disparaît si le visiteur préfère réduire les animations.
+ */
 const interactive =
-  "hover:-translate-y-1 hover:border-zinc-600 hover:bg-zinc-800/50";
+  "motion-safe:hover:-translate-y-1 hover:border-zinc-600 hover:bg-zinc-800/50";
 ---
 
 {

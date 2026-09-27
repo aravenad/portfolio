@@ -15,6 +15,7 @@ const brand =
   [
     skill.color && `--skill-color: ${skill.color}`,
     skill.color2 && `--skill-color-2: ${skill.color2}`,
+    skill.colorLight && `--skill-color-light: ${skill.colorLight}`,
   ]
     .filter(Boolean)
     .join("; ") || undefined;
@@ -66,14 +67,12 @@ const brand =
   }
 
   /*
-   * Thème clair : les couleurs de marque éclaircies pour le fond sombre (le
-   * blanc de GitHub, le jaune de JavaScript) s'effaceraient sur la tuile claire.
-   * Leur luminance est plafonnée à 55 %, teinte et saturation intactes : chaque
-   * logo garde au moins 3:1, vérifié par tests/data/skills.test.ts.
+   * Thème clair : les mêmes couleurs vives qu'en sombre. Seule une marque dont
+   * la couleur disparaîtrait sur la tuile claire en a une autre (`colorLight`) :
+   * le blanc de GitHub devient son noir officiel.
    */
   :global(:root[data-theme="light"]) .skill-tile:hover .skill-icon {
-    color: oklch(from var(--skill-color, currentColor) min(l, 0.55) c h);
-    --logo-accent: oklch(from var(--skill-color-2, currentColor) min(l, 0.55) c h);
+    color: var(--skill-color-light, var(--skill-color, currentColor));
   }
 
   /*

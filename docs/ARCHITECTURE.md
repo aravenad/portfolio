@@ -28,7 +28,7 @@ justifie : ce document n'en donne que la carte.
 | `src/components/pages/` | Le contenu de chaque page, commun aux deux langues | Lit la langue dans l'URL |
 | `src/layouts/BaseLayout.astro` | Le document HTML commun : `<head>`, header, footer, scripts globaux | Toute page passe par lui |
 | `src/components/sections/` | Blocs de page (hero, compétences, parcours…) | Lisent les données, composent des `ui/` |
-| `src/components/ui/` | Primitives réutilisables | Ne lisent aucune donnée : tout arrive par les props |
+| `src/components/ui/` | Primitives réutilisables ; `button-styles.ts` : les surfaces cliquables partagées (boutons, pagination) | Ne lisent aucune donnée : tout arrive par les props |
 | `src/components/layout/` | Header et footer | Persistés entre les pages (`transition:persist`) |
 | `src/data/` | Contenu éditable en TypeScript ; `ui.ts` : tous les textes de l'interface | Chaque contenu a sa version anglaise à côté (`…En`), vérifiée par `tests/data/` |
 | `src/content/projects/` | Une fiche Markdown par projet ; `en/` : les mêmes en anglais | Schéma dans `src/content.config.ts`, vérifié au build |
@@ -138,13 +138,16 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
   thèmes, sans une ligne de code en plus. Pas de blanc ni de noir purs : le
   contraste reste net sans fatiguer l'œil.
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
-  clair), l'accent argent devient un bleu acier, et les couleurs de marque des
-  logos sont assombries au survol pour rester lisibles (`SkillTile.astro`).
+  clair) et l'accent argent devient un bleu acier. Les logos des compétences
+  gardent leurs couleurs vives ; seule une marque qui disparaîtrait sur la tuile
+  claire en porte une autre (`colorLight` : le noir de GitHub).
+- **Un réglage propre au clair** s'écrit avec la variante `light:` (définie
+  dans `global.css`), par exemple `light:hover:bg-zinc-900`.
 
 ## 5. Tests
 
 ```sh
-npm test          # 574 tests, quelques secondes
+npm test          # 576 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 ```
 
@@ -165,7 +168,7 @@ npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 | Je veux… | Je fais… |
 | :--- | :--- |
 | **Ajouter un projet** | Deux fichiers de même nom : `src/content/projects/mon-projet.md` et sa traduction dans `src/content/projects/en/`, avec l'en-tête décrit dans le README. Le nom devient l'URL. |
-| **Ajouter une compétence** | Une entrée dans `src/data/skills.ts` (technique : une seule liste ; transversale : `softSkills` et `softSkillsEn`, au même rang). Une couleur de marque trop sombre fait échouer les tests : l'éclaircir, comme indiqué en tête du fichier. |
+| **Ajouter une compétence** | Une entrée dans `src/data/skills.ts` (technique : une seule liste ; transversale : `softSkills` et `softSkillsEn`, au même rang). Une couleur de marque trop sombre fait échouer les tests : l'éclaircir, comme indiqué en tête du fichier. Une couleur quasi blanche demande en plus `colorLight` pour le thème clair. |
 | **Ajouter une expérience** | Une entrée dans `experiences` (ou `education`) et sa traduction au même rang dans `experiencesEn` (ou `educationEn`), dans `src/data/career.ts`. Les formats de période sont décrits en tête du fichier et vérifiés par les tests. |
 | **Modifier un texte de l'interface** | `src/data/ui.ts`, dans les deux langues. |
 | **Ajouter une section à l'accueil** | Un composant dans `sections/` basé sur `ui/Section.astro` avec un `id`, ses textes dans `ui.ts`, placé dans `components/pages/Home.astro`. Pour un lien dans la barre : l'ajouter dans `navLinks` et `navLinksEn` (`src/data/site.ts`), dans l'ordre des sections, avec l'`id` dans `sections`. |
