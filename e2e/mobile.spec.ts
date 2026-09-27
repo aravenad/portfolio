@@ -1,4 +1,4 @@
-import { expect, navLink, test } from "./helpers";
+import { clickInPlace, expect, navLink, test } from "./helpers";
 
 /**
  * Sur téléphone : le menu déroulant, les réglages de la barre et le sommaire
@@ -34,7 +34,7 @@ test("le menu s'ouvre et se referme au bouton comme à Échap", async ({ page })
 test("choisir une section referme le menu et y mène", async ({ page }) => {
   await toggle(page).click();
 
-  await navLink(page, "Parcours").click();
+  await clickInPlace(page, navLink(page, "Parcours"));
 
   await expect(menu(page)).toBeHidden();
   await expect(page.locator("#career")).toBeInViewport();

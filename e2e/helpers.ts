@@ -37,12 +37,17 @@ export const test = base.extend({
 export { expect };
 
 /**
- * Lance `action`, puis attend que la page suivante soit montée par le routeur.
+ * Lance `action`, puis attend que la page suivante soit montée par le routeur
+ * et que sa transition soit finie.
+ *
+ * Pendant la transition, le navigateur envoie les clics à `<html>` et non aux
+ * éléments de la page : un clic à la souris y serait perdu.
  */
 export async function afterNavigation(page: Page, action: () => Promise<unknown>): Promise<void> {
   const before = await page.evaluate(() => window.__pageLoads);
   await action();
   await page.waitForFunction((count) => window.__pageLoads > count, before);
+  await page.waitForFunction(() => !document.documentElement.hasAttribute("data-astro-transition"));
 }
 
 /**
@@ -77,11 +82,14 @@ export const topOf = (page: Page, id: string) =>
  *
  * `locator.click()` amène toujours sa cible à l'écran avant de cliquer. Sur un
  * élément de la barre collante, ce recadrage lance un défilement doux de
- * quelques pixels : sans conséquence d'habitude, mais faux dès que le test
- * mesure la position de lecture.
+ * quelques pixels, qu'aucun visiteur ne provoque. Il fausse la position de
+ * lecture, et, s'il se termine après le changement de page, il annule le
+ * défilement vers l'ancre visée. À utiliser pour tout clic dans la barre dont
+ * le test observe le défilement.
  *
- * La cible est d'abord attendue immobile : juste après une navigation, les
- * contrôles de la barre glissent encore vers leur place.
+ * La cible est d'abord attendue immobile — juste après une navigation, les
+ * contrôles de la barre glissent encore vers leur place — puis à portée : le
+ * point visé doit lui appartenir, et non à `<html>` ou à un élément posé dessus.
  */
 export async function clickInPlace(page: Page, locator: Locator): Promise<void> {
   let box = await locator.boundingBox();
@@ -90,7 +98,13 @@ export async function clickInPlace(page: Page, locator: Locator): Promise<void> 
     .poll(async () => {
       const previous = box;
       box = await locator.boundingBox();
-      return !!box && JSON.stringify(box) === JSON.stringify(previous);
+      if (!box || JSON.stringify(box) !== JSON.stringify(previous)) return false;
+
+      const { x, y, width, height } = box;
+      return locator.evaluate(
+        (element, [px, py]) => element.contains(document.elementFromPoint(px, py)),
+        [x + width / 2, y + height / 2],
+      );
     })
     .toBe(true);
 
