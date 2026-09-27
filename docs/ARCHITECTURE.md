@@ -78,8 +78,13 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   `src/content/projects/en/`, sous le même nom de fichier. Les tests vérifient
   que les deux versions restent alignées (même nombre, même ordre, mêmes dates).
 - **Le sélecteur de langue** (header) mène à la même page dans l'autre langue
-  (`switchLangPath`) et garde l'ancre. Le header et le footer sont persistés par
-  langue (`transition:persist="header-fr"`…) : changer de langue les remplace.
+  (`switchLangPath`), **au même endroit** : la section en cours est replacée au
+  même pixel, ou, sur une fiche projet dont les ancres sont traduites, la même
+  proportion de la page (`lib/lang-switch.ts`). La position est rétablie avant
+  l'affichage, pendant le fondu du routeur, et le gabarit ne rejoue ni son
+  entrée ni l'apparition des blocs déjà visibles. Le header et le footer sont
+  persistés par langue (`transition:persist="header-fr"`…) : changer de langue
+  les remplace.
 - **Pour les moteurs de recherche**, chaque page déclare ses deux versions
   (`<link rel="alternate" hreflang>`), le français servant de défaut.
 - Le CV n'existe qu'en français : la version anglaise le signale sur son bouton.
@@ -98,8 +103,9 @@ chargement. Tout comportement doit donc passer par `onEachPage()`
 | Bouton de retour en haut | `ui/BackToTop.astro` | `lib/back-to-top.ts` |
 | Glissement de la page active | `ui/Pagination.astro` | `lib/pagination.ts` |
 | Sommaire des fiches et curseur de lecture | `ui/TableOfContents.astro` | `lib/toc.ts` |
-| Bouton de thème | `layout/Header.astro` | `lib/theme.ts` |
+| Bouton de thème, en fondu enchaîné | `layout/Header.astro` | `lib/theme.ts` |
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
+| Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
@@ -121,6 +127,10 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
 - **Aucun flash** : un script en ligne du `<head>` applique le thème mémorisé
   avant le premier rendu, et le reporte sur la page suivante à chaque
   navigation.
+- **Un fondu au changement** : le bouton bascule le thème dans une View
+  Transition (fondu enchaîné de toute la page, 0,4 s), qui couvre aussi ce que
+  CSS ne sait pas animer, comme la matière qui s'inverse. Sans ce support, ou
+  sous `prefers-reduced-motion`, le changement est immédiat.
 - **Le clair retourne l'échelle `zinc`** au lieu d'ajouter des classes : sous
   `data-theme="light"`, `global.css` redonne à chaque nuance une valeur claire
   (`zinc-950`, le fond, devient un gris perle ; `zinc-100`, les titres, un
@@ -134,7 +144,7 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
 ## 5. Tests
 
 ```sh
-npm test          # 561 tests, quelques secondes
+npm test          # 574 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 ```
 

@@ -33,6 +33,42 @@ export function toggledTheme(theme: Theme): Theme {
   return theme === "light" ? "dark" : "light";
 }
 
+/** Ce que la transition utilise du document. */
+export interface TransitionDocument {
+  documentElement: Pick<HTMLElement, "setAttribute" | "removeAttribute">;
+  startViewTransition?: (update: () => void) => { finished: Promise<unknown> };
+}
+
+/**
+ * Applique `update` dans un fondu enchaîné de toute la page (View Transitions),
+ * ou directement si le navigateur ne sait pas le faire ou si le visiteur préfère
+ * réduire les animations.
+ *
+ * Le fondu couvre tout d'un coup, y compris ce que les transitions CSS ne savent
+ * pas animer : la matière du fond qui s'inverse, son mode de fusion. Pendant le
+ * fondu, `<html data-theme-switching>` permet à global.css d'en régler la durée
+ * sans toucher aux fondus de navigation du routeur.
+ */
+export function withViewTransition(
+  doc: TransitionDocument,
+  motionOk: boolean,
+  update: () => void,
+): void {
+  if (!motionOk || typeof doc.startViewTransition !== "function") {
+    update();
+    return;
+  }
+
+  const root = doc.documentElement;
+  root.setAttribute("data-theme-switching", "");
+
+  doc
+    .startViewTransition(update)
+    .finished.finally(() => root.removeAttribute("data-theme-switching"))
+    // Un fondu interrompu (nouveau clic, navigation) ne doit rien signaler.
+    .catch(() => {});
+}
+
 /** Ce que le bouton utilise de l'élément `<html>`. */
 export type ThemeRoot = Pick<HTMLElement, "dataset">;
 
@@ -51,6 +87,8 @@ export function wireThemeToggle(
   root: ThemeRoot,
   getStore: () => ThemeStore,
   signal: AbortSignal,
+  /** Enrobe le changement, par exemple dans `withViewTransition`. */
+  transition: (update: () => void) => void = (update) => update(),
 ): void {
   const current = (): Theme => (root.dataset.theme === "light" ? "light" : "dark");
 
@@ -65,7 +103,7 @@ export function wireThemeToggle(
     "click",
     () => {
       const next = toggledTheme(current());
-      apply(next);
+      transition(() => apply(next));
       saveTheme(getStore, next);
     },
     { signal },
