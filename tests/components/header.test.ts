@@ -66,7 +66,7 @@ describe("Header", () => {
     const home = document.querySelector("[data-home-link]");
 
     expect(home?.getAttribute("href")).toBe("/portfolio/");
-    expect(home?.textContent?.trim()).toBe(site.name);
+    expect(home?.textContent?.trim()).toBe(site.brand);
   });
 
   it("part dans son état « haut de page » : nu et élargi", async () => {

@@ -4,7 +4,7 @@ import { navLinks, navLinksEn, site, socialLinks } from "../../src/data/site";
 
 describe("informations du site", () => {
   it("renseigne les champs repris dans les métadonnées", () => {
-    for (const key of ["name", "author", "title", "description", "email"] as const) {
+    for (const key of ["name", "brand", "author", "title", "description", "email"] as const) {
       expect(site[key], key).toBeTruthy();
     }
   });
