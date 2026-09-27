@@ -23,12 +23,13 @@ npm run build    # génère ./dist
 npm run preview  # prévisualise le build
 npm test         # 576 tests
 npm run coverage # tests + rapport de couverture
+npm run test:e2e # tests de bout en bout (Playwright)
 ```
 
 Node >= 22.12. Le site est publié sur <https://aravenad.github.io/portfolio/> à
 chaque push sur `main`, via le workflow `.github/workflows/deploy.yml` — qui
 lance d'abord les tests et un `npm audit`, et ne construit rien si l'un des deux
-échoue. Détail : §7 de l'architecture.
+échoue ; rien n'est publié si les tests de bout en bout échouent. Détail : §7 de l'architecture.
 
 ## Structure
 
@@ -54,6 +55,7 @@ src/
 public/              servi tel quel : CV, favicon, images d'aperçu
 tools/               sources des images générées, non compilées
 tests/               Vitest : données, composants, pages
+e2e/                 Playwright : le site construit, dans un navigateur
 docs/                architecture du projet
 .github/             workflow de publication et Dependabot
 ```
@@ -124,6 +126,7 @@ les modifier, voir §6 de l'architecture.
 
 ```sh
 npm test
+npm run test:e2e
 ```
 
 Les composants sont rendus sans navigateur, par l'API Container d'Astro, et les
@@ -136,7 +139,13 @@ insécable des périodes du parcours, le contraste des couleurs de marque sur le
 tuiles dans les deux thèmes, les métadonnées d'aperçu LinkedIn, le marquage du
 lien de navigation courant, et l'alignement des contenus anglais sur les
 français. Un nouveau projet ou une nouvelle compétence est validé par les tests
-avant même le build. Voir §5 de l'architecture.
+avant même le build.
+
+Les tests de bout en bout (`e2e/`, Playwright) prennent le relais là où Vitest
+ne voit rien : les scripts des composants, sur le site construit, dans Chromium.
+Ils cliquent, défilent et changent de langue ou de thème comme un visiteur, sur
+bureau et sur téléphone. Première fois : `npx playwright install --only-shell
+chromium`. Voir §5 de l'architecture.
 
 ## Logos des compétences
 

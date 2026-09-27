@@ -4,6 +4,9 @@ dist/
 .astro/
 # rapport de couverture des tests
 coverage/
+# résultats des tests de bout en bout (traces des échecs)
+test-results/
+playwright-report/
 
 # dependencies
 node_modules/
