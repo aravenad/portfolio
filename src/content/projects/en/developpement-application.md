@@ -2,7 +2,7 @@
 title: "Developing an application"
 summary: "Design and development of a festival management tool: budget, scheduling, logistics and artists."
 tags: ["Java", "UML", "Project management"]
-status: "en-cours"
+status: "termine"
 team: "Team project"
 year: 2025
 order: 5
