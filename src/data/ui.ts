@@ -92,7 +92,7 @@ const fr = {
   contact: {
     title: "Me contacter",
     description:
-      "Je recherche un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet, pour valider ma deuxième année de BUT Informatique. Une question, une opportunité ? Écris-moi.",
+      "Je recherche un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écris-moi.",
     email: "Envoyer un e-mail",
     cv: "Télécharger mon CV",
     github: "Voir mon GitHub",
@@ -197,7 +197,7 @@ const en = {
   contact: {
     title: "Contact me",
     description:
-      "I am looking for a 10 to 12-week internship, from April 19 to June 25, 2027, extendable until July 9, to complete the second year of my computer science degree. A question, an opportunity? Write to me.",
+      "I am looking for a 10 to 12-week internship, from April 19 to June 25, 2027, extendable until July 9, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also travel to the surrounding area. A question, an opportunity? Write to me.",
     email: "Send an email",
     // Le CV n'existe qu'en français : le dire avant le téléchargement.
     cv: "Download my résumé (French)",
