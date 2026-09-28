@@ -14,7 +14,7 @@ import type { Skill } from "../types";
  *
  * En thème clair, les logos gardent ces mêmes couleurs vives. Seule une marque
  * dont la couleur disparaîtrait sur la tuile claire en porte une autre,
- * `colorLight` : c'est le cas du blanc de GitHub.
+ * `colorLight` : c'est le cas du blanc de GitHub et du jaune de JavaScript.
  */
 export const technicalSkills: Skill[] = [
   { label: "HTML", icon: "simple-icons:html5", color: "#E34F26" },
@@ -22,11 +22,18 @@ export const technicalSkills: Skill[] = [
   // sur la tuile : éclairci de 25 % vers le blanc, teinte inchangée.
   { label: "CSS", icon: "simple-icons:css", color: "#8C66B3" },
   { label: "PHP", icon: "simple-icons:php", color: "#777BB4" },
+  // Le jaune officiel ne tient que 1,07:1 sur la tuile claire. En thème clair,
+  // il passe à un jaune assombri (OKLCH 71 %, chroma 0,15, teinte 99° au lieu
+  // de 90 %, 0,18 et 101°) : 1,76:1. C'est la seule couleur sous les 3:1 des
+  // autres logos, par choix : les versions à 3:1 viraient à l'or foncé et ne
+  // se lisaient plus comme le jaune de JavaScript. Le test lui fixe un plancher
+  // à part.
   {
     label: "JavaScript",
     short: "JS",
     icon: "simple-icons:javascript",
     color: "#F7DF1E",
+    colorLight: "#B9A207",
   },
   // Même correction pour le bleu ISO C++ (#00599C), à 2,6:1.
   { label: "C++", icon: "simple-icons:cplusplus", color: "#4083B5" },

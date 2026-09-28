@@ -36,9 +36,10 @@ export interface Skill {
    */
   color2?: string;
   /**
-   * Couleur de marque en thème clair, pour la seule marque dont la couleur du
-   * thème sombre disparaîtrait sur une tuile claire (le blanc de GitHub). Les
-   * autres gardent leur couleur vive dans les deux thèmes.
+   * Couleur de marque en thème clair, pour les marques dont la couleur du
+   * thème sombre disparaîtrait sur une tuile claire (le blanc de GitHub, le
+   * jaune de JavaScript). Les autres gardent leur couleur vive dans les deux
+   * thèmes.
    */
   colorLight?: string;
 }

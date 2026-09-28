@@ -143,7 +143,8 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
   clair) et l'accent argent devient un bleu acier. Les logos des compétences
   gardent leurs couleurs vives ; seule une marque qui disparaîtrait sur la tuile
-  claire en porte une autre (`colorLight` : le noir de GitHub).
+  claire en porte une autre (`colorLight` : le noir de GitHub, le jaune assombri
+  de JavaScript).
 - **Un réglage propre au clair** s'écrit avec la variante `light:` (définie
   dans `global.css`), par exemple `light:hover:bg-zinc-900`.
 
@@ -186,7 +187,7 @@ Côté Vitest :
 | Je veux… | Je fais… |
 | :--- | :--- |
 | **Ajouter un projet** | Deux fichiers de même nom : `src/content/projects/mon-projet.md` et sa traduction dans `src/content/projects/en/`, avec l'en-tête décrit dans le README. Le nom devient l'URL. |
-| **Ajouter une compétence** | Une entrée dans `src/data/skills.ts` (technique : une seule liste ; transversale : `softSkills` et `softSkillsEn`, au même rang). Une couleur de marque trop sombre fait échouer les tests : l'éclaircir, comme indiqué en tête du fichier. Une couleur quasi blanche demande en plus `colorLight` pour le thème clair. |
+| **Ajouter une compétence** | Une entrée dans `src/data/skills.ts` (technique : une seule liste ; transversale : `softSkills` et `softSkillsEn`, au même rang). Une couleur de marque trop sombre fait échouer les tests : l'éclaircir, comme indiqué en tête du fichier. Une couleur quasi blanche, ou trop pâle pour la tuile claire comme le jaune de JavaScript, demande en plus `colorLight` pour le thème clair. |
 | **Ajouter une expérience** | Une entrée dans `experiences` (ou `education`) et sa traduction au même rang dans `experiencesEn` (ou `educationEn`), dans `src/data/career.ts`. Les formats de période sont décrits en tête du fichier et vérifiés par les tests. |
 | **Modifier un texte de l'interface** | `src/data/ui.ts`, dans les deux langues. |
 | **Ajouter une section à l'accueil** | Un composant dans `sections/` basé sur `ui/Section.astro` avec un `id`, ses textes dans `ui.ts`, placé dans `components/pages/Home.astro`. Pour un lien dans la barre : l'ajouter dans `navLinks` et `navLinksEn` (`src/data/site.ts`), dans l'ordre des sections, avec l'`id` dans `sections`. |
