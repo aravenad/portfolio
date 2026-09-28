@@ -45,7 +45,7 @@ test("les réglages de langue et de thème restent accessibles", async ({ page }
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.locator("a[data-lang-switch]").click();
-  await expect(page).toHaveURL(/\/portfolio\/en\/$/);
+  await expect(page).toHaveURL(/\/en\/$/);
 });
 
 test("le sommaire replié se referme sur la section choisie", async ({ page }) => {

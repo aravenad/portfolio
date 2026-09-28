@@ -2,12 +2,16 @@ import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { parseHTML } from "linkedom";
 
 /** Origine du site en production, pour les tests qui dépendent de l'URL. */
-export const SITE_ORIGIN = "https://aravenad.github.io";
+export const SITE_ORIGIN = "https://damien-aravena.fr";
 
 /**
  * ⚠️ `site` et `base` doivent être redonnés au conteneur : il ne lit pas
  * astro.config.mjs. Sans `site`, `new URL(…, Astro.site)` lève « Invalid URL »
  * dans BaseLayout et toute page devient irrendable.
+ *
+ * La `base` est volontaire, alors que le site publié n'en a pas : avec « / »,
+ * un `href="/projects"` écrit à la main, sans `url()`, passerait inaperçu. Les
+ * tests qui forcent `BASE_URL` à « /portfolio/ » le font pour la même raison.
  */
 const astroConfig = { site: SITE_ORIGIN, base: "/portfolio" } as const;
 

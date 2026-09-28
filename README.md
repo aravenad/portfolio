@@ -26,7 +26,7 @@ npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
 
-Node >= 22.12. Le site est publié sur <https://aravenad.github.io/portfolio/> à
+Node >= 22.12. Le site est publié sur <https://damien-aravena.fr/> à
 chaque push sur `main`, via le workflow `.github/workflows/deploy.yml` — qui
 lance d'abord les tests et un `npm audit`, et ne construit rien si l'un des deux
 échoue ; rien n'est publié si les tests de bout en bout échouent. Détail : §7 de l'architecture.

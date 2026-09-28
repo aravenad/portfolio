@@ -1,8 +1,8 @@
 /**
  * Les langues du site et le passage de l'une à l'autre, sans DOM.
  *
- * Le français est la langue par défaut et vit à la racine (`/portfolio/…`) ;
- * l'anglais vit sous `/portfolio/en/…`, avec exactement les mêmes chemins
+ * Le français est la langue par défaut et vit à la racine (`/…`) ; l'anglais
+ * vit sous `/en/…`, avec exactement les mêmes chemins
  * derrière ce préfixe. C'est ce qui permet de passer d'une langue à l'autre
  * sur la même page : il suffit d'ajouter ou de retirer `/en`.
  *

@@ -84,6 +84,6 @@ test("une ancre de l'accueil atteinte depuis une autre page est rejointe", async
 
   await afterNavigation(page, () => clickInPlace(page, navLink(page, "Contact")));
 
-  await expect(page).toHaveURL(/\/portfolio\/#contact$/);
+  await expect(page).toHaveURL(/:\d+\/#contact$/);
   await expect(page.locator("#contact")).toBeInViewport();
 });
