@@ -149,10 +149,13 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       Transitions de page : la navigation devient un échange de DOM avec fondu,
       au lieu d'un rechargement complet.
 
-      ⚠️ Conséquence à ne pas perdre de vue : les `<script>` des composants ne
+      ⚠️ Conséquence à ne pas perdre de vue : les scripts des composants ne
       sont plus réexécutés d'une page à l'autre. Tout comportement doit passer
       par `onEachPage()` (src/lib/enhance.ts), sinon il meurt à la deuxième page
       sans rien signaler.
+
+      (Pas de balise script écrite en toutes lettres dans ce commentaire : le
+      scan des dépendances de Vite la prendrait pour une vraie et échouerait.)
     */}
     <ClientRouter />
 
