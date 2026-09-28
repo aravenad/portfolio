@@ -2,7 +2,7 @@
 title: "Développement d'une application"
 summary: "Conception et développement d'un outil de gestion de festivals : budget, planning, logistique et artistes."
 tags: ["Java", "UML", "Gestion de projet"]
-status: "en-cours"
+status: "termine"
 team: "En équipe"
 year: 2025
 order: 5

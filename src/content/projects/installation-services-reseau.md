@@ -2,7 +2,7 @@
 title: "Installation de services réseau"
 summary: "Rédaction d'un guide d'installation en anglais pour un serveur Debian 12 équipé d'Apache, PostgreSQL et PHP, validé depuis la machine hôte."
 tags: ["Linux", "Apache", "PostgreSQL", "PHP"]
-status: "en-cours"
+status: "termine"
 team: "Seul"
 year: 2025
 order: 6
