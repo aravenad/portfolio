@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Tests de bout en bout : le site construit, servi sous `/portfolio`, dans un
+ * Tests de bout en bout : le site construit, servi à la racine, dans un
  * vrai Chromium. Ils couvrent ce que Vitest ne voit pas — les `<script>` des
  * composants, qui relient les règles de `src/lib/` au DOM (voir §5 de
  * docs/ARCHITECTURE.md).
@@ -25,9 +25,9 @@ export default defineConfig({
   reporter: process.env.CI ? [["github"], ["list"]] : "list",
 
   use: {
-    // Toujours avec la barre finale : `page.goto("projects")` résout alors
-    // en /portfolio/projects, pas en /projects.
-    baseURL: `http://localhost:${port}/portfolio/`,
+    // Avec la barre finale : `page.goto("projects")` résout en /projects, et
+    // `page.goto("")` ouvre l'accueil.
+    baseURL: `http://localhost:${port}/`,
     trace: "retain-on-failure",
   },
 
@@ -52,7 +52,7 @@ export default defineConfig({
   // rend la main aussitôt — Playwright croit alors que le serveur est tombé.
   webServer: {
     command: `npm run build && npm run preview -- --port ${port} --ignore-lock`,
-    url: `http://localhost:${port}/portfolio/`,
+    url: `http://localhost:${port}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

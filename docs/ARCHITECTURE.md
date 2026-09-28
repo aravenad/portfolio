@@ -50,22 +50,24 @@ src/content/projects/*.md ─┴─> src/lib/projects.ts ─> sections/ ─> com
 
 | URL (français) | Composant | Contenu |
 | :--- | :--- | :--- |
-| `/portfolio/` | `Home.astro` | Hero, compétences ×2, parcours, projets mis en avant, contact |
-| `/portfolio/projects` | `ProjectsListPage.astro` | Première page de la liste (6 projets) |
-| `/portfolio/projects/page/N` | `ProjectsListPage.astro` | Pages suivantes, générées selon le nombre de projets |
-| `/portfolio/projects/<fichier>` | `ProjectDetail.astro` | Une fiche, son sommaire, les projets voisins |
+| `/` | `Home.astro` | Hero, compétences ×2, parcours, projets mis en avant, contact |
+| `/projects` | `ProjectsListPage.astro` | Première page de la liste (6 projets) |
+| `/projects/page/N` | `ProjectsListPage.astro` | Pages suivantes, générées selon le nombre de projets |
+| `/projects/<fichier>` | `ProjectDetail.astro` | Une fiche, son sommaire, les projets voisins |
 
 La version anglaise a les mêmes routes, préfixées par `/en` :
-`/portfolio/en/`, `/portfolio/en/projects/<fichier>`…
+`/en/`, `/en/projects/<fichier>`…
 
 - **L'ordre des projets** est donné par `order` (croissant), partout : liste,
   accueil, projets précédent et suivant.
 - **L'accueil** montre les trois premiers projets `featured: true`, ou les trois
   premiers tout court s'il n'y en a aucun.
-- **Le site vit dans un sous-dossier** (`base: '/portfolio'`). Tout lien interne
-  passe par `localizedUrl(chemin, langue)` (`src/lib/i18n.ts`), qui ajoute la
-  base et, en anglais, `/en`. Un `href="/…"` écrit à la main pointerait à la
-  racine du domaine, donc vers une 404, ou ferait changer de langue.
+- **Le site vit à la racine de son domaine** (`damien-aravena.fr`, sans
+  `base`). Tout lien interne passe quand même par `localizedUrl(chemin, langue)`
+  (`src/lib/i18n.ts`), qui ajoute la base s'il y en a une et, en anglais, `/en`.
+  Un `href="/…"` écrit à la main ferait changer de langue, et casserait tout
+  retour dans un sous-dossier : les tests unitaires rendent donc les pages sous
+  une base `/portfolio` fictive, pour qu'un tel lien y échoue.
 
 ### Langues
 
@@ -161,8 +163,8 @@ Deux niveaux, qui se complètent :
 - **Vitest (`tests/`)** vérifie les règles et le HTML produit, couverts à
   100 %. Il ne voit pas les `<script>` des composants : Vite les compile à part,
   pour le navigateur.
-- **Playwright (`e2e/`)** vérifie ce câblage sur le site construit, servi sous
-  `/portfolio`, dans Chromium : barre de navigation, menu mobile, thème,
+- **Playwright (`e2e/`)** vérifie ce câblage sur le site construit, servi à la
+  racine, dans Chromium : barre de navigation, menu mobile, thème,
   langue et position de lecture, apparition au défilement, sommaire, retour en
   haut, pagination. Bureau pour tout, gabarit de téléphone pour
   `mobile.spec.ts`. Chaque test échoue aussi sur une erreur de console.
@@ -197,7 +199,7 @@ Côté Vitest :
 | **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind. |
 | **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
-| **Changer le nom du dépôt** | Le dossier de publication change : mettre à jour `base` dans `astro.config.mjs`, puis remplacer `/portfolio` dans `tests/` (`helpers/render.ts` et les tests qui vérifient des URL), dans `e2e/` et dans `playwright.config.ts`. |
+| **Changer de domaine** | Mettre à jour `site` dans `astro.config.mjs` et `SITE_ORIGIN` dans `tests/helpers/render.ts`, le domaine personnalisé dans les réglages Pages du dépôt, puis les DNS chez le registraire (Infomaniak). Pour revenir sur `aravenad.github.io/portfolio`, remettre aussi `base: '/portfolio'` et le préfixe `/portfolio/` dans `e2e/` et `playwright.config.ts`. |
 
 Rendu de l'image d'aperçu, depuis la racine du projet. Sous Windows, remplacer
 `chrome` par le chemin complet de `chrome.exe` et l'URL par
@@ -245,6 +247,11 @@ test ───┤            ├──> deploy
 - **Côté GitHub** : Pages a pour source « GitHub Actions », et l'environnement
   `github-pages` n'accepte que la branche `main`. Déployer depuis une autre
   branche demande de l'y autoriser (Settings → Environments).
+- **Domaine** : `damien-aravena.fr`, acheté chez Infomaniak, qui en garde les
+  DNS. Il est déclaré dans Settings → Pages (pas de fichier `CNAME` : avec un
+  déploiement par Actions, GitHub l'ignore) et vérifié au niveau du compte, ce
+  qui empêche un autre dépôt de le revendiquer. L'ancienne adresse
+  `aravenad.github.io/portfolio/` redirige vers lui.
 
 ## 8. `tools/`
 

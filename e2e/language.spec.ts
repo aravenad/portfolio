@@ -9,15 +9,15 @@ const langLink = (page: import("@playwright/test").Page) => page.locator("a[data
 
 test("le lien mène à la même page dans l'autre langue, et en revient", async ({ page }) => {
   await page.goto("");
-  await expect(langLink(page)).toHaveAttribute("href", "/portfolio/en/");
+  await expect(langLink(page)).toHaveAttribute("href", "/en/");
 
   await afterNavigation(page, () => langLink(page).click());
-  await expect(page).toHaveURL(/\/portfolio\/en\/$/);
+  await expect(page).toHaveURL(/\/en\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(langLink(page)).toHaveText("FR");
 
   await afterNavigation(page, () => langLink(page).click());
-  await expect(page).toHaveURL(/\/portfolio\/$/);
+  await expect(page).toHaveURL(/:\d+\/$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "fr");
 });
 
@@ -27,7 +27,7 @@ for (const path of ["projects", "projects/page/2", "projects/developpement-appli
 
     await afterNavigation(page, () => langLink(page).click());
 
-    await expect(page).toHaveURL(new RegExp(`/portfolio/en/${path}$`));
+    await expect(page).toHaveURL(new RegExp(`/en/${path}$`));
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 }

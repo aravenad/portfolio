@@ -20,8 +20,8 @@ export function normalizePath(path: string): string {
  * une sous-page : la fiche d'un projet, ou la deuxième page de la liste. Sans
  * cela, « Projets » s'éteignait dès qu'on ouvrait un projet.
  *
- * Les liens à ancre ne peuvent jamais être des parents : « /portfolio/#skills »
- * suivi d'une barre ne préfixe aucun chemin.
+ * Les liens à ancre ne peuvent jamais être des parents : « /#skills » suivi
+ * d'une barre ne préfixe aucun chemin.
  *
  * Le rendu serveur l'appelle pour le premier écran, le script du header après
  * chaque navigation client — le header persiste, son `aria-current` resterait
