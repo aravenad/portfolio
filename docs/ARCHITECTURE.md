@@ -93,6 +93,9 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   du site (`@astrojs/sitemap`, `/sitemap-index.xml`) fait de même pour chaque
   URL, et `/robots.txt` (`src/pages/robots.txt.ts`) l'annonce. Le titre de
   l'accueil porte le nom complet, celui qu'on tape pour trouver le site.
+  L'accueil décrit aussi la personne en données structurées (`Person`,
+  JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
+  GitHub et LinkedIn, tirés des données du site.
 - Le CV n'existe qu'en français : la version anglaise le signale sur son bouton.
 
 ## 4. Dans le navigateur

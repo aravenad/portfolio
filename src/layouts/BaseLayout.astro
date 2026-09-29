@@ -21,6 +21,7 @@ import Header from "../components/layout/Header.astro";
 import { site } from "../data/site";
 import { useTranslations } from "../data/ui";
 import { defaultLang, getLang, languages, switchLangPath } from "../lib/i18n";
+import { personSchema, toJsonLd } from "../lib/structured-data";
 import { url } from "../lib/url";
 import "../styles/global.css";
 
@@ -144,6 +145,20 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} />
 
     <title>{title}</title>
+
+    {/*
+      Qui est derrière le site, pour les moteurs de recherche. Sur l'accueil
+      seulement : c'est la page qui présente la personne, les autres parlent
+      de projets. `is:inline` garde la balise telle quelle, Astro ne tente
+      pas de la traiter comme un module JavaScript.
+    */}
+    {isHomePage && (
+      <script
+        is:inline
+        type="application/ld+json"
+        set:html={toJsonLd(personSchema(Astro.site!, t.meta.jobTitle))}
+      />
+    )}
 
     {/*
       Transitions de page : la navigation devient un échange de DOM avec fondu,

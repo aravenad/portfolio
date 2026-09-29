@@ -240,3 +240,36 @@ describe("BaseLayout, langues et thème", () => {
     expect(inline).toContain('localStorage.getItem("theme")');
   });
 });
+
+describe("données structurées", () => {
+  /** La fiche `Person` de la page, ou `undefined` si elle n'en a pas. */
+  function person(document: Document) {
+    const tag = document.head.querySelector('script[type="application/ld+json"]');
+    return tag ? JSON.parse(tag.textContent ?? "") : undefined;
+  }
+
+  it("présente la personne sur l'accueil, avec ses profils", async () => {
+    const { document } = await renderPage(BaseLayout, options());
+    const data = person(document);
+
+    expect(data["@type"]).toBe("Person");
+    expect(data.name).toBe(site.author);
+    expect(data.url).toBe(`${SITE_ORIGIN}/portfolio/`);
+    expect(data.sameAs).toEqual([site.github, site.linkedin]);
+    expect(data.jobTitle).toBe("Étudiant en BUT Informatique");
+  });
+
+  it("traduit l'intitulé sur l'accueil anglais, sans changer de personne", async () => {
+    const fr = person((await renderPage(BaseLayout, options())).document);
+    const en = person((await renderPage(BaseLayout, options("/portfolio/en/"))).document);
+
+    expect(en["@id"]).toBe(fr["@id"]);
+    expect(en.url).toBe(fr.url);
+    expect(en.jobTitle).toBe("Computer science student (BUT Informatique)");
+  });
+
+  it("n'en met pas sur les autres pages", async () => {
+    const { document } = await renderPage(BaseLayout, options("/portfolio/projects"));
+    expect(person(document)).toBeUndefined();
+  });
+});
