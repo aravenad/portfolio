@@ -261,10 +261,9 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
         <slot />
       </main>
 
+      <BackToTop />
       <Footer />
     </div>
-
-    <BackToTop />
 
     <script>
       import { onEachPage } from "../lib/enhance";

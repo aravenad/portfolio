@@ -6,14 +6,22 @@ import { getLang } from "../../lib/i18n";
 const t = useTranslations(getLang(Astro.url.pathname));
 ---
 
-<button
-  type="button"
-  data-back-to-top
-  aria-label={t.backToTop}
-  class="invisible fixed bottom-6 right-6 z-40 flex size-11 translate-y-2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900/90 text-zinc-400 opacity-0 backdrop-blur transition hover:border-accent/40 hover:text-accent data-[visible]:visible data-[visible]:translate-y-0 data-[visible]:opacity-100"
->
-  <Arrow direction="up" />
-</button>
+{/*
+  Le bouton ne flotte pas en `fixed` : il couvrirait les liens du pied de page
+  une fois en bas. Il vit dans un porteur `sticky`, de hauteur nulle, posé
+  juste avant le pied de page : collé au bas de l'écran pendant la lecture, il
+  s'arrête au-dessus du pied de page quand celui-ci entre dans la vue.
+*/}
+<div class="pointer-events-none sticky bottom-0 z-40 h-0">
+  <button
+    type="button"
+    data-back-to-top
+    aria-label={t.backToTop}
+    class="pointer-events-auto invisible absolute bottom-6 right-6 flex size-11 translate-y-2 items-center justify-center rounded-full border border-zinc-800 bg-zinc-900/90 text-zinc-400 opacity-0 backdrop-blur transition hover:border-accent/40 hover:text-accent data-[visible]:visible data-[visible]:translate-y-0 data-[visible]:opacity-100"
+  >
+    <Arrow direction="up" />
+  </button>
+</div>
 
 <script>
   import { wireBackToTop } from "../../lib/back-to-top";

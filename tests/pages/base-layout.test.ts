@@ -178,6 +178,19 @@ describe("BaseLayout", () => {
     expect(document.querySelector("[data-back-to-top]")).toBeTruthy();
   });
 
+  it("arrête le bouton de retour en haut au-dessus du pied de page", async () => {
+    // Son porteur `sticky` doit précéder le footer dans la même colonne : c'est
+    // ce qui l'empêche de couvrir les liens du pied de page une fois en bas.
+    const { document } = await renderPage(BaseLayout, options());
+    const holder = document.querySelector("[data-back-to-top]")?.parentElement;
+    const footer = document.querySelector("footer");
+
+    expect(holder?.getAttribute("class")).toContain("sticky");
+    const column = [...(footer?.parentElement?.children ?? [])];
+    expect(column).toContain(holder);
+    expect(column.indexOf(holder!)).toBeLessThan(column.indexOf(footer!));
+  });
+
   it("garde un filet de sécurité sur la révélation au défilement", async () => {
     // ⚠️ Si le module qui révèle les blocs n'arrive jamais, le drapeau doit se
     // retirer seul : sans ce garde-fou, une erreur de chargement cacherait la
