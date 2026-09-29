@@ -14,7 +14,7 @@ justifie : ce document n'en donne que la carte.
   vivent dans `src/data/` et `src/content/`. Les modifier ne demande pas de
   toucher aux composants.
 - **Le moins de JavaScript possible.** Un routeur de transitions et quelques
-  comportements (~26 Ko, 9 Ko compressé). Sans JavaScript, tout le contenu
+  comportements (~27 Ko, 9 Ko compressé). Sans JavaScript, tout le contenu
   reste lisible et tous les liens fonctionnent.
 - **Toute décision est testable hors navigateur.** Les scripts des composants
   mesurent le DOM et appliquent un résultat ; la règle qui décide est dans
@@ -32,7 +32,7 @@ justifie : ce document n'en donne que la carte.
 | `src/components/layout/` | Header et footer ; le footer ouvre le plan du site par-dessus la page (`popover`) | Persistés entre les pages (`transition:persist`) |
 | `src/data/` | Contenu éditable en TypeScript ; `ui.ts` : tous les textes de l'interface | Chaque contenu a sa version anglaise à côté (`…En`), vérifiée par `tests/data/` |
 | `src/content/projects/` | Une fiche Markdown par projet ; `en/` : les mêmes en anglais | Schéma dans `src/content.config.ts`, vérifié au build |
-| `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination | Sans DOM, couverte à 100 % |
+| `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination, CV public, données structurées | Sans DOM, couverte à 100 % |
 | `src/styles/global.css` | Thème Tailwind, calques du fond, utilitaires, rendu Markdown | Seule feuille de style globale |
 | `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS ou le code importent |
 | `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) | Nom stable : c'est lui qui fait l'URL |
@@ -96,7 +96,9 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   L'accueil décrit aussi la personne en données structurées (`Person`,
   JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
   GitHub et LinkedIn, tirés des données du site.
-- Le CV n'existe qu'en français : la version anglaise le signale sur son bouton.
+- Le CV n'existe qu'en français : la version anglaise le signale sur son bouton
+  et dans le plan du site. Son adresse vit dans `src/lib/cv.ts`, seule source
+  des deux liens : c'est la version publique, sans téléphone ni adresse mail.
 
 ## 4. Dans le navigateur
 
@@ -106,7 +108,8 @@ chargement. Tout comportement doit donc passer par `onEachPage()`
 (`src/lib/enhance.ts`), qui le rejoue à chaque page et fournit un `AbortSignal`
 à poser sur chaque écouteur, pour qu'aucun ne survive à la page suivante.
 
-Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
+Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`, sauf le
+plan du site, encore seulement couvert par les tests de composant.
 
 | Comportement | Script | Règle testée |
 | :--- | :--- | :--- |
@@ -118,6 +121,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
+| Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant |
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
 `data-reveal-armed` avant le premier affichage ; le CSS ne masque les blocs
@@ -128,7 +132,9 @@ les 3 secondes, le drapeau est retiré et tout redevient visible. Sous
 **Style.** Tailwind v4, sans fichier de configuration : le thème est dans le
 bloc `@theme` de `global.css`. Le fond de page est fait de deux calques sur
 `body` : la matière métallique (`::before`, photo `chrome-original-hq.webp`
-fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
+fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`). Le
+titre de l'accueil entre mot par mot, du flou au net (`.blur-word`), en CSS
+seul ; le reste du gabarit monte en fondu (`.page-enter`).
 
 ### Thèmes
 
@@ -159,7 +165,7 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`).
 ## 5. Tests
 
 ```sh
-npm test          # 576 tests, quelques secondes
+npm test          # 589 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 31 tests de bout en bout, une quinzaine de secondes
 ```
