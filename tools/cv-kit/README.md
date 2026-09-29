@@ -107,10 +107,11 @@ travail, et le bruit ne survit pas à une impression laser de bureau.
 
 ## 5. Typographie
 
-Le site n'embarque aucune police : il utilise la pile système (Inter sur la
-plupart des machines). Pour le CV, **Inter** est donc le choix qui colle le
-mieux — à défaut, n'importe quelle grotesque neutre (Helvetica, Arial, Source
-Sans, Figtree) tiendra la DA.
+Le site embarque **Noto Sans** (Fontsource, version variable, voir
+`src/styles/global.css`). Le CV et la lettre de motivation utilisent la même :
+`cv-public.html` la demande en premier, il faut donc qu'elle soit installée sur
+la machine qui génère le PDF (fonts.google.com), sinon le navigateur retombe
+sur la police système.
 
 Ce qui compte plus que la police :
 

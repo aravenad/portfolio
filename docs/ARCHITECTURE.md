@@ -210,8 +210,9 @@ chrome --headless=new --hide-scrollbars --force-device-scale-factor=2 \
   --window-size=1200,630 --screenshot=public/og-v6.png "file://$PWD/tools/og.html"
 ```
 
-La police vient de la machine (Inter, sinon Roboto) : vérifier le rendu avant
-de le publier.
+La police est Noto Sans, celle du site : elle doit être installée sur la
+machine qui fait la capture (fonts.google.com), sinon Chrome en substitue une
+autre. Vérifier le rendu avant de le publier.
 
 ## 7. Workflow de publication
 
