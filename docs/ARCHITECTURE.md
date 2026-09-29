@@ -89,7 +89,10 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   persistés par langue (`transition:persist="header-fr"`…) : changer de langue
   les remplace.
 - **Pour les moteurs de recherche**, chaque page déclare ses deux versions
-  (`<link rel="alternate" hreflang>`), le français servant de défaut.
+  (`<link rel="alternate" hreflang>`), le français servant de défaut. Le plan
+  du site (`@astrojs/sitemap`, `/sitemap-index.xml`) fait de même pour chaque
+  URL, et `/robots.txt` (`src/pages/robots.txt.ts`) l'annonce. Le titre de
+  l'accueil porte le nom complet, celui qu'on tape pour trouver le site.
 - Le CV n'existe qu'en français : la version anglaise le signale sur son bouton.
 
 ## 4. Dans le navigateur
