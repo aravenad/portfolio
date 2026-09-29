@@ -31,6 +31,9 @@ pnpm-debug.log*
 # ai assistant files
 AGENTS.md
 CLAUDE.md
+# fichiers produits par les sessions Claude (lettres de motivation…) : ils
+# portent des données de candidature, sans rapport avec ce dépôt public.
+Claude outputs/
 
 # étude de direction artistique du fond métallique : 38 Mo de sources, de
 # rendus et de variantes, dont un GIF de comparaison de 19,6 Mo. Atelier, pas
