@@ -31,6 +31,9 @@ pnpm-debug.log*
 # ai assistant files
 AGENTS.md
 CLAUDE.md
+# réglages locaux de l'assistant (lancement du serveur de dev pour l'aperçu),
+# propres à cette machine.
+.claude/
 # fichiers produits par les sessions Claude (lettres de motivation…) : ils
 # portent des données de candidature, sans rapport avec ce dépôt public.
 Claude outputs/
