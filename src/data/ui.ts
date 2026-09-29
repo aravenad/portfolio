@@ -22,6 +22,8 @@ const fr = {
     title: site.title,
     description: site.description,
     ogImageAlt: "Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble",
+    /** Intitulé des données structurées `Person` (lib/structured-data.ts). */
+    jobTitle: "Étudiant en BUT Informatique",
   },
 
   header: {
@@ -130,6 +132,7 @@ const en = {
     description:
       "Portfolio of Damien Aravena Bravo, computer science student (BUT Informatique) in Grenoble: web development, Java applications and database projects.",
     ogImageAlt: "Damien Aravena Bravo, computer science student in Grenoble",
+    jobTitle: "Computer science student (BUT Informatique)",
   },
 
   header: {
