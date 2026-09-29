@@ -29,7 +29,7 @@ justifie : ce document n'en donne que la carte.
 | `src/layouts/BaseLayout.astro` | Le document HTML commun : `<head>`, header, footer, scripts globaux | Toute page passe par lui |
 | `src/components/sections/` | Blocs de page (hero, compétences, parcours…) | Lisent les données, composent des `ui/` |
 | `src/components/ui/` | Primitives réutilisables ; `button-styles.ts` : les surfaces cliquables partagées (boutons, pagination) | Ne lisent aucune donnée : tout arrive par les props |
-| `src/components/layout/` | Header et footer | Persistés entre les pages (`transition:persist`) |
+| `src/components/layout/` | Header et footer ; le footer ouvre le plan du site par-dessus la page (`popover`) | Persistés entre les pages (`transition:persist`) |
 | `src/data/` | Contenu éditable en TypeScript ; `ui.ts` : tous les textes de l'interface | Chaque contenu a sa version anglaise à côté (`…En`), vérifiée par `tests/data/` |
 | `src/content/projects/` | Une fiche Markdown par projet ; `en/` : les mêmes en anglais | Schéma dans `src/content.config.ts`, vérifié au build |
 | `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination | Sans DOM, couverte à 100 % |
