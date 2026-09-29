@@ -118,7 +118,16 @@ const fr = {
 
   toc: { title: "Sur cette page" },
   backToTop: "Revenir en haut de la page",
-  footer: { rights: "Tous droits réservés." },
+  footer: {
+    rights: "Tous droits réservés.",
+    /** Le plan du site : un lien du pied de page, ouvert par-dessus la page. */
+    sitemapLabel: "Plan du site",
+    close: "Fermer le plan du site",
+    home: "Accueil",
+    projects: "Projets",
+    contact: "Contact",
+    cv: "CV (PDF)",
+  },
 };
 
 export type Dictionary = typeof fr;
@@ -225,7 +234,15 @@ const en = {
 
   toc: { title: "On this page" },
   backToTop: "Back to top",
-  footer: { rights: "All rights reserved." },
+  footer: {
+    rights: "All rights reserved.",
+    sitemapLabel: "Site map",
+    close: "Close the site map",
+    home: "Home",
+    projects: "Projects",
+    contact: "Contact",
+    cv: "Résumé (PDF, French)",
+  },
 } satisfies Dictionary;
 
 export const ui: Record<Lang, Dictionary> = { fr, en };

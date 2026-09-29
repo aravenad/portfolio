@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Le pied de page liste les projets dans son plan du site.
+vi.mock("astro:content", async () => (await import("../helpers/content")).contentModule);
+
 import Arrow from "../../src/components/ui/Arrow.astro";
 import BackToTop from "../../src/components/ui/BackToTop.astro";
 import Badge from "../../src/components/ui/Badge.astro";
@@ -11,8 +14,9 @@ import Footer from "../../src/components/layout/Footer.astro";
 import Section from "../../src/components/ui/Section.astro";
 import SectionHeading from "../../src/components/ui/SectionHeading.astro";
 import TableOfContents from "../../src/components/ui/TableOfContents.astro";
-import { socialLinks } from "../../src/data/site";
-import { render } from "../helpers/render";
+import { navLinks, socialLinks } from "../../src/data/site";
+import { fixtureProjects } from "../helpers/content";
+import { at, render } from "../helpers/render";
 
 beforeEach(() => {
   vi.stubEnv("BASE_URL", "/portfolio/");
@@ -260,20 +264,70 @@ describe("Breadcrumb", () => {
 });
 
 describe("Footer", () => {
-  it("reprend tous les liens sociaux", async () => {
-    const { body } = await render(Footer);
-    const hrefs = [...body.querySelectorAll("ul a")].map((a) => a.getAttribute("href"));
+  /** Les liens de la ligne du pied de page, hors plan du site. */
+  const rowLinks = (body: HTMLElement) =>
+    [...body.querySelectorAll("footer > div a")].map((a) => a.getAttribute("href"));
 
-    expect(hrefs).toEqual(socialLinks.map((link) => link.href));
+  it("reprend tous les liens sociaux sur sa ligne", async () => {
+    const { body } = await render(Footer);
+    expect(rowLinks(body)).toEqual(socialLinks.map((link) => link.href));
   });
 
   it("coupe le référent sur les liens sortants, et sur eux seuls", async () => {
     const { body } = await render(Footer);
 
-    for (const link of body.querySelectorAll("ul a")) {
+    for (const link of body.querySelectorAll("footer a:not([download])")) {
       const href = link.getAttribute("href") ?? "";
       expect(link.getAttribute("rel"), href).toBe(href.startsWith("http") ? "noreferrer" : null);
     }
+  });
+
+  describe("plan du site", () => {
+    it("s'ouvre depuis un bouton de la ligne, sans script", async () => {
+      const { body } = await render(Footer);
+      const map = body.querySelector("#site-map");
+      const opener = body.querySelector("footer > div button[popovertarget='site-map']");
+
+      expect(map?.hasAttribute("popover")).toBe(true);
+      expect(map?.tagName).toBe("NAV");
+      expect(map?.getAttribute("aria-label")).toBe("Plan du site");
+      expect(opener?.textContent?.trim()).toBe("Plan du site");
+    });
+
+    it("liste les sections de l'accueil, chaque projet et le CV", async () => {
+      const { body } = await render(Footer);
+      const hrefs = [...body.querySelectorAll("#site-map a")].map((a) => a.getAttribute("href"));
+
+      for (const link of navLinks) {
+        expect(hrefs, link.label).toContain(`/portfolio${link.href}`);
+      }
+      for (const project of fixtureProjects) {
+        expect(hrefs, project.id).toContain(`/portfolio/projects/${project.id}`);
+      }
+      expect(body.querySelector("#site-map a[download]")?.getAttribute("href")).toBe(
+        "/portfolio/cv-damien-aravena-bravo-public.pdf",
+      );
+    });
+
+    it("se ferme par un bouton étiqueté, pas par une croix muette", async () => {
+      const { body } = await render(Footer);
+      const close = body.querySelector("#site-map button[popovertargetaction='hide']");
+
+      expect(close?.getAttribute("aria-label")).toBe("Fermer le plan du site");
+    });
+
+    it("reste dans la langue de la page", async () => {
+      const { body } = await render(Footer, at("/portfolio/en/projects"));
+      const internal = [...body.querySelectorAll("#site-map a:not([download])")]
+        .map((a) => a.getAttribute("href") ?? "")
+        .filter((href) => href.startsWith("/"));
+
+      expect(body.querySelector("#site-map")?.getAttribute("aria-label")).toBe("Site map");
+      expect(internal.length).toBeGreaterThan(0);
+      for (const href of internal) {
+        expect(href).toMatch(/^\/portfolio\/en(\/|$)/);
+      }
+    });
   });
 
   it("affiche l'année en cours", async () => {

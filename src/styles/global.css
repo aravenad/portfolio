@@ -426,6 +426,53 @@ body::after {
 }
 
 /*
+ * Plan du site, ouvert depuis le pied de page (`popover`, voir Footer.astro).
+ * Le voile reprend le fond du thème plutôt qu'un noir fixe : il assombrit en
+ * thème sombre et pâlit en thème clair.
+ *
+ * L'entrée et la sortie passent par des transitions : `@starting-style` donne
+ * l'état de départ à l'ouverture, `allow-discrete` laisse le panneau visible le
+ * temps de sa sortie au lieu de disparaître d'un coup.
+ */
+.site-map::backdrop {
+  background: color-mix(in oklch, var(--color-zinc-950) 60%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-map,
+  .site-map::backdrop {
+    opacity: 0;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out,
+      overlay 0.2s ease-out allow-discrete,
+      display 0.2s ease-out allow-discrete;
+  }
+
+  .site-map {
+    transform: translateY(8px) scale(0.98);
+  }
+
+  .site-map:popover-open,
+  .site-map:popover-open::backdrop {
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .site-map:popover-open,
+    .site-map:popover-open::backdrop {
+      opacity: 0;
+    }
+
+    .site-map:popover-open {
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+}
+
+/*
  * Après un changement de langue, la page n'est pas « ouverte » : on lit la même
  * chose dans l'autre langue. Le gabarit arrive donc sans son animation d'entrée.
  * Le drapeau est posé par le script du header et ne vit que sur cette page.

@@ -4,27 +4,12 @@ import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
+import { publicCv } from "../../lib/cv";
 import { getLang } from "../../lib/i18n";
-import { url } from "../../lib/url";
 
 const t = useTranslations(getLang(Astro.url.pathname));
-
-/*
- * ⚠️ LA VERSION PUBLIQUE, ET ELLE SEULE. Le kit produit deux CV : celui-ci, et
- * un complet qui porte le téléphone et l'adresse mail. Le dépôt est public et
- * le fichier servi ici est indexable : le suffixe reste donc dans le nom du
- * fichier, pour qu'on ne puisse pas déposer l'autre à sa place sans le voir.
- *
- * Le nom envoyé au lecteur, lui, n'a pas à porter cette précaution : `download`
- * le rebaptise à l'enregistrement.
- *
- * Le CV n'existe qu'en français : la version anglaise du site sert le même
- * fichier, et son bouton le signale.
- */
-const cv = {
-  href: url("/cv-damien-aravena-bravo-public.pdf"),
-  filename: "CV-Damien-Aravena-Bravo.pdf",
-};
+/** Le CV public, et lui seul : voir src/lib/cv.ts. */
+const cv = publicCv();
 ---
 
 <Section id="contact" aria-labelledby="contact-title">
