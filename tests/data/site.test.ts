@@ -9,6 +9,10 @@ describe("informations du site", () => {
     }
   });
 
+  it("met le nom complet dans le titre, celui qu'on cherche sur Google", () => {
+    expect(site.title).toContain(site.author);
+  });
+
   it("garde une description assez longue pour LinkedIn et assez courte pour Google", () => {
     // LinkedIn tronque ou ignore en dessous de 100 caractères ; les résultats de
     // recherche coupent au-delà de 160.

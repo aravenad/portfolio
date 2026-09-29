@@ -126,7 +126,7 @@ const en = {
   ogLocale: "en_US",
 
   meta: {
-    title: "Damien — Portfolio",
+    title: site.title,
     description:
       "Portfolio of Damien Aravena Bravo, computer science student (BUT Informatique) in Grenoble: web development, Java applications and database projects.",
     ogImageAlt: "Damien Aravena Bravo, computer science student in Grenoble",

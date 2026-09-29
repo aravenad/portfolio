@@ -11,7 +11,7 @@ import { SITE_ORIGIN, meta, renderPage } from "../helpers/render";
  */
 const options = (pathname = "/portfolio/") => ({
   request: new Request(`${SITE_ORIGIN}${pathname}`),
-  props: { title: "Damien — Portfolio" },
+  props: { title: site.title },
   slots: { default: "<p>contenu</p>" },
 });
 

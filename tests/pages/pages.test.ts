@@ -295,6 +295,7 @@ describe("version anglaise", () => {
     const { document } = await renderPage(HomeEn, { request: request("/portfolio/en/") });
 
     expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(document.title).toBe(site.title);
     expect(meta(document, "og:locale")).toBe("en_US");
     expect(document.querySelector("h1")?.textContent?.replace(/\s+/g, " ").trim())
       .toBe("Hi, I'm Damien.");
@@ -361,5 +362,16 @@ describe("version anglaise", () => {
       expect(link.getAttribute("href")).toMatch(/^\/portfolio\/en\/projects\//);
     }
     expect(document.querySelector("article header")?.textContent).toContain("Completed");
+  });
+});
+
+describe("robots.txt", () => {
+  it("ouvre tout le site et annonce le plan du site, base comprise", async () => {
+    const { GET } = await import("../../src/pages/robots.txt");
+    const response = await GET({ site: new URL(SITE_ORIGIN) } as never);
+    const body = await response.text();
+
+    expect(body).toContain("User-agent: *\nAllow: /");
+    expect(body).toContain(`Sitemap: ${SITE_ORIGIN}/portfolio/sitemap-index.xml`);
   });
 });
