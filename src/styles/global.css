@@ -1,13 +1,21 @@
 @import "tailwindcss";
+@import "@fontsource-variable/noto-sans";
 
 /*
  * Couleur d'accent du site. Un argent froid, calqué sur les hautes lumières de
  * la bannière LinkedIn : la direction artistique est strictement monochrome,
  * l'accent se distingue par sa température, pas par une teinte franche.
  * Il porte le lien de nav actif, les flèches au survol, le focus clavier.
+ *
+ * Police : Noto Sans, la même que le CV et la lettre de motivation. Servie avec
+ * le site (Fontsource, version variable) plutôt que laissée à la police système,
+ * qui changeait d'un appareil à l'autre (Segoe UI, San Francisco, Roboto…).
+ * Seul le romain est importé : le site n'emploie pas d'italique.
  */
 @theme {
   --color-accent: oklch(90% 0.032 250);
+  --font-sans: "Noto Sans Variable", "Noto Sans", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /*

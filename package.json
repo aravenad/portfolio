@@ -16,6 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource-variable/noto-sans": "^5.3.0",
     "@iconify-json/simple-icons": "^1.2.96",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.3",
