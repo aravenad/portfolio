@@ -392,11 +392,46 @@ body::after {
 }
 
 /*
+ * Titre du hero : chaque mot passe du flou au net en montant, l'un après
+ * l'autre. Transposition en CSS de BlurText (React Bits, repris par shadcn.io),
+ * mot par mot et non lettre par lettre : moins de calques flous à peindre sur un
+ * texte de cette taille, et une entrée plus posée.
+ *
+ * Elle remplace `.page-enter` sur le titre, mais pas son budget : à ~0,7 s,
+ * l'entrée passait inaperçue. Le dernier mot est net en ~1,6 s ; le premier
+ * apparaît tout de suite, ce qui limite l'effet sur le LCP. Le prénom est
+ * enveloppé plutôt qu'animé lui-même, pour ne pas écraser l'`animation` de
+ * `.text-chrome` : son reflet part avec lui.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .blur-word {
+    display: inline-block;
+    animation: blur-word 1s cubic-bezier(0.33, 1, 0.68, 1) both;
+    animation-delay: calc(var(--word, 0) * 200ms);
+  }
+}
+
+@keyframes blur-word {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+/*
  * Après un changement de langue, la page n'est pas « ouverte » : on lit la même
  * chose dans l'autre langue. Le gabarit arrive donc sans son animation d'entrée.
  * Le drapeau est posé par le script du header et ne vit que sur cette page.
  */
-:root[data-lang-switching] .page-enter {
+:root[data-lang-switching] .page-enter,
+:root[data-lang-switching] .blur-word {
   animation: none;
 }
 

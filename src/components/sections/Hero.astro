@@ -13,12 +13,29 @@ interface Props {
 
 const { intro, name, description } = Astro.props;
 const t = useTranslations(getLang(Astro.url.pathname));
+
+/** Les mots de l'accroche, animés un à un (`.blur-word`), le prénom en dernier. */
+const introWords = intro.split(/\s+/).filter(Boolean);
 ---
 
 <section class="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-24 sm:py-32">
   <Container>
-    <h1 class="page-enter max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
-      {intro} <span class="text-chrome">{name}</span>.
+    {/*
+      Le titre est lu d'un bloc par les lecteurs d'écran (`aria-label`) : les
+      mots découpés pour l'animation leur sont masqués, sans quoi certains les
+      annonceraient un par un.
+    */}
+    <h1
+      class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl"
+      aria-label={`${intro} ${name}.`}
+    >
+      {introWords.map((word, index) => (
+        <Fragment>
+          <span class="blur-word" style={`--word: ${index}`} aria-hidden="true">{word}</span>{" "}
+        </Fragment>
+      ))}<span class="blur-word" style={`--word: ${introWords.length}`} aria-hidden="true"
+        ><span class="text-chrome">{name}</span>.</span
+      >
     </h1>
 
     <p class="page-enter mt-6 max-w-2xl text-lg leading-8 text-zinc-400" style="--index: 1">
