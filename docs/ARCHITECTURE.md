@@ -108,8 +108,7 @@ chargement. Tout comportement doit donc passer par `onEachPage()`
 (`src/lib/enhance.ts`), qui le rejoue à chaque page et fournit un `AbortSignal`
 à poser sur chaque écouteur, pour qu'aucun ne survive à la page suivante.
 
-Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`, sauf le
-plan du site, encore seulement couvert par les tests de composant.
+Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 
 | Comportement | Script | Règle testée |
 | :--- | :--- | :--- |
@@ -121,7 +120,7 @@ plan du site, encore seulement couvert par les tests de composant.
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
-| Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant |
+| Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
 `data-reveal-armed` avant le premier affichage ; le CSS ne masque les blocs
@@ -167,7 +166,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ```sh
 npm test          # 589 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 31 tests de bout en bout, une quinzaine de secondes
+npm run test:e2e  # 34 tests de bout en bout, une quinzaine de secondes
 ```
 
 Deux niveaux, qui se complètent :
@@ -178,7 +177,7 @@ Deux niveaux, qui se complètent :
 - **Playwright (`e2e/`)** vérifie ce câblage sur le site construit, servi à la
   racine, dans Chromium : barre de navigation, menu mobile, thème,
   langue et position de lecture, apparition au défilement, sommaire, retour en
-  haut, pagination. Bureau pour tout, gabarit de téléphone pour
+  haut, pagination, plan du site. Bureau pour tout, gabarit de téléphone pour
   `mobile.spec.ts`. Chaque test échoue aussi sur une erreur de console.
   Première fois : `npx playwright install --only-shell chromium`.
 
