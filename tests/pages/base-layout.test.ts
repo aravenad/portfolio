@@ -149,6 +149,21 @@ describe("BaseLayout", () => {
     expect(preload?.getAttribute("href")).toBeTruthy();
   });
 
+  it("déclare une icône raster lisible par la recherche Google", async () => {
+    // Google veut un carré multiple de 48 px : le .ico en contient un, le SVG
+    // n'a pas de taille propre. Sans `sizes`, Chrome préférerait le .ico au SVG.
+    const { document } = await renderPage(BaseLayout, options());
+    const icons = [...document.querySelectorAll('link[rel="icon"]')];
+
+    expect(icons.find((icon) => icon.getAttribute("href")?.endsWith("/favicon.ico"))?.getAttribute("sizes")).toBe(
+      "48x48",
+    );
+    expect(icons.some((icon) => icon.getAttribute("type") === "image/svg+xml")).toBe(true);
+    expect(document.querySelector('link[rel="apple-touch-icon"]')?.getAttribute("href")).toMatch(
+      /\/apple-touch-icon\.png$/,
+    );
+  });
+
   it("distingue l'accueil des autres pages", async () => {
     const accueil = await renderPage(BaseLayout, options("/portfolio/"));
     const projets = await renderPage(BaseLayout, options("/portfolio/projects"));
