@@ -135,6 +135,7 @@ const fr = {
     email: "Envoyer un e-mail",
     cv: "Télécharger mon CV",
     github: "Voir mon GitHub",
+    linkedin: "Voir mon LinkedIn",
   },
 
   breadcrumb: {
@@ -289,6 +290,7 @@ const en = {
     // Le CV n'existe qu'en français : le dire avant le téléchargement.
     cv: "Download my résumé (French)",
     github: "See my GitHub",
+    linkedin: "See my LinkedIn",
   },
 
   breadcrumb: {

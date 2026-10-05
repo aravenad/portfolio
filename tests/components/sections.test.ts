@@ -171,6 +171,21 @@ describe("Contact", () => {
     expect(github?.getAttribute("rel")).toBe("noreferrer");
   });
 
+  it("propose LinkedIn et GitHub en icônes nommées pour les lecteurs d'écran", async () => {
+    // La grille de l'IUT cite LinkedIn en premier parmi les moyens de contact.
+    const { body } = await render(Contact);
+
+    for (const [href, label] of [
+      [site.linkedin, "Voir mon LinkedIn"],
+      [site.github, "Voir mon GitHub"],
+    ]) {
+      const link = body.querySelector(`a[href="${href}"]`);
+      expect(link?.getAttribute("aria-label"), href).toBe(label);
+      expect(link?.getAttribute("rel"), href).toBe("noreferrer");
+      expect(link?.querySelector("svg"), href).toBeTruthy();
+    }
+  });
+
   it("rattache son titre à la section", async () => {
     const { body } = await render(Contact);
     expect(body.querySelector("section")?.getAttribute("id")).toBe("contact");

@@ -1,7 +1,9 @@
 ---
+import { Icon } from "astro-icon/components";
 import Button from "../ui/Button.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import { outlineButton } from "../ui/button-styles";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { publicCv } from "../../lib/cv";
@@ -10,6 +12,18 @@ import { getLang } from "../../lib/i18n";
 const t = useTranslations(getLang(Astro.url.pathname));
 /** Le CV public, et lui seul : voir src/lib/cv.ts. */
 const cv = publicCv();
+
+/*
+ * Deux actions, puis deux profils. L'e-mail et le CV gardent des boutons à
+ * libellé : ce sont eux qu'un recruteur vient chercher. LinkedIn et GitHub
+ * passent en icônes, que tout le monde reconnaît : quatre boutons à libellé
+ * alourdissaient la ligne. Leur nom reste dans `aria-label`, et dans `title`
+ * pour qui survole.
+ */
+const profiles = [
+  { href: site.linkedin, label: t.contact.linkedin, icon: "simple-icons:linkedin" },
+  { href: site.github, label: t.contact.github, icon: "simple-icons:github" },
+];
 ---
 
 <Section id="contact" aria-labelledby="contact-title">
@@ -20,15 +34,30 @@ const cv = publicCv();
     description={t.contact.description}
   />
 
-  <div class="mt-12 flex flex-wrap gap-4">
+  <div class="mt-12 flex flex-wrap items-center gap-4">
     <Button href={`mailto:${site.email}`}>{t.contact.email}</Button>
 
     <Button href={cv.href} download={cv.filename} variant="secondary">
       {t.contact.cv}
     </Button>
 
-    <Button href={site.github} variant="secondary" rel="noreferrer">
-      {t.contact.github}
-    </Button>
+    <span aria-hidden="true" class="mx-1 hidden h-8 w-px bg-zinc-800 sm:block"></span>
+
+    {
+      profiles.map((profile) => (
+        <a
+          href={profile.href}
+          rel="noreferrer"
+          aria-label={profile.label}
+          title={profile.label}
+          class:list={[
+            "inline-flex size-12 items-center justify-center rounded-lg text-zinc-300 transition hover:text-zinc-100",
+            outlineButton,
+          ]}
+        >
+          <Icon name={profile.icon} class="size-5" />
+        </a>
+      ))
+    }
   </div>
 </Section>
