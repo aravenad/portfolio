@@ -1,12 +1,13 @@
 # Portfolio
 
-Portfolio personnel de Damien Aravena Bravo — étudiant en BUT Informatique à Grenoble.
+Portfolio personnel de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
 Site entièrement statique : vingt pages HTML (dix en français, dix en anglais),
-une feuille de style, et ~27 Ko de JavaScript (9 Ko compressé) — le routeur de
-transitions d'Astro et une dizaine de petits comportements (menu, navigation
-active, apparition au défilement, thème, plan du site).
+une feuille de style et environ 27 Ko de JavaScript (9 Ko compressés). Ce
+JavaScript se limite au routeur de transitions d'Astro et à une dizaine de
+petits comportements (menu, navigation active, apparition au défilement, thème,
+plan du site).
 
 Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
 choix du visiteur, mémorisé d'une visite à l'autre.
@@ -26,10 +27,11 @@ npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
 
-Node >= 22.12. Le site est publié sur <https://damien-aravena.fr/> à
-chaque push sur `main`, via le workflow `.github/workflows/deploy.yml` — qui
-lance d'abord les tests et un `npm audit`, et ne construit rien si l'un des deux
-échoue ; rien n'est publié si les tests de bout en bout échouent. Détail : §7 de l'architecture.
+Node >= 22.12. Chaque push sur `main` publie le site sur
+<https://damien-aravena.fr/> via le workflow `.github/workflows/deploy.yml`.
+Le workflow lance d'abord les tests et un `npm audit`, et ne construit rien si
+l'un des deux échoue. Rien n'est publié non plus si les tests de bout en bout
+échouent. Détail : §7 de l'architecture.
 
 ## Structure
 
@@ -117,10 +119,10 @@ sombre dans `@theme`, et toute la palette du thème clair dans le bloc
 
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
 noir, matière métallique en haut de page, lettrage chromé. Le thème clair en
-est le négatif doux : fond gris perle, matière en plis gris, lettrage graphite. Elle tient dans
-`src/styles/global.css` (palette, calques, utilitaires), `src/assets/` (la
-matière et son masque de fondu) et `tools/og.html` (l'image d'aperçu). Pour
-les modifier, voir §6 de l'architecture.
+est le négatif doux : fond gris perle, matière en plis gris, lettrage graphite.
+Elle tient dans `src/styles/global.css` (palette, calques, utilitaires),
+`src/assets/` (la matière et son masque de fondu) et `tools/og.html` (l'image
+d'aperçu). Pour les modifier, voir §6 de l'architecture.
 
 ## Tests
 
@@ -151,6 +153,6 @@ chromium`. Voir §5 de l'architecture.
 
 Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
 via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer un
-SVG dans `src/icons/` et le référencer par son nom de fichier, sans préfixe — ou,
-pour un logo d'organisation du parcours, déposer le fichier dans `public/logos/`
-et renseigner `logo:` dans `src/data/career.ts`.
+SVG dans `src/icons/` et le référencer par son nom de fichier, sans préfixe.
+Pour un logo d'organisation du parcours, déposer plutôt le fichier dans
+`public/logos/` et renseigner `logo:` dans `src/data/career.ts`.
