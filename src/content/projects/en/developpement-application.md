@@ -5,7 +5,7 @@ tags: ["Java", "UML", "Project management"]
 status: "termine"
 team: "Team project"
 year: 2025
-order: 5
+order: 1
 featured: true
 ---
 

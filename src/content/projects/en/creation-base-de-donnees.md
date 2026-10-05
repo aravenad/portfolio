@@ -5,7 +5,7 @@ tags: ["PostgreSQL", "SQL", "Modeling"]
 status: "termine"
 team: "In pairs"
 year: 2024
-order: 3
+order: 4
 featured: true
 ---
 

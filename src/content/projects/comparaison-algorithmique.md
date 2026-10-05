@@ -5,7 +5,7 @@ tags: ["Java", "Algorithmique", "Optimisation"]
 status: "termine"
 team: "En binôme"
 year: 2024
-order: 1
+order: 2
 featured: true
 ---
 

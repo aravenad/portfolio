@@ -5,8 +5,7 @@ tags: ["Linux", "Debian", "System"]
 status: "termine"
 team: "Solo"
 year: 2024
-order: 2
-featured: true
+order: 7
 ---
 
 ## Context
