@@ -26,6 +26,17 @@ import type { CareerEntry } from "../types";
  */
 export const experiences: CareerEntry[] = [
   {
+    title: "Stage de développement",
+    organization: "Entreprise à définir",
+    location: "Grenoble et alentours",
+    period: "Avril – juin 2027",
+    description:
+      "Stage de fin de 2e année de BUT, de 10 à 12 semaines : du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet. Je cherche une entreprise, de préférence en développement web.",
+    icon: "calendar",
+    upcoming: true,
+    project: "stage-2027",
+  },
+  {
     organization: "Horizon Groupe",
     location: "Villard-Bonnot",
     period: "Juillet 2025 – juin 2026",
@@ -118,6 +129,17 @@ export const education: CareerEntry[] = [
  * mais tous les mois prennent la capitale, comme le veut l'anglais.
  */
 export const experiencesEn: CareerEntry[] = [
+  {
+    title: "Development internship",
+    organization: "Company to be confirmed",
+    location: "Grenoble area",
+    period: "April – June 2027",
+    description:
+      "End-of-second-year internship of my BUT, 10 to 12 weeks: from April 19 to June 25, 2027, extendable to July 9. I am looking for a company, ideally in web development.",
+    icon: "calendar",
+    upcoming: true,
+    project: "stage-2027",
+  },
   {
     organization: "Horizon Groupe",
     location: "Villard-Bonnot",

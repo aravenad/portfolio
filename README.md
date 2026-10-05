@@ -22,7 +22,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 596 tests
+npm test         # 619 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -94,7 +94,7 @@ status: "termine" # termine | en-cours | a-venir
 team: "En binôme"
 year: 2026
 order: 8 # ordre d'affichage
-cover: uml # motif de la carte : uml | algo | web | erd | chart | network | terminal
+cover: uml # motif de la carte : uml | algo | web | erd | chart | network | terminal | calendar
 featured: true # mis en avant sur l'accueil
 role: # ce que j'ai fait moi-même dans l'équipe
   - "Conception du diagramme de classes"

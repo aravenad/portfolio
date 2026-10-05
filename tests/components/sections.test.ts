@@ -140,6 +140,15 @@ describe("Career", () => {
     expect(columns).toEqual(["Expérience", "Formation"]);
   });
 
+  it("marque le stage à venir et renvoie à sa fiche", async () => {
+    const { body } = await render(Career);
+    const first = body.querySelector("ul > li")!;
+
+    expect(first.querySelector("h3")?.textContent).toContain("À venir");
+    expect(first.querySelector('a[href="/portfolio/projects/stage-2027"]')?.textContent)
+      .toContain("Voir la fiche");
+  });
+
   it("liste toutes les entrées des deux colonnes", async () => {
     const { body } = await render(Career);
     const lists = body.querySelectorAll("ul");

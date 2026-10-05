@@ -90,6 +90,8 @@ const fr = {
     description: "Ma formation et les expériences qui m'ont fait découvrir le métier.",
     experience: "Expérience",
     education: "Formation",
+    upcoming: "À venir",
+    seeProject: "Voir la fiche",
   },
 
   projects: {
@@ -244,6 +246,8 @@ const en = {
     description: "My education and the experiences that introduced me to the field.",
     experience: "Experience",
     education: "Education",
+    upcoming: "Upcoming",
+    seeProject: "See the project page",
   },
 
   projects: {

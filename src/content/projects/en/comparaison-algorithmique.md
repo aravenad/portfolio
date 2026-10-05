@@ -5,7 +5,7 @@ tags: ["Java", "Algorithms", "Optimization"]
 status: "termine"
 team: "In pairs"
 year: 2024
-order: 2
+order: 3
 cover: algo
 featured: true
 ---

@@ -20,9 +20,18 @@ export type Competence = (typeof COMPETENCES)[number];
 /**
  * Motifs dessinés sur la couverture d'une carte projet (ProjectCover.astro) :
  * diagramme de classes, barres d'un tri, fenêtre de navigateur, schéma
- * entités-associations, courbe, serveur en réseau, terminal.
+ * entités-associations, courbe, serveur en réseau, terminal, calendrier.
  */
-export const COVERS = ["uml", "algo", "web", "erd", "chart", "network", "terminal"] as const;
+export const COVERS = [
+  "uml",
+  "algo",
+  "web",
+  "erd",
+  "chart",
+  "network",
+  "terminal",
+  "calendar",
+] as const;
 
 export type Cover = (typeof COVERS)[number];
 
@@ -93,4 +102,8 @@ export interface CareerEntry {
   icon?: string;
   /** Repli affiché quand aucun logo n'est disponible. */
   initials?: string;
+  /** Entrée pas encore commencée : marquée « À venir » dans le parcours. */
+  upcoming?: boolean;
+  /** Identifiant de la fiche projet liée, dans `src/content/projects/`. */
+  project?: string;
 }

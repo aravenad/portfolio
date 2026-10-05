@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { education, educationEn, experiences, experiencesEn } from "../../src/data/career";
@@ -194,6 +196,18 @@ describe("cohérence du parcours", () => {
         entry.title ?? entry.roles?.length,
         `${entry.organization} n'annonce aucun intitulé de poste`,
       ).toBeTruthy();
+    }
+  });
+
+  it("ne lie une entrée qu'à une fiche projet qui existe, dans les deux langues", () => {
+    // Un identifiant mal recopié donnerait un lien vers une page absente.
+    for (const entry of entries) {
+      if (!entry.project) continue;
+
+      for (const folder of ["", "en/"]) {
+        const file = new URL(`../../src/content/projects/${folder}${entry.project}.md`, import.meta.url);
+        expect(existsSync(file), `${folder}${entry.project}.md`).toBe(true);
+      }
     }
   });
 

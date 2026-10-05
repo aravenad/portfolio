@@ -27,6 +27,7 @@ const framing: Record<Cover, string> = {
   chart: "--cover-x: 84%; --cover-y: 55%",
   network: "--cover-x: 58%; --cover-y: 18%",
   terminal: "--cover-x: 34%; --cover-y: 86%",
+  calendar: "--cover-x: 62%; --cover-y: 78%",
 };
 ---
 
@@ -177,6 +178,35 @@ const framing: Record<Cover, string> = {
             <path d="M66 90h136M66 104h108M66 118h120" class="opacity-60" />
             <path d="m66 132 8 6-8 6" />
             <rect x="84" y="132" width="9" height="12" class="fill-current text-accent" stroke="none" />
+          </>
+        )}
+
+        {cover === "calendar" && (
+          <>
+            <rect x="60" y="30" width="200" height="128" rx="8" class="fill-zinc-950/70" />
+            <path d="M60 56h200M104 22v16M216 22v16" />
+            {Array.from({ length: 18 }, (_, index) => {
+              const column = index % 6;
+              const row = Math.floor(index / 6);
+              // Dix semaines de stage, puis deux de prolongation possible.
+              const week = index - 2;
+              return (
+                <rect
+                  x={76 + column * 30}
+                  y={68 + row * 28}
+                  width="22"
+                  height="18"
+                  rx="3"
+                  class:list={[
+                    week >= 0 && week < 10 && "fill-current text-accent opacity-80",
+                    week >= 10 && week < 12 && "text-accent",
+                    (week < 0 || week >= 12) && "opacity-40",
+                  ]}
+                  stroke={week >= 0 && week < 10 ? "none" : "currentColor"}
+                  stroke-dasharray={week >= 10 && week < 12 ? "3 3" : undefined}
+                />
+              );
+            })}
           </>
         )}
       </svg>

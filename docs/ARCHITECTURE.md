@@ -171,7 +171,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ## 5. Tests
 
 ```sh
-npm test          # 596 tests, quelques secondes
+npm test          # 619 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 34 tests de bout en bout, une quinzaine de secondes
 ```
