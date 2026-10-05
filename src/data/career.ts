@@ -92,17 +92,11 @@ export const education: CareerEntry[] = [
     initials: "IUT2",
   },
   {
-    title: "Certification PIX",
-    organization: "Compétences numériques",
-    period: "Avril 2022",
-    icon: "simple-icons:pix",
-  },
-  {
     title: "Classe préparatoire TSI",
     organization: "Lycée polyvalent Gaspard Monge",
     location: "Chambéry",
     period: "Septembre 2020 – juin 2023",
-    description: "Technologie et sciences industrielles.",
+    description: "Technologie et sciences industrielles. Première année validée (60 crédits ECTS).",
     initials: "GM",
   },
   {
@@ -110,7 +104,7 @@ export const education: CareerEntry[] = [
     organization: "Lycée polyvalent Pablo Neruda",
     location: "Saint-Martin-d'Hères",
     period: "Septembre 2018 – juin 2020",
-    description: "Mention bien.",
+    description: "Spécialité SIN (systèmes d'information et numérique), mention assez bien.",
     initials: "PN",
   },
 ];
@@ -191,17 +185,11 @@ export const educationEn: CareerEntry[] = [
     initials: "IUT2",
   },
   {
-    title: "PIX certification",
-    organization: "Digital skills",
-    period: "April 2022",
-    icon: "simple-icons:pix",
-  },
-  {
     title: "TSI preparatory class",
     organization: "Gaspard Monge High School",
     location: "Chambéry",
     period: "September 2020 – June 2023",
-    description: "Technology and industrial sciences.",
+    description: "Technology and industrial sciences. First year completed (60 ECTS credits).",
     initials: "GM",
   },
   {
@@ -209,7 +197,7 @@ export const educationEn: CareerEntry[] = [
     organization: "Pablo Neruda High School",
     location: "Saint-Martin-d'Hères",
     period: "September 2018 – June 2020",
-    description: "With honors (mention bien).",
+    description: "Information and digital systems (SIN) specialty, with honors (mention assez bien).",
     initials: "PN",
   },
 ];
