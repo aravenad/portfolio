@@ -1,0 +1,185 @@
+---
+import type { Cover } from "../types";
+
+interface Props {
+  cover?: Cover;
+}
+
+const { cover } = Astro.props;
+
+/*
+ * La couverture d'une carte projet. Pas de capture d'écran : les projets sont
+ * anciens, et une capture aurait juré avec le reste du site. À la place, la
+ * matière métallique du haut de page (`.project-cover` dans global.css), cadrée
+ * différemment pour chaque motif, sous un dessin au trait qui dit de quoi parle
+ * le projet : un diagramme de classes, un schéma de base, une fenêtre de
+ * navigateur…
+ *
+ * Le dessin est décoratif : le titre de la carte, juste dessous, dit déjà tout.
+ * Il suit `currentColor`, donc les deux thèmes sans règle à part ; le seul
+ * détail mis en valeur prend la couleur d'accent.
+ */
+const framing: Record<Cover, string> = {
+  uml: "--cover-x: 22%; --cover-y: 38%",
+  algo: "--cover-x: 70%; --cover-y: 30%",
+  web: "--cover-x: 46%; --cover-y: 62%",
+  erd: "--cover-x: 12%; --cover-y: 70%",
+  chart: "--cover-x: 84%; --cover-y: 55%",
+  network: "--cover-x: 58%; --cover-y: 18%",
+  terminal: "--cover-x: 34%; --cover-y: 86%",
+};
+---
+
+<div
+  aria-hidden="true"
+  class="project-cover relative aspect-[16/9] overflow-hidden border-b border-zinc-800"
+  style={cover ? framing[cover] : undefined}
+>
+  {
+    cover && (
+      <svg
+        viewBox="0 0 320 180"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="relative size-full text-zinc-400 transition group-hover:text-zinc-300"
+      >
+        {cover === "uml" && (
+          <>
+            <rect x="36" y="44" width="96" height="84" rx="4" class="fill-zinc-950/70" />
+            <path d="M36 62h96M36 98h96M48 53h44M48 74h52M48 86h36M48 110h60" />
+            <rect x="196" y="22" width="88" height="60" rx="4" class="fill-zinc-950/70" />
+            <path d="M196 40h88M208 31h40M208 52h48M208 66h32" />
+            <rect x="196" y="104" width="88" height="56" rx="4" class="fill-zinc-950/70" />
+            <path d="M196 122h88M208 113h36M208 134h44M208 146h28" />
+            <path d="M132 72h32v-20h22" />
+            <path d="m186 46 10 6-10 6z" class="fill-zinc-950" />
+            <path d="M132 112h32v20h32" class="text-accent" stroke="currentColor" />
+            <path d="m188 128 8 4-8 4" class="text-accent" stroke="currentColor" />
+          </>
+        )}
+
+        {cover === "algo" && (
+          <>
+            <path d="M40 150h240" />
+            {[28, 40, 52, 96, 64, 76, 88, 108, 120].map((height, index) => (
+              <rect
+                x={52 + index * 26}
+                y={150 - height}
+                width="16"
+                height={height}
+                rx="2"
+                class:list={[
+                  "fill-zinc-950/70",
+                  (index === 3 || index === 4) && "text-accent",
+                ]}
+                stroke="currentColor"
+              />
+            ))}
+            <path d="M138 46c4-18 26-18 30 0" class="text-accent" stroke="currentColor" />
+            <path d="m163 40 5 6 4-7" class="text-accent" stroke="currentColor" />
+          </>
+        )}
+
+        {cover === "web" && (
+          <>
+            <rect x="40" y="22" width="240" height="136" rx="8" class="fill-zinc-950/70" />
+            <path d="M40 42h240" />
+            <circle cx="54" cy="32" r="2.5" />
+            <circle cx="64" cy="32" r="2.5" />
+            <circle cx="74" cy="32" r="2.5" />
+            <rect x="92" y="27" width="140" height="10" rx="5" />
+            <rect x="56" y="54" width="208" height="34" rx="3" />
+            <path d="M68 66h88M68 76h56" class="text-accent" stroke="currentColor" />
+            <rect x="56" y="98" width="64" height="46" rx="3" />
+            <rect x="128" y="98" width="64" height="46" rx="3" />
+            <rect x="200" y="98" width="64" height="46" rx="3" />
+            <path d="M64 110h40M64 120h28M136 110h40M136 120h32M208 110h40M208 120h24" />
+          </>
+        )}
+
+        {cover === "erd" && (
+          <>
+            <path
+              d="M44 46v88a40 12 0 0 0 80 0V46"
+              class="fill-zinc-950/70"
+            />
+            <ellipse cx="84" cy="46" rx="40" ry="12" class="fill-zinc-950" />
+            <path d="M44 76a40 12 0 0 0 80 0M44 106a40 12 0 0 0 80 0" />
+            <rect x="172" y="30" width="112" height="120" rx="4" class="fill-zinc-950/70" />
+            <path d="M172 50h112M212 50v100M172 74h112M172 98h112M172 122h112" />
+            <path d="M184 40h48M224 62h44" class="text-accent" stroke="currentColor" />
+            <circle cx="192" cy="62" r="3" class="text-accent" stroke="currentColor" />
+            <path d="M184 86h16M184 110h16M184 134h16M224 86h36M224 110h48M224 134h28" />
+            <path d="M124 90h48M160 90l12-7M160 90l12 7M134 84v12" />
+          </>
+        )}
+
+        {cover === "chart" && (
+          <>
+            <path d="M48 28v122h236" />
+            <path d="M48 60h236M48 90h236M48 120h236" stroke-dasharray="2 6" class="opacity-50" />
+            <path
+              d="M48 132 82 112l34 8 34-36 34 10 34-34 34 12 32-28"
+              class="text-accent"
+              stroke="currentColor"
+            />
+            {[
+              [82, 112],
+              [116, 120],
+              [150, 84],
+              [184, 94],
+              [218, 60],
+              [252, 72],
+            ].map(([cx, cy]) => (
+              <circle cx={cx} cy={cy} r="3" class="fill-zinc-950" />
+            ))}
+            {[
+              [66, 142],
+              [100, 136],
+              [132, 128],
+              [168, 124],
+              [202, 110],
+              [236, 104],
+              [270, 96],
+            ].map(([cx, cy]) => (
+              <circle cx={cx} cy={cy} r="1.5" class="opacity-60" />
+            ))}
+          </>
+        )}
+
+        {cover === "network" && (
+          <>
+            <rect x="40" y="36" width="72" height="108" rx="4" class="fill-zinc-950/70" />
+            <path d="M40 72h72M40 108h72M66 54h34M66 90h34M66 126h34" />
+            <circle cx="54" cy="54" r="2.5" class="text-accent" stroke="currentColor" />
+            <circle cx="54" cy="90" r="2.5" />
+            <circle cx="54" cy="126" r="2.5" />
+            <path d="M112 90h50M178 84l60-46M178 92l78 2M176 98l54 44M168 80l24-44" />
+            <circle cx="170" cy="90" r="9" class="fill-zinc-950 text-accent" stroke="currentColor" />
+            <circle cx="244" cy="34" r="6" class="fill-zinc-950" />
+            <circle cx="264" cy="94" r="6" class="fill-zinc-950" />
+            <circle cx="236" cy="146" r="6" class="fill-zinc-950" />
+            <circle cx="196" cy="30" r="5" class="fill-zinc-950" />
+          </>
+        )}
+
+        {cover === "terminal" && (
+          <>
+            <rect x="48" y="28" width="224" height="124" rx="8" class="fill-zinc-950/70" />
+            <path d="M48 48h224" />
+            <circle cx="62" cy="38" r="2.5" />
+            <circle cx="72" cy="38" r="2.5" />
+            <circle cx="82" cy="38" r="2.5" />
+            <path d="m66 64 8 6-8 6M84 70h80" class="text-accent" stroke="currentColor" />
+            <path d="M66 90h136M66 104h108M66 118h120" class="opacity-60" />
+            <path d="m66 132 8 6-8 6" />
+            <rect x="84" y="132" width="9" height="12" class="fill-current text-accent" stroke="none" />
+          </>
+        )}
+      </svg>
+    )
+  }
+</div>

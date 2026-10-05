@@ -1,3 +1,4 @@
+import type { Competence, Cover } from "../../src/types";
 import Content from "./Content.astro";
 
 export interface FixtureProject {
@@ -11,6 +12,10 @@ export interface FixtureProject {
     year?: number;
     order: number;
     featured: boolean;
+    cover?: Cover;
+    role: string[];
+    competences: Competence[];
+    learned: string[];
   };
 }
 
@@ -29,6 +34,11 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
     year: 2026 - index,
     order: index + 1,
     featured: index < 3,
+    // Seul le troisième remplit les rubriques du PPP : les autres prouvent
+    // qu'une fiche incomplète n'en montre rien.
+    role: index === 2 ? ["Conception de la base", "Tests unitaires"] : [],
+    competences: index === 2 ? ["realiser", "collaborer"] : [],
+    learned: index === 2 ? ["Écrire des tests avant le code"] : [],
   },
 }));
 

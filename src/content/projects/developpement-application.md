@@ -6,6 +6,7 @@ status: "termine"
 team: "En équipe"
 year: 2025
 order: 1
+cover: uml
 featured: true
 ---
 

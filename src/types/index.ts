@@ -1,6 +1,31 @@
 /** Avancement d'un projet, tel qu'écrit dans l'en-tête des fiches. */
 export type ProjectStatus = "termine" | "en-cours" | "a-venir";
 
+/**
+ * Les six compétences du BUT Informatique, dans l'ordre du Programme National.
+ * Une fiche cite celles que le projet mobilise ; leurs intitulés sont dans
+ * src/data/ui.ts.
+ */
+export const COMPETENCES = [
+  "realiser",
+  "optimiser",
+  "administrer",
+  "gerer",
+  "conduire",
+  "collaborer",
+] as const;
+
+export type Competence = (typeof COMPETENCES)[number];
+
+/**
+ * Motifs dessinés sur la couverture d'une carte projet (ProjectCover.astro) :
+ * diagramme de classes, barres d'un tri, fenêtre de navigateur, schéma
+ * entités-associations, courbe, serveur en réseau, terminal.
+ */
+export const COVERS = ["uml", "algo", "web", "erd", "chart", "network", "terminal"] as const;
+
+export type Cover = (typeof COVERS)[number];
+
 export interface NavLink {
   label: string;
   href: string;

@@ -9,7 +9,7 @@ export const site = {
   author: "Damien Aravena Bravo",
   // Le nom complet, pas le seul prénom : c'est lui qu'on tape pour trouver le
   // site, et Google pèse fortement le titre de la page.
-  title: "Damien Aravena Bravo — Portfolio",
+  title: "Damien Aravena Bravo | Portfolio",
   // Les aperçus LinkedIn demandent au moins 100 caractères de description.
   description:
     "Portfolio de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble : projets de développement web, d'applications Java et de bases de données.",
@@ -23,6 +23,7 @@ export const site = {
  * y ajoute le préfixe de la langue (`localizedUrl`).
  */
 export const navLinks: NavLink[] = [
+  { label: "À propos", href: "/#about", sections: ["about"] },
   { label: "Compétences", href: "/#skills", sections: ["skills", "soft-skills"] },
   { label: "Parcours", href: "/#career", sections: ["career"] },
   { label: "Projets", href: "/projects", sections: ["projects"] },
@@ -31,6 +32,7 @@ export const navLinks: NavLink[] = [
 
 /** Les mêmes liens en anglais : seuls les libellés changent. */
 export const navLinksEn: NavLink[] = [
+  { label: "About", href: "/#about", sections: ["about"] },
   { label: "Skills", href: "/#skills", sections: ["skills", "soft-skills"] },
   { label: "Background", href: "/#career", sections: ["career"] },
   { label: "Projects", href: "/projects", sections: ["projects"] },

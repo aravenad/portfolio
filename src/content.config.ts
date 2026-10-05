@@ -1,6 +1,8 @@
 import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
 
+import { COMPETENCES, COVERS } from "./types";
+
 /**
  * Les fiches projet : un fichier Markdown par projet, en français dans
  * src/content/projects/, en anglais dans src/content/projects/en/.
@@ -26,6 +28,19 @@ const schema = z.object({
   /** Ordre d'affichage (croissant). */
   order: z.number().default(99),
   featured: z.boolean().default(false),
+  /** Motif de la couverture sur la carte, identique dans les deux langues. */
+  cover: z.enum(COVERS).optional(),
+  /*
+   * Les rubriques attendues par la grille du PPP, en plus du corps Markdown.
+   * Chacune n'apparaît sur la fiche, et dans son sommaire, qu'une fois
+   * renseignée : une fiche peut donc être publiée avant d'être complète.
+   */
+  /** Ce que j'ai fait moi-même, dans un projet d'équipe. */
+  role: z.array(z.string()).default([]),
+  /** Compétences du BUT mobilisées, dans l'ordre de COMPETENCES. */
+  competences: z.array(z.enum(COMPETENCES)).default([]),
+  /** Techniques et savoir-faire acquis. */
+  learned: z.array(z.string()).default([]),
 });
 
 // `*.md` et non `**/*.md` : le sous-dossier `en/` appartient à l'autre collection.

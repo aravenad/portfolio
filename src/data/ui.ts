@@ -1,5 +1,5 @@
 import type { Lang } from "../lib/i18n";
-import type { ProjectStatus } from "../types";
+import type { Competence, ProjectStatus } from "../types";
 import { site } from "./site";
 
 /**
@@ -44,6 +44,30 @@ const fr = {
     contact: "Me contacter",
   },
 
+  about: {
+    title: "À propos",
+    paragraphs: [
+      "Après un bac STI2D, j'ai passé trois ans en classe préparatoire TSI à Chambéry. J'y ai appris à tenir une forte charge de travail dans la durée, la rigueur, et ce que l'entraide entre camarades change au travail d'équipe. En rejoignant le BUT Informatique, je suis passé d'un enseignement très théorique à une formation par la pratique : une adaptation exigeante, que j'ai appréciée dès la première année.",
+      "En 2025-2026, j'ai pris une année de césure pour découvrir le monde du travail. Chez Microstore (Horizon Groupe), une entreprise du Green IT qui gère et reconditionne les parcs informatiques de grands comptes, j'ai occupé trois postes au pôle technique, de la réception du matériel à la préparation logicielle d'environ 800 machines par mois. En parallèle, j'ai continué à développer des projets personnels.",
+      "Ce que je préfère, c'est mener un projet de A à Z, du besoin jusqu'à une application qui fonctionne. Le développement web reste mon terrain favori, mais je suis ouvert à tous les types de développement d'applications.",
+      "En dehors de l'informatique, j'aime la musique, les jeux vidéo et les documentaires, surtout ceux d'investigation. Curieux de nature, j'aime apprendre un peu sur tout, et je suis de près l'actualité des nouvelles technologies.",
+    ],
+    facts: [
+      {
+        label: "Formation",
+        value: "BUT Informatique, 2e année, parcours Réalisation d'applications (IUT2, Grenoble)",
+      },
+      { label: "Métier visé", value: "Développeur web, et plus largement développeur d'applications" },
+      { label: "Diplôme", value: "Baccalauréat STI2D, spécialité SIN, mention assez bien (2020)" },
+      {
+        label: "Recherche",
+        value:
+          "Un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027 (prolongeable jusqu'au 9 juillet), puis une alternance en 3e année",
+      },
+      { label: "Secteur", value: "Grenoble et alentours, en transports en commun" },
+    ],
+  },
+
   skills: {
     technical: {
       title: "Compétences techniques",
@@ -74,16 +98,29 @@ const fr = {
     seeAll: "Voir tous les projets",
     listTitle: "Tous mes projets",
     listDescription:
-      "L'ensemble des projets réalisés durant ma formation, du plus ancien au plus récent.",
-    listMetaTitle: "Projets — Damien",
+      "L'ensemble des projets réalisés durant ma formation, en commençant par ceux de mon parcours : la conception et le développement d'applications.",
+    listMetaTitle: `Projets | ${site.author}`,
     listMetaDescription:
       "Les projets réalisés par Damien Aravena Bravo en BUT Informatique : développement web, applications Java, bases de données et services réseau.",
-    pageMetaTitle: (page: number) => `Projets, page ${page} — Damien`,
+    pageMetaTitle: (page: number) => `Projets, page ${page} | ${site.author}`,
     pageMetaDescription: (page: number) =>
       `Les projets réalisés par Damien Aravena Bravo en BUT Informatique : développement web, applications Java, bases de données et services réseau (page ${page}).`,
     pageOf: (page: number, total: number) => `Page ${page} sur ${total}`,
     discover: "Découvrir le projet",
     neighbors: "Projets précédent et suivant",
+    sections: {
+      role: { slug: "mon-role", title: "Mon rôle" },
+      competences: { slug: "competences-mobilisees", title: "Compétences mobilisées" },
+      learned: { slug: "ce-que-j-ai-appris", title: "Ce que j'ai appris" },
+    },
+    competences: {
+      realiser: "Réaliser un développement d'application",
+      optimiser: "Optimiser des applications informatiques",
+      administrer: "Administrer des systèmes informatiques communicants complexes",
+      gerer: "Gérer des données de l'information",
+      conduire: "Conduire un projet",
+      collaborer: "Travailler dans une équipe informatique",
+    } satisfies Record<Competence, string>,
     status: {
       termine: "Terminé",
       "en-cours": "En cours",
@@ -160,6 +197,30 @@ const en = {
     contact: "Contact me",
   },
 
+  about: {
+    title: "About",
+    paragraphs: [
+      "After a technology baccalaureate (STI2D), I spent three years in a TSI preparatory class in Chambéry. It taught me to sustain a heavy workload over time, to be rigorous, and how much helping one another changes teamwork. Moving on to the BUT in computer science took me from very theoretical teaching to learning by doing: a demanding shift, and one I enjoyed from the first year.",
+      "In 2025-2026, I took a gap year to discover the working world. At Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large corporate clients, I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside, I kept building personal projects.",
+      "What I enjoy most is carrying a project from start to finish, from the need to an application that works. Web development remains my favourite field, but I am open to every kind of application development.",
+      "Outside computing, I enjoy music, video games and documentaries, especially investigative ones. Curious by nature, I like learning a little about everything, and I closely follow news about new technologies.",
+    ],
+    facts: [
+      {
+        label: "Studies",
+        value: "BUT in computer science, 2nd year, application development track (IUT2, Grenoble)",
+      },
+      { label: "Target role", value: "Web developer, and more broadly application developer" },
+      { label: "Diploma", value: "STI2D baccalaureate, SIN specialty, with honors (2020)" },
+      {
+        label: "Looking for",
+        value:
+          "A 10 to 12-week internship, from April 19 to June 25, 2027 (extendable to July 9), then a work-study contract for my 3rd year",
+      },
+      { label: "Area", value: "Grenoble and surroundings, by public transport" },
+    ],
+  },
+
   skills: {
     technical: {
       title: "Technical skills",
@@ -189,16 +250,30 @@ const en = {
     previewDescription: "These skills come together in the projects I carried out during my studies.",
     seeAll: "See all projects",
     listTitle: "All my projects",
-    listDescription: "Every project I carried out during my studies, from the oldest to the most recent.",
-    listMetaTitle: "Projects — Damien",
+    listDescription:
+      "Every project I carried out during my studies, starting with those of my track: designing and developing applications.",
+    listMetaTitle: `Projects | ${site.author}`,
     listMetaDescription:
       "Projects by Damien Aravena Bravo during his computer science degree: web development, Java applications, databases and network services.",
-    pageMetaTitle: (page: number) => `Projects, page ${page} — Damien`,
+    pageMetaTitle: (page: number) => `Projects, page ${page} | ${site.author}`,
     pageMetaDescription: (page: number) =>
       `Projects by Damien Aravena Bravo during his computer science degree: web development, Java applications, databases and network services (page ${page}).`,
     pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
     discover: "Discover the project",
     neighbors: "Previous and next projects",
+    sections: {
+      role: { slug: "my-role", title: "My role" },
+      competences: { slug: "skills-used", title: "Skills used" },
+      learned: { slug: "what-i-learned", title: "What I learned" },
+    },
+    competences: {
+      realiser: "Develop applications",
+      optimiser: "Optimise applications",
+      administrer: "Administer complex networked computer systems",
+      gerer: "Manage information data",
+      conduire: "Lead a project",
+      collaborer: "Work in an IT team",
+    } satisfies Record<Competence, string>,
     status: {
       termine: "Completed",
       "en-cours": "In progress",

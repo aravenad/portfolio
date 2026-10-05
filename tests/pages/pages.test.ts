@@ -63,7 +63,7 @@ describe("page d'accueil", () => {
     // Un lien « /#skills » vers une section absente ne mène nulle part.
     const { document } = await renderPage(Home, { request: request("/portfolio/") });
 
-    for (const id of ["skills", "soft-skills", "career", "projects", "contact"]) {
+    for (const id of ["about", "skills", "soft-skills", "career", "projects", "contact"]) {
       expect(document.getElementById(id), `section #${id} absente de l'accueil`).toBeTruthy();
     }
   });
@@ -158,7 +158,7 @@ describe("fiche d'un projet", () => {
       props,
     });
 
-    expect(document.title).toBe("Projet 2 — Damien");
+    expect(document.title).toBe("Projet 2 | Damien Aravena Bravo");
     expect(meta(document, "description")).toBe("Résumé du projet 2.");
     expect(document.querySelector("h1")?.textContent?.trim()).toBe("Projet 2");
   });
@@ -201,6 +201,39 @@ describe("fiche d'un projet", () => {
       "Réalisation",
       "Résultats",
     ]);
+  });
+
+  it("ajoute au corps les rubriques du PPP renseignées, et au sommaire leurs titres", async () => {
+    const props = await propsFor("projet-3");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-3"),
+      props,
+    });
+    const prose = document.querySelector(".prose")!;
+    const links = [
+      ...document.querySelectorAll('[data-toc="sidebar"] [data-toc-link]'),
+    ].map((link) => link.textContent?.trim());
+
+    expect(prose.querySelector("#mon-role + ul")?.textContent).toContain("Tests unitaires");
+    expect(prose.querySelector("#competences-mobilisees + ul")?.textContent).toContain(
+      "Travailler dans une équipe informatique",
+    );
+    expect(prose.querySelector("#ce-que-j-ai-appris + ul")?.textContent).toContain(
+      "Écrire des tests avant le code",
+    );
+    expect(links.slice(-3)).toEqual(["Mon rôle", "Compétences mobilisées", "Ce que j'ai appris"]);
+  });
+
+  it("ne montre aucune rubrique du PPP tant qu'elle est vide", async () => {
+    const props = await propsFor("projet-1");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props,
+    });
+
+    for (const id of ["mon-role", "competences-mobilisees", "ce-que-j-ai-appris"]) {
+      expect(document.getElementById(id), id).toBeNull();
+    }
   });
 
   it("place le sommaire avant le corps du texte", async () => {
@@ -305,7 +338,7 @@ describe("version anglaise", () => {
   it("porte les mêmes ancres que l'accueil français", async () => {
     const { document } = await renderPage(HomeEn, { request: request("/portfolio/en/") });
 
-    for (const id of ["skills", "soft-skills", "career", "projects", "contact"]) {
+    for (const id of ["about", "skills", "soft-skills", "career", "projects", "contact"]) {
       expect(document.getElementById(id), `section #${id} absente`).toBeTruthy();
     }
   });
@@ -327,7 +360,7 @@ describe("version anglaise", () => {
       request: request("/portfolio/en/projects"),
     });
 
-    expect(document.title).toBe("Projects — Damien");
+    expect(document.title).toBe("Projects | Damien Aravena Bravo");
     expect(document.querySelector('nav[aria-label="Breadcrumb"]')?.textContent).toContain("Home");
     expect(document.querySelector("[data-pagination]")?.textContent).toContain("Next");
     expect(document.querySelector('[data-page="2"]')?.getAttribute("href"))
@@ -343,7 +376,7 @@ describe("version anglaise", () => {
       request: request("/portfolio/en/projects/page/2"),
       params: { page: "2" },
     });
-    expect(document.title).toBe("Projects, page 2 — Damien");
+    expect(document.title).toBe("Projects, page 2 | Damien Aravena Bravo");
   });
 
   it("traduit l'habillage d'une fiche et garde ses voisins en anglais", async () => {

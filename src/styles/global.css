@@ -283,6 +283,42 @@ body::after {
 }
 
 /*
+ * Couverture des cartes projet (ProjectCover.astro). Un fragment de la matière
+ * du haut de page, la même image, déjà en cache : chaque carte en montre un
+ * autre cadrage (`--cover-x`, `--cover-y`), assez agrandi pour que les plis se
+ * lisent comme une matière et non comme un motif. Composée comme le calque du
+ * body : `screen` en sombre, inversée et en `multiply` en clair. Le fondu vers
+ * le bas laisse le dessin au trait se détacher, et rejoint la carte sans arête.
+ */
+.project-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../assets/chrome-original-hq.webp");
+  background-repeat: no-repeat;
+  background-position: var(--cover-x, 50%) var(--cover-y, 50%);
+  background-size: 360% auto;
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  transition: opacity 0.3s;
+}
+
+.group:hover .project-cover::before {
+  opacity: 0.6;
+}
+
+:root[data-theme="light"] .project-cover::before {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+  opacity: 0.3;
+}
+
+:root[data-theme="light"] .group:hover .project-cover::before {
+  opacity: 0.4;
+}
+
+/*
  * Apparition au défilement : le bloc monte de 48 px en se révélant, une fois
  * entré dans la fenêtre, avec un décalage entre voisins.
  *

@@ -6,6 +6,7 @@ status: "termine"
 team: "En binôme"
 year: 2024
 order: 4
+cover: erd
 featured: true
 ---
 

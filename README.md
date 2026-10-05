@@ -22,7 +22,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 591 tests
+npm test         # 596 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -82,8 +82,8 @@ l'autre. Les tests signalent une version anglaise qui ne suit plus la française
 Créer un fichier dans `src/content/projects/`, et sa traduction **sous le même
 nom** dans `src/content/projects/en/`. Le nom du fichier devient l'URL
 (`/projects/mon-projet` et `/en/projects/mon-projet`), le corps est du Markdown
-libre. `order`, `status`, `year` et `featured` doivent être identiques dans les
-deux versions.
+libre. `order`, `status`, `year`, `featured`, `cover` et `competences` doivent
+être identiques dans les deux versions.
 
 ```md
 ---
@@ -94,7 +94,13 @@ status: "termine" # termine | en-cours | a-venir
 team: "En binôme"
 year: 2026
 order: 8 # ordre d'affichage
+cover: uml # motif de la carte : uml | algo | web | erd | chart | network | terminal
 featured: true # mis en avant sur l'accueil
+role: # ce que j'ai fait moi-même dans l'équipe
+  - "Conception du diagramme de classes"
+competences: [realiser, collaborer] # compétences du BUT mobilisées
+learned: # techniques et savoir-faire acquis
+  - "Écrire les tests avant le code"
 ---
 
 ## Contexte
@@ -104,6 +110,12 @@ featured: true # mis en avant sur l'accueil
 
 Le schéma est validé au build par `src/content.config.ts` : un champ manquant ou
 mal typé arrête la compilation.
+
+`role`, `competences` et `learned` sont les rubriques de la grille du PPP. Elles
+s'affichent à la suite du corps, avec leur entrée dans le sommaire, et seulement
+une fois renseignées : une fiche peut être publiée avant d'être complète. Les
+compétences sont celles du Programme National, dans son ordre : `realiser`,
+`optimiser`, `administrer`, `gerer`, `conduire`, `collaborer`.
 
 ## Personnaliser
 

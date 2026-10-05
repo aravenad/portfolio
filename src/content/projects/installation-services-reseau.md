@@ -6,6 +6,7 @@ status: "termine"
 team: "Seul"
 year: 2025
 order: 6
+cover: network
 ---
 
 ## Contexte

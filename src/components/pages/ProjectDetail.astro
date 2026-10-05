@@ -6,6 +6,7 @@ import Breadcrumb from "../ui/Breadcrumb.astro";
 import Container from "../ui/Container.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { getLang } from "../../lib/i18n";
 import { getProjectHref, type Project } from "../../lib/projects";
@@ -22,15 +23,35 @@ interface Props {
  * (`getProjectPaths`).
  */
 const { project, previous, next } = Astro.props;
-const { title, summary, tags, status, team, year } = project.data;
+const { title, summary, tags, status, team, year, role, competences, learned } = project.data;
 const { Content, headings } = await render(project);
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
 
+/*
+ * Les rubriques de la grille du PPP qui ne vivent pas dans le Markdown, à la
+ * suite du corps. Une rubrique vide n'est pas rendue : la fiche reste
+ * publiable tant qu'elle n'est pas complète. Ses titres rejoignent ceux du
+ * Markdown dans le sommaire.
+ */
+const sections = [
+  { ...t.projects.sections.role, items: role },
+  {
+    ...t.projects.sections.competences,
+    items: competences.map((competence) => t.projects.competences[competence]),
+  },
+  { ...t.projects.sections.learned, items: learned },
+].filter((section) => section.items.length > 0);
+
+const tocHeadings = [
+  ...headings,
+  ...sections.map(({ slug, title: text }) => ({ depth: 2, slug, text })),
+];
+
 const meta = [team, year?.toString()].filter(Boolean);
 ---
 
-<BaseLayout title={`${title} — Damien`} description={summary}>
+<BaseLayout title={`${title} | ${site.author}`} description={summary}>
   <Container class="pt-10">
     <Breadcrumb
       items={[{ label: t.breadcrumb.projects, href: "/projects" }, { label: title }]}
@@ -80,10 +101,23 @@ const meta = [team, year?.toString()].filter(Boolean);
         hauteur du texte qui donne au sommaire collant sa course.
       */}
       <div class="mt-14 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
-        <TableOfContents headings={headings} class="lg:col-start-2 lg:row-start-1" />
+        <TableOfContents headings={tocHeadings} class="lg:col-start-2 lg:row-start-1" />
 
         <div class="prose mt-10 max-w-3xl lg:col-start-1 lg:row-start-1 lg:mt-0">
           <Content />
+
+          {
+            sections.map((section) => (
+              <>
+                <h2 id={section.slug}>{section.title}</h2>
+                <ul>
+                  {section.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </>
+            ))
+          }
         </div>
       </div>
 

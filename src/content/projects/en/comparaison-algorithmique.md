@@ -6,6 +6,7 @@ status: "termine"
 team: "In pairs"
 year: 2024
 order: 2
+cover: algo
 featured: true
 ---
 

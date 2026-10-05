@@ -6,6 +6,7 @@ status: "termine"
 team: "Solo"
 year: 2024
 order: 7
+cover: terminal
 ---
 
 ## Context

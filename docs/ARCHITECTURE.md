@@ -62,6 +62,13 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   accueil, projets précédent et suivant.
 - **L'accueil** montre les trois premiers projets `featured: true`, ou les trois
   premiers tout court s'il n'y en a aucun.
+- **Chaque carte projet a une couverture** (`ProjectCover.astro`) : un cadrage
+  de la matière du haut de page, sous un motif au trait choisi par `cover`.
+  Pas de capture d'écran : les projets sont trop anciens pour en avoir, et une
+  capture jurerait avec la direction artistique.
+- **Une fiche suit la grille du PPP** : le corps Markdown (contexte, objectifs,
+  réalisation, résultats), puis `role`, `competences` et `learned`, rendus par
+  `ProjectDetail.astro` seulement s'ils sont renseignés.
 - **Le site vit à la racine de son domaine** (`damien-aravena.fr`, sans
   `base`). Tout lien interne passe quand même par `localizedUrl(chemin, langue)`
   (`src/lib/i18n.ts`), qui ajoute la base s'il y en a une et, en anglais, `/en`.
@@ -164,7 +171,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ## 5. Tests
 
 ```sh
-npm test          # 591 tests, quelques secondes
+npm test          # 596 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 34 tests de bout en bout, une quinzaine de secondes
 ```

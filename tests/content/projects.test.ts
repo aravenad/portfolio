@@ -147,10 +147,10 @@ describe("fiches de projet en anglais", () => {
       expect(result.success, JSON.stringify(result.error)).toBe(true);
     });
 
-    it("garde l'ordre, le statut, l'année et la mise en avant de la version française", () => {
+    it("garde l'ordre, le statut, l'année, la mise en avant, la couverture et les compétences de la version française", () => {
       const original = fiches.find((fiche) => fiche.slug === slug)!.data;
 
-      for (const key of ["order", "status", "year", "featured"]) {
+      for (const key of ["order", "status", "year", "featured", "cover", "competences"]) {
         expect(data[key], key).toEqual(original[key]);
       }
     });
@@ -158,6 +158,16 @@ describe("fiches de projet en anglais", () => {
     it("garde autant d'étiquettes que la version française", () => {
       const original = fiches.find((fiche) => fiche.slug === slug)!.data;
       expect((data.tags as string[]).length).toBe((original.tags as string[]).length);
+    });
+
+    it("garde autant de points dans son rôle et ses acquis que la version française", () => {
+      const original = fiches.find((fiche) => fiche.slug === slug)!.data;
+
+      for (const key of ["role", "learned"]) {
+        expect(((data[key] as string[] | undefined) ?? []).length, key).toBe(
+          ((original[key] as string[] | undefined) ?? []).length,
+        );
+      }
     });
   });
 });

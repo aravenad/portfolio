@@ -6,6 +6,7 @@ status: "termine"
 team: "Team of 4"
 year: 2024
 order: 3
+cover: web
 featured: true
 ---
 

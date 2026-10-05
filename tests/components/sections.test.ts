@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("astro:content", async () => (await import("../helpers/content")).contentModule);
 
+import About from "../../src/components/sections/About.astro";
 import Career from "../../src/components/sections/Career.astro";
 import Contact from "../../src/components/sections/Contact.astro";
 import Hero from "../../src/components/sections/Hero.astro";
@@ -11,6 +12,7 @@ import Skills from "../../src/components/sections/Skills.astro";
 import { education, experiences } from "../../src/data/career";
 import { site } from "../../src/data/site";
 import { softSkills, technicalSkills } from "../../src/data/skills";
+import { ui } from "../../src/data/ui";
 import { fixtureProjects } from "../helpers/content";
 import { render } from "../helpers/render";
 
@@ -47,6 +49,35 @@ describe("Hero", () => {
     for (const link of body.querySelectorAll("a")) {
       expect(link.getAttribute("href")).toMatch(/^#/);
     }
+  });
+});
+
+describe("About", () => {
+  it("rattache son titre à la section", async () => {
+    const { body } = await render(About);
+    expect(body.querySelector("section")?.getAttribute("id")).toBe("about");
+    expect(body.querySelector("#about-title")?.textContent?.replace(/\s+/g, " ").trim())
+      .toBe("À propos");
+  });
+
+  it("affiche chaque paragraphe de son texte", async () => {
+    const { body } = await render(About);
+    expect(body.querySelectorAll("section .text-lg p")).toHaveLength(ui.fr.about.paragraphs.length);
+  });
+
+  it("donne le nom complet, que le hero réduit au prénom", async () => {
+    // Attendu par la grille d'évaluation de l'IUT : nom, prénom, métier visé,
+    // diplômes.
+    const { body } = await render(About);
+    expect(body.textContent).toContain(site.author);
+  });
+
+  it("présente chaque élément de la fiche comme un couple terme-définition", async () => {
+    const { body } = await render(About);
+    const terms = [...body.querySelectorAll("dl dt")].map((dt) => dt.textContent?.trim());
+
+    expect(terms).toEqual(ui.fr.about.facts.map((fact) => fact.label));
+    expect(body.querySelectorAll("dl dd")).toHaveLength(ui.fr.about.facts.length);
   });
 });
 
