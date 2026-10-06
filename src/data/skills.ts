@@ -1,4 +1,5 @@
 import type { Skill } from "../types";
+import { withFrenchSpacing } from "../lib/typography";
 
 /*
  * Langages et outils affichés en tuiles à côté du texte.
@@ -112,7 +113,7 @@ export const technicalSkills: Skill[] = [
   },
 ];
 
-export const softSkills: Skill[] = [
+export const softSkills: Skill[] = withFrenchSpacing([
   { label: "Travail en équipe", detail: "Projets de 2 à 7 personnes" },
   { label: "Gestion de projet", detail: "Découpage, planning, délais" },
   { label: "Recueil de besoins", detail: "Entretiens client, spécifications" },
@@ -122,7 +123,7 @@ export const softSkills: Skill[] = [
   { label: "Autonomie", detail: "Projets menés seul de bout en bout" },
   { label: "Documentation", detail: "Choix de conception justifiés" },
   { label: "Analyse de données", detail: "Nettoyage SQL, visualisations" },
-];
+]);
 
 /** Les mêmes compétences en anglais, dans le même ordre. */
 export const softSkillsEn: Skill[] = [

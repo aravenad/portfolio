@@ -40,7 +40,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 639 tests
+npm test         # 649 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -84,6 +84,11 @@ docs/                architecture du projet
 
 Chaque contenu existe en français et en anglais : modifier l'un, c'est modifier
 l'autre. Les tests signalent une version anglaise qui ne suit plus la française.
+
+En français, écrire l'espace devant `; : ? !` (et à l'intérieur des « »)
+comme une espace normale : le build la rend insécable, dans les données comme
+dans le Markdown des fiches, pour qu'un signe ne parte jamais seul à la ligne
+(`src/lib/typography.ts`).
 
 | Quoi | Français | Anglais |
 | :--- | :--- | :--- |

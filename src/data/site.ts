@@ -1,3 +1,4 @@
+import { frenchSpacing } from "../lib/typography";
 import type { NavLink, SocialLink } from "../types";
 
 /** Informations globales du site. */
@@ -11,8 +12,9 @@ export const site = {
   // site, et Google pèse fortement le titre de la page.
   title: "Damien Aravena Bravo | Portfolio",
   // Les aperçus LinkedIn demandent au moins 100 caractères de description.
-  description:
+  description: frenchSpacing(
     "Portfolio de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble : projets de développement web, d'applications Java et de bases de données.",
+  ),
   email: "damien.aravena@gmail.com",
   github: "https://github.com/aravenad",
   linkedin: "https://www.linkedin.com/in/aravenad/",

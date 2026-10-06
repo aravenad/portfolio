@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { education, experiences } from "../../src/data/career";
+import { site } from "../../src/data/site";
+import { softSkills } from "../../src/data/skills";
 import { ui, useTranslations } from "../../src/data/ui";
 import { languages } from "../../src/lib/i18n";
 
@@ -76,11 +79,19 @@ describe("textes de l'interface", () => {
     }
   });
 
-  it("lie la ponctuation double au mot qui la précède dans les mentions légales", () => {
+  it("lie la ponctuation double au mot qui la précède, partout en français", () => {
     // En français, une espace précède « ; : ? ! ». Normale, elle laissait le
     // signe partir seul en début de ligne sur téléphone (« respectifs / ; ils »).
-    for (const text of strings(ui.fr.legal)) {
-      expect(text, text).not.toMatch(/ [;:?!]/);
+    const texts = [
+      ...strings(ui.fr),
+      ...strings(experiences),
+      ...strings(education),
+      ...strings(softSkills),
+      site.description,
+    ];
+
+    for (const text of texts) {
+      expect(text, text).not.toMatch(/ [;:?!»]/);
     }
   });
 

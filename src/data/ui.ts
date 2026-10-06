@@ -1,5 +1,6 @@
 import type { Lang } from "../lib/i18n";
 import type { Competence, ProjectStatus } from "../types";
+import { withFrenchSpacing } from "../lib/typography";
 import { site } from "./site";
 
 /**
@@ -165,16 +166,16 @@ const fr = {
     title: "Mentions légales",
     metaTitle: `Mentions légales | ${site.author}`,
     metaDescription:
-      "Mentions légales du portfolio de Damien Aravena Bravo : éditeur, contact, hébergeur et données personnelles.",
+      "Mentions légales du portfolio de Damien Aravena Bravo : éditeur, contact, hébergeur et données personnelles.",
     publisher: {
       title: "Éditeur",
       text: "Ce site est édité à titre personnel et non professionnel par Damien Aravena Bravo, étudiant en BUT Informatique, qui en est aussi le directeur de la publication.",
       anonymity:
-        "Éditeur non professionnel, il ne publie pas son adresse postale, comme le permet l'article 1-1 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique : ses éléments d'identification sont connus de l'hébergeur.",
+        "Éditeur non professionnel, il ne publie pas son adresse postale, comme le permet l'article 1-1 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique : ses éléments d'identification sont connus de l'hébergeur.",
     },
     contact: {
       title: "Contact",
-      text: "Pour toute question sur le site ou son contenu, écrivez à :",
+      text: "Pour toute question sur le site ou son contenu, écrivez à :",
     },
     host: {
       title: "Hébergeur",
@@ -183,14 +184,14 @@ const fr = {
     domain: {
       title: "Nom de domaine",
       text: (domain: string) =>
-        `Le nom de domaine ${domain} est enregistré auprès d'Infomaniak, qui en gère les DNS mais n'héberge pas le site :`,
+        `Le nom de domaine ${domain} est enregistré auprès d'Infomaniak, qui en gère les DNS mais n'héberge pas le site :`,
       country: "Suisse",
     },
     privacy: {
       title: "Données personnelles",
       paragraphs: [
-        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
-        "Votre navigateur garde deux réglages, qui n'en sortent jamais : votre choix du thème clair (stockage local), pour le retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
+        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
+        "Votre navigateur garde deux réglages, qui n'en sortent jamais : votre choix du thème clair (stockage local), pour le retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
         "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre. Vous pouvez demander à tout moment leur suppression, à la même adresse, et adresser une réclamation à la CNIL.",
       ],
       hostLogs: "Comme tout hébergeur, GitHub enregistre l'adresse IP des visiteurs à des fins de sécurité. Voir sa",
@@ -198,7 +199,7 @@ const fr = {
     },
     credits: {
       title: "Propriété intellectuelle",
-      text: "Les textes et les illustrations du site sont la propriété de Damien Aravena Bravo. Les logos des technologies sont des marques de leurs propriétaires respectifs ; ils proviennent de Simple Icons (licence CC0) et, pour Java, de devicon (licence MIT).",
+      text: "Les textes et les illustrations du site sont la propriété de Damien Aravena Bravo. Les logos des technologies sont des marques de leurs propriétaires respectifs ; ils proviennent de Simple Icons (licence CC0) et, pour Java, de devicon (licence MIT).",
     },
   },
   backToTop: "Revenir en haut de la page",
@@ -416,7 +417,11 @@ const en = {
   },
 } satisfies Dictionary;
 
-export const ui: Record<Lang, Dictionary> = { fr, en };
+/*
+ * Le français passe par `withFrenchSpacing` : l'espace devant « ; : ? ! »
+ * devient insécable, sans qu'on ait à la taper (voir src/lib/typography.ts).
+ */
+export const ui: Record<Lang, Dictionary> = { fr: withFrenchSpacing(fr), en };
 
 /** Les textes d'une langue. */
 export function useTranslations(lang: Lang): Dictionary {

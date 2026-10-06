@@ -1,6 +1,7 @@
 import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
 
+import { frenchSpacing } from "./lib/typography";
 import { COMPETENCES, COVERS } from "./types";
 
 /**
@@ -16,14 +17,21 @@ import { COMPETENCES, COVERS } from "./types";
  * ajouté ici doit l'être aussi au type `FixtureProject` des tests
  * (tests/helpers/content.ts), qui imite ces collections.
  */
+/**
+ * Un texte affiché tel quel : l'espace devant « ; : ? ! » y devient insécable,
+ * comme dans le corps Markdown (voir src/lib/typography.ts). Sans effet sur
+ * l'anglais, qui n'en met pas.
+ */
+const text = () => z.string().transform(frenchSpacing);
+
 const schema = z.object({
-  title: z.string(),
+  title: text(),
   /** Résumé affiché sur les cartes. */
-  summary: z.string(),
+  summary: text(),
   tags: z.array(z.string()).default([]),
   status: z.enum(["termine", "en-cours", "a-venir"]),
   /** Contexte de réalisation : seul, en binôme, en équipe. */
-  team: z.string().optional(),
+  team: text().optional(),
   year: z.number().optional(),
   /** Ordre d'affichage (croissant). */
   order: z.number().default(99),
@@ -36,11 +44,11 @@ const schema = z.object({
    * renseignée : une fiche peut donc être publiée avant d'être complète.
    */
   /** Ce que j'ai fait moi-même, dans un projet d'équipe. */
-  role: z.array(z.string()).default([]),
+  role: z.array(text()).default([]),
   /** Compétences du BUT mobilisées, dans l'ordre de COMPETENCES. */
   competences: z.array(z.enum(COMPETENCES)).default([]),
   /** Techniques et savoir-faire acquis. */
-  learned: z.array(z.string()).default([]),
+  learned: z.array(text()).default([]),
 });
 
 // `*.md` et non `**/*.md` : le sous-dossier `en/` appartient à l'autre collection.

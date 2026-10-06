@@ -27,6 +27,22 @@ for (const route of routes) {
   });
 }
 
+for (const route of routes.filter((path) => !path.startsWith("en/"))) {
+  test(`/${route} ne laisse aucun signe partir seul à la ligne`, async ({ page }) => {
+    // Le texte s'écrit avec des espaces normales ; le build doit les avoir
+    // rendues insécables devant « ; : ? ! », Markdown des fiches compris.
+    await page.goto(route);
+
+    const text = await page.locator("body").evaluate((body) => {
+      const copy = body.cloneNode(true) as HTMLElement;
+      copy.querySelectorAll("script, style, code, pre").forEach((element) => element.remove());
+      return copy.textContent ?? "";
+    });
+
+    expect(text.match(/.{0,30} [;:?!»]/g) ?? []).toEqual([]);
+  });
+}
+
 test.describe("apparition au défilement", () => {
   test("un bloc sous la ligne de flottaison apparaît quand on l'atteint", async ({ page }) => {
     await page.goto("");

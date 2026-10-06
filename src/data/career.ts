@@ -1,4 +1,5 @@
 import type { CareerEntry } from "../types";
+import { withFrenchSpacing } from "../lib/typography";
 
 /**
  * Logos : `icon` pour les marques présentes dans simple-icons, sinon `initials`.
@@ -24,7 +25,7 @@ import type { CareerEntry } from "../types";
  * en `uppercase`. Elle n'en compte pas moins — c'est la donnée, et elle
  * redeviendrait visible le jour où ce style changerait.
  */
-export const experiences: CareerEntry[] = [
+export const experiences: CareerEntry[] = withFrenchSpacing([
   {
     title: "Stage de développement",
     organization: "Entreprise à définir",
@@ -91,9 +92,9 @@ export const experiences: CareerEntry[] = [
       "Découverte du fonctionnement d'un laboratoire de recherche, échanges avec les chercheurs et assistance dans leur travail quotidien.",
     initials: "UGA",
   },
-];
+]);
 
-export const education: CareerEntry[] = [
+export const education: CareerEntry[] = withFrenchSpacing([
   {
     title: "BUT Informatique",
     organization: "IUT2 (Université Grenoble Alpes)",
@@ -118,7 +119,7 @@ export const education: CareerEntry[] = [
     description: "Spécialité SIN (systèmes d'information et numérique), mention assez bien.",
     initials: "PN",
   },
-];
+]);
 
 /*
  * Le même parcours en anglais, entrée pour entrée et dans le même ordre : les
