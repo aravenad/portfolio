@@ -15,7 +15,8 @@ choix du visiteur, mémorisé d'une visite à l'autre.
 Pensé aussi pour le téléphone, où un recruteur ouvre souvent le lien en premier :
 
 - sous 1024 px, les textes longs de l'accueil (À propos, compétences) ne
-  montrent que leur premier paragraphe, la suite derrière « Lire la suite » ;
+  montrent que leur premier paragraphe, la suite derrière « Lire la suite »,
+  qui s'ouvre et se referme en glissant ;
 - sous 640 px, les logos des compétences passent de tuiles carrées à des
   pastilles compactes, qui prennent la couleur de leur marque au toucher, et les
   cartes de projets passent en ligne, vignette à gauche, sans étiquettes ;

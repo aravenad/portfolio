@@ -85,6 +85,51 @@ test.describe("accueil allégé", () => {
     await expect(page.locator("#about .read-more-text > p").first()).toBeInViewport();
   });
 
+  test("l'ouverture et la fermeture glissent au lieu de sauter", async ({ page }) => {
+    const block = page.locator("#about [data-read-more]");
+    const text = block.locator(".read-more-text");
+    const height = () => text.evaluate((element) => element.getBoundingClientRect().height);
+
+    const collapsed = await height();
+    await block.locator(":scope > button").click();
+    await page.waitForTimeout(120);
+
+    // En cours de route : ni l'ancienne hauteur, ni encore la nouvelle.
+    const midway = await height();
+    expect(midway).toBeGreaterThan(collapsed);
+    await expect(block).not.toHaveAttribute("data-collapsed");
+    await expect.poll(() => text.evaluate((element) => element.getAnimations().length)).toBe(0);
+    const open = await height();
+    expect(midway).toBeLessThan(open);
+
+    await block.locator(":scope > button").click();
+    await page.waitForTimeout(120);
+    const closing = await height();
+    expect(closing).toBeLessThan(open);
+    expect(closing).toBeGreaterThan(collapsed);
+
+    await expect(block).toHaveAttribute("data-collapsed");
+    expect(await height()).toBe(collapsed);
+    await expect(text).not.toHaveCSS("overflow", "hidden");
+  });
+
+  test.describe("sous prefers-reduced-motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("le texte s'ouvre et se ferme d'un coup, sans animation", async ({ page }) => {
+      await page.goto("");
+      const block = page.locator("#about [data-read-more]");
+      const text = block.locator(".read-more-text");
+
+      await block.locator(":scope > button").click();
+      expect(await text.evaluate((element) => element.getAnimations().length)).toBe(0);
+      await expect(block).not.toHaveAttribute("data-collapsed");
+
+      await block.locator(":scope > button").click();
+      await expect(block).toHaveAttribute("data-collapsed");
+    });
+  });
+
   test("les compétences passent en pastilles, qui prennent leur couleur au toucher", async ({ page }) => {
     await expect(page.locator(".skill-tile").first()).toBeHidden();
 

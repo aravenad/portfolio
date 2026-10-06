@@ -49,18 +49,47 @@ const t = useTranslations(getLang(Astro.url.pathname));
 <script>
   import { onEachPage } from "../../lib/enhance";
 
+  /*
+   * L'ouverture et la fermeture s'animent : la hauteur du texte glisse d'un état
+   * à l'autre, et les paragraphes qui arrivent ou s'en vont passent en fondu.
+   * Même courbe que l'apparition au défilement (global.css) : elle étale le
+   * mouvement sur toute la durée au lieu de l'escamoter au départ.
+   *
+   * La hauteur cible se mesure en posant l'état final le temps d'un calcul de
+   * mise en page, sans peinture entre les deux. Un clic en cours d'animation
+   * repart de la hauteur affichée, pas de la fin de l'animation précédente.
+   */
+  const DURATION = 380;
+  const EASING = "cubic-bezier(0.33, 1, 0.68, 1)";
+
   onEachPage((signal) => {
+    const motionOk = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     for (const block of document.querySelectorAll<HTMLElement>("[data-read-more]")) {
       const button = block.querySelector(":scope > button");
-      if (!(button instanceof HTMLButtonElement)) continue;
+      const text = block.querySelector<HTMLElement>(":scope > .read-more-text");
+      if (!(button instanceof HTMLButtonElement) || !text) continue;
+
+      const rest = [...text.children].slice(1) as HTMLElement[];
+      let expanded = false;
+      let running: Animation[] = [];
 
       block.toggleAttribute("data-collapsed", true);
       button.hidden = false;
 
+      /** La hauteur du texte une fois l'état demandé posé, mesurée sans être peinte. */
+      const heightWhen = (collapsed: boolean) => {
+        const was = block.hasAttribute("data-collapsed");
+        block.toggleAttribute("data-collapsed", collapsed);
+        const height = text.getBoundingClientRect().height;
+        block.toggleAttribute("data-collapsed", was);
+        return height;
+      };
+
       button.addEventListener(
         "click",
         () => {
-          const expanded = block.toggleAttribute("data-collapsed") === false;
+          expanded = !expanded;
           button.setAttribute("aria-expanded", String(expanded));
 
           // Replier fait disparaître le texte au-dessus du bouton : sans ce
@@ -68,6 +97,46 @@ const t = useTranslations(getLang(Astro.url.pathname));
           if (!expanded && block.getBoundingClientRect().top < 0) {
             block.scrollIntoView({ block: "start", behavior: "instant" });
           }
+
+          const from = text.getBoundingClientRect().height;
+          running.forEach((animation) => animation.cancel());
+          running = [];
+
+          if (!motionOk() || typeof text.animate !== "function") {
+            block.toggleAttribute("data-collapsed", !expanded);
+            text.style.overflow = "";
+            return;
+          }
+
+          const to = heightWhen(!expanded);
+          // Ouvrir pose l'état final tout de suite, et la hauteur rattrape.
+          // Fermer garde les paragraphes affichés pendant qu'ils s'effacent.
+          block.removeAttribute("data-collapsed");
+          text.style.overflow = "hidden";
+
+          const height = text.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+            duration: DURATION,
+            easing: EASING,
+          });
+          const fades = rest.map((paragraph) =>
+            paragraph.animate(
+              expanded
+                ? [{ opacity: 0, transform: "translateY(0.5rem)" }, { opacity: 1, transform: "none" }]
+                : [{ opacity: 1 }, { opacity: 0 }],
+              { duration: expanded ? DURATION : DURATION * 0.6, easing: EASING, fill: "forwards" },
+            ),
+          );
+          running = [height, ...fades];
+
+          height.finished
+            .then(() => {
+              block.toggleAttribute("data-collapsed", !expanded);
+              text.style.overflow = "";
+              fades.forEach((fade) => fade.cancel());
+              running = [];
+            })
+            // Annulée par un nouveau clic : c'est lui qui pose l'état suivant.
+            .catch(() => {});
         },
         { signal },
       );

@@ -128,7 +128,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
-| Texte replié sous lg (« Lire la suite » / « Réduire ») | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
+| Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
@@ -175,7 +175,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ```sh
 npm test          # 649 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 49 tests de bout en bout, une quarantaine de secondes
+npm run test:e2e  # 51 tests de bout en bout, une quarantaine de secondes
 ```
 
 Deux niveaux, qui se complètent :
