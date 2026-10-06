@@ -14,7 +14,7 @@ justifie : ce document n'en donne que la carte.
   vivent dans `src/data/` et `src/content/`. Les modifier ne demande pas de
   toucher aux composants.
 - **Le moins de JavaScript possible.** Un routeur de transitions et quelques
-  comportements (~27 Ko, 9 Ko compressé). Sans JavaScript, tout le contenu
+  comportements (~28 Ko, 9 Ko compressé). Sans JavaScript, tout le contenu
   reste lisible et tous les liens fonctionnent.
 - **Toute décision est testable hors navigateur.** Les scripts des composants
   mesurent le DOM et appliquent un résultat ; la règle qui décide est dans
@@ -128,6 +128,8 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
+| Texte replié sous lg (« Lire la suite » / « Réduire ») | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
+| Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
 `data-reveal-armed` avant le premier affichage ; le CSS ne masque les blocs
@@ -163,17 +165,17 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
   clair) et l'accent argent devient un bleu acier. Les logos des compétences
   gardent leurs couleurs vives ; seule une marque qui disparaîtrait sur la tuile
-  claire en porte une autre (`colorLight` : le noir de GitHub, le jaune assombri
-  de JavaScript).
+  claire en porte une autre (`colorLight` : le noir de GitHub et de Symfony, le
+  jaune assombri de JavaScript, le cyan assombri de Tailwind CSS).
 - **Un réglage propre au clair** s'écrit avec la variante `light:` (définie
   dans `global.css`), par exemple `light:hover:bg-zinc-900`.
 
 ## 5. Tests
 
 ```sh
-npm test          # 619 tests, quelques secondes
+npm test          # 631 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 34 tests de bout en bout, une quinzaine de secondes
+npm run test:e2e  # 41 tests de bout en bout, une trentaine de secondes
 ```
 
 Deux niveaux, qui se complètent :
@@ -184,8 +186,9 @@ Deux niveaux, qui se complètent :
 - **Playwright (`e2e/`)** vérifie ce câblage sur le site construit, servi à la
   racine, dans Chromium : barre de navigation, menu mobile, thème,
   langue et position de lecture, apparition au défilement, sommaire, retour en
-  haut, pagination, plan du site. Bureau pour tout, gabarit de téléphone pour
-  `mobile.spec.ts`. Chaque test échoue aussi sur une erreur de console.
+  haut, pagination, plan du site, texte replié. Bureau pour tout, gabarit de
+  téléphone pour `mobile.spec.ts`, dont les contrôles de mise en page tournent
+  à 360 px : le Pixel 7 (412 px) ne voyait pas les défauts des écrans étroits. Chaque test échoue aussi sur une erreur de console.
   Première fois : `npx playwright install --only-shell chromium`.
 
 Côté Vitest :

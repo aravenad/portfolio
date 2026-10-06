@@ -3,14 +3,26 @@
 Portfolio personnel de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : vingt pages HTML (dix en français, dix en anglais),
-une feuille de style et environ 27 Ko de JavaScript (9 Ko compressés). Ce
-JavaScript se limite au routeur de transitions d'Astro et à une dizaine de
+Site entièrement statique : vingt-deux pages HTML (onze en français, onze en
+anglais), une feuille de style et environ 28 Ko de JavaScript (9 Ko compressés).
+Ce JavaScript se limite au routeur de transitions d'Astro et à une dizaine de
 petits comportements (menu, navigation active, apparition au défilement, thème,
-plan du site).
+plan du site, texte replié sur téléphone).
 
 Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
 choix du visiteur, mémorisé d'une visite à l'autre.
+
+Pensé aussi pour le téléphone, où un recruteur ouvre souvent le lien en premier :
+
+- sous 1024 px, les textes longs de l'accueil (À propos, compétences) ne
+  montrent que leur premier paragraphe, la suite derrière « Lire la suite » ;
+- sous 640 px, les logos des compétences passent de tuiles carrées à des
+  pastilles compactes, qui prennent la couleur de leur marque au toucher, et les
+  cartes de projets passent en ligne, vignette à gauche, sans étiquettes ;
+- les boutons d'action s'empilent en pleine largeur.
+
+Sur grand écran, l'espace libre sous la fiche d'À propos propose de prendre
+contact ou de télécharger le CV.
 
 Architecture, fonctionnement, évolutions et workflow de publication :
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -22,7 +34,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 619 tests
+npm test         # 631 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -43,7 +55,7 @@ src/
 │   ├── layout/      Header et Footer
 │   ├── sections/    blocs de page (hero, compétences, parcours…)
 │   ├── pages/       contenu des pages, commun aux deux langues
-│   └── ProjectCard.astro
+│   └── ProjectCard.astro, ProjectCover.astro
 ├── content/projects/  une fiche Markdown par projet (en/ : en anglais)
 ├── content.config.ts  schéma des fiches, vérifié au build
 ├── data/            contenu éditable : site, compétences, parcours, textes (ui.ts)
@@ -145,8 +157,8 @@ npm run test:e2e
 
 Les composants sont rendus sans navigateur, par l'API Container d'Astro, et les
 assertions portent sur le DOM produit. La suite couvre les helpers, les données,
-les composants et les quatre routes, dans les deux langues ; elle tourne en
-quelques secondes.
+les composants et les quatre routes, dans les deux langues, à 100 % (la CI
+exige 80 %) ; elle tourne en quelques secondes.
 
 Elle sert surtout à vérifier ce qui ne se voit pas à la relecture : l'espace
 insécable des périodes du parcours, le contraste des couleurs de marque sur les
@@ -158,13 +170,17 @@ avant même le build.
 Les tests de bout en bout (`e2e/`, Playwright) prennent le relais là où Vitest
 ne voit rien : les scripts des composants, sur le site construit, dans Chromium.
 Ils cliquent, défilent et changent de langue ou de thème comme un visiteur, sur
-bureau et sur téléphone. Première fois : `npx playwright install --only-shell
-chromium`. Voir §5 de l'architecture.
+bureau et sur téléphone. Les vérifications de mise en page mobile tournent à
+360 px, la largeur des téléphones les plus étroits : le Pixel 7 de Playwright
+(412 px) laissait passer deux défauts visibles à 360 px. Première fois :
+`npx playwright install --only-shell chromium`. Voir §5 de l'architecture.
 
 ## Logos des compétences
 
 Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
-via `astro-icon` et sont inlinés au build. Pour un logo absent du jeu, déposer un
+via `astro-icon` et sont inlinés au build. Ils s'affichent en tuiles
+(`SkillTile`) sur grand écran et en pastilles (`SkillChip`) sur téléphone ; les
+deux lisent leurs couleurs de marque par `brandStyle()`, dans `src/lib/skills.ts`. Pour un logo absent du jeu, déposer un
 SVG dans `src/icons/` et le référencer par son nom de fichier, sans préfixe.
 Pour un logo d'organisation du parcours, déposer plutôt le fichier dans
 `public/logos/` et renseigner `logo:` dans `src/data/career.ts`.
