@@ -72,7 +72,7 @@ const fr = {
     technical: {
       title: "Compétences techniques",
       paragraphs: [
-        "Au fil de mes projets et de ma formation, j'ai pratiqué plusieurs langages et environnements de développement. Côté web, je travaille avec HTML, CSS, PHP et JavaScript. J'ai également développé en Java et en Python pour la programmation orientée objet, et en C++ pour une approche plus procédurale. Je manipule enfin les données en SQL, avec une pratique plus poussée de PostgreSQL.",
+        "Au fil de mes projets et de ma formation, j'ai pratiqué plusieurs langages et environnements de développement. Côté web, je travaille avec HTML, CSS, JavaScript et TypeScript, ainsi qu'avec PHP et le framework Symfony. Ce portfolio est lui-même construit avec Astro et Tailwind CSS. J'ai également développé en Java et en Python pour la programmation orientée objet, et en C++ pour une approche plus procédurale. Je manipule enfin les données en SQL, avec une pratique plus poussée de PostgreSQL.",
         "Côté outils, j'utilise les IDE de la suite JetBrains adaptés à ces langages, ainsi que Git et GitHub pour le versionnement et le travail collaboratif.",
       ],
     },
@@ -228,7 +228,7 @@ const en = {
     technical: {
       title: "Technical skills",
       paragraphs: [
-        "Through my projects and my studies, I have worked with several languages and development environments. On the web side, I use HTML, CSS, PHP and JavaScript. I have also developed in Java and Python for object-oriented programming, and in C++ for a more procedural approach. Finally, I handle data with SQL, with deeper experience of PostgreSQL.",
+        "Through my projects and my studies, I have worked with several languages and development environments. On the web side, I use HTML, CSS, JavaScript and TypeScript, as well as PHP with the Symfony framework. This portfolio itself is built with Astro and Tailwind CSS. I have also developed in Java and Python for object-oriented programming, and in C++ for a more procedural approach. Finally, I handle data with SQL, with deeper experience of PostgreSQL.",
         "As for tools, I use the JetBrains IDEs suited to these languages, along with Git and GitHub for version control and collaborative work.",
       ],
     },

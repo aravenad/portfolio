@@ -14,14 +14,23 @@ import type { Skill } from "../types";
  *
  * En thème clair, les logos gardent ces mêmes couleurs vives. Seule une marque
  * dont la couleur disparaîtrait sur la tuile claire en porte une autre,
- * `colorLight` : c'est le cas du blanc de GitHub et du jaune de JavaScript.
+ * `colorLight` : c'est le cas du blanc de GitHub et de Symfony, du jaune de
+ * JavaScript et du cyan de Tailwind CSS.
  */
 export const technicalSkills: Skill[] = [
   { label: "HTML", icon: "simple-icons:html5", color: "#E34F26" },
   // Le violet officiel du logo CSS (rebeccapurple, #663399) ne tient que 2,2:1
   // sur la tuile : éclairci de 25 % vers le blanc, teinte inchangée.
   { label: "CSS", icon: "simple-icons:css", color: "#8C66B3" },
-  { label: "PHP", icon: "simple-icons:php", color: "#777BB4" },
+  // Le cyan officiel (#06B6D4) ne tient que 1,68:1 sur la tuile claire. En
+  // thème clair, il est assombri de 30 % vers le noir, teinte inchangée : 3,24:1.
+  {
+    label: "Tailwind CSS",
+    short: "TW",
+    icon: "simple-icons:tailwindcss",
+    color: "#06B6D4",
+    colorLight: "#047F94",
+  },
   // Le jaune officiel ne tient que 1,07:1 sur la tuile claire. En thème clair,
   // il passe à un jaune assombri (OKLCH 71 %, chroma 0,15, teinte 99° au lieu
   // de 90 %, 0,18 et 101°) : 1,76:1. C'est la seule couleur sous les 3:1 des
@@ -35,7 +44,18 @@ export const technicalSkills: Skill[] = [
     color: "#F7DF1E",
     colorLight: "#B9A207",
   },
-  // Même correction pour le bleu ISO C++ (#00599C), à 2,6:1.
+  { label: "TypeScript", short: "TS", icon: "simple-icons:typescript", color: "#3178C6" },
+  { label: "Astro", icon: "simple-icons:astro", color: "#BC52EE" },
+  { label: "PHP", icon: "simple-icons:php", color: "#777BB4" },
+  // Symfony publie un logo noir : même traitement que GitHub, blanc sur fond
+  // sombre, noir officiel en thème clair.
+  {
+    label: "Symfony",
+    icon: "simple-icons:symfony",
+    color: "#FFFFFF",
+    colorLight: "#000000",
+  },
+  // Même correction que CSS pour le bleu ISO C++ (#00599C), à 2,6:1.
   { label: "C++", icon: "simple-icons:cplusplus", color: "#4083B5" },
   // Logo local (src/icons/java.svg) : simple-icons ne publie pas de logo Java,
   // la marque étant déposée. Celui-ci vient de devicon, sous licence MIT — voir
