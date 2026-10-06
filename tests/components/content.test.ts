@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import CareerItem from "../../src/components/ui/CareerItem.astro";
 import ProjectCard from "../../src/components/ProjectCard.astro";
+import ProjectCover from "../../src/components/ProjectCover.astro";
 import SkillList from "../../src/components/ui/SkillList.astro";
 import SkillTile from "../../src/components/ui/SkillTile.astro";
 import { technicalSkills } from "../../src/data/skills";
+import { COVERS } from "../../src/types";
 import { render } from "../helpers/render";
 
 beforeEach(() => {
@@ -276,5 +278,43 @@ describe("ProjectCard", () => {
 
     expect(encours.html).toContain("text-accent/80");
     expect(termine.html).not.toContain("text-accent/80");
+  });
+});
+
+describe("ProjectCover", () => {
+  it("dessine chaque motif, cadré à sa façon dans la matière", async () => {
+    const framings = new Set<string>();
+
+    for (const cover of COVERS) {
+      const { body } = await render(ProjectCover, { props: { cover } });
+      const frame = body.querySelector(".project-cover");
+      const drawing = frame?.querySelector("svg");
+
+      expect(drawing, cover).toBeTruthy();
+      expect(drawing?.children.length, cover).toBeGreaterThan(0);
+      framings.add(frame?.getAttribute("style") ?? "");
+    }
+
+    // Deux motifs au même cadrage montreraient la même matière.
+    expect(framings.size).toBe(COVERS.length);
+  });
+
+  it("reste décorative : le titre de la carte dit déjà tout", async () => {
+    const { body } = await render(ProjectCover, { props: { cover: "web" } });
+    expect(body.querySelector(".project-cover")?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("garde la matière sans dessin quand la fiche n'a pas de couverture", async () => {
+    const { body } = await render(ProjectCover, { props: {} });
+
+    expect(body.querySelector(".project-cover")).toBeTruthy();
+    expect(body.querySelector("svg")).toBeNull();
+  });
+
+  it("reçoit sa mise en page de la carte", async () => {
+    // Vignette à gauche sur téléphone, bandeau 16/9 au-delà : c'est la carte
+    // qui en décide.
+    const { body } = await render(ProjectCover, { props: { cover: "uml", class: "w-28 sm:w-auto" } });
+    expect(body.querySelector(".project-cover")?.className).toContain("w-28 sm:w-auto");
   });
 });

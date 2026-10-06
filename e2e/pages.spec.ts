@@ -49,6 +49,18 @@ test.describe("apparition au défilement", () => {
   });
 });
 
+test("sur grand écran, le texte n'est jamais replié", async ({ page }) => {
+  await page.goto("");
+
+  for (const id of ["about", "skills", "soft-skills"]) {
+    const block = page.locator(`#${id} [data-read-more]`);
+    await expect(block.locator(":scope > button"), id).toBeHidden();
+    await expect(block.locator(".read-more-text > p:visible"), id).toHaveCount(
+      await block.locator(".read-more-text > p").count(),
+    );
+  }
+});
+
 test.describe("fiche projet", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("projects/developpement-application");
