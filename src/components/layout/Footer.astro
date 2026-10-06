@@ -33,14 +33,21 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
   <Container
     class="flex flex-col items-start justify-between gap-4 text-sm text-zinc-500 sm:flex-row sm:items-center"
   >
-    <p>
-      © {year} {site.name}. {t.footer.rights}
-      <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
-      <button type="button" popovertarget="site-map" class="cursor-pointer transition hover:text-zinc-200">
-        {t.footer.sitemapLabel}
-      </button>
-      <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
-      <a href={localizedUrl("/legal", lang)} class="transition hover:text-zinc-200">{t.footer.legal}</a>
+    {/*
+      Sur téléphone, la ligne ne tient plus : le droit d'auteur d'un côté, le
+      plan et les mentions légales de l'autre, chacun sur sa ligne. Sans quoi le
+      premier point séparateur restait seul en bout de ligne.
+    */}
+    <p class="flex flex-col gap-1 sm:block">
+      <span>© {year} {site.name}. {t.footer.rights}</span>
+      <span>
+        <span aria-hidden="true" class="mx-2 hidden text-zinc-700 sm:inline">·</span>
+        <button type="button" popovertarget="site-map" class="cursor-pointer transition hover:text-zinc-200">
+          {t.footer.sitemapLabel}
+        </button>
+        <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
+        <a href={localizedUrl("/legal", lang)} class="transition hover:text-zinc-200">{t.footer.legal}</a>
+      </span>
     </p>
 
     <ul class="flex items-center gap-6">

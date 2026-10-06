@@ -76,6 +76,14 @@ describe("textes de l'interface", () => {
     }
   });
 
+  it("lie la ponctuation double au mot qui la précède dans les mentions légales", () => {
+    // En français, une espace précède « ; : ? ! ». Normale, elle laissait le
+    // signe partir seul en début de ligne sur téléphone (« respectifs / ; ils »).
+    for (const text of strings(ui.fr.legal)) {
+      expect(text, text).not.toMatch(/ [;:?!]/);
+    }
+  });
+
   it("propose toujours l'autre langue dans le header", () => {
     expect(useTranslations("fr").header.otherLang.short).toBe("EN");
     expect(useTranslations("en").header.otherLang.short).toBe("FR");
