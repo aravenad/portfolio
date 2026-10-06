@@ -1,9 +1,11 @@
 ---
+import Button from "../ui/Button.astro";
 import Card from "../ui/Card.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
+import { publicCv } from "../../lib/cv";
 import { getLang } from "../../lib/i18n";
 
 /*
@@ -13,6 +15,7 @@ import { getLang } from "../../lib/i18n";
  * ailleurs dans la page : le hero ne garde que le prénom.
  */
 const t = useTranslations(getLang(Astro.url.pathname));
+const cv = publicCv();
 ---
 
 <Section id="about" aria-labelledby="about-title">
@@ -27,19 +30,37 @@ const t = useTranslations(getLang(Astro.url.pathname));
       {t.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     </div>
 
-    <Card class="order-first p-6 sm:p-8 lg:order-none">
-      <p class="text-xl font-medium text-zinc-100">{site.author}</p>
+    <div class="order-first lg:order-none">
+      <Card class="p-6 sm:p-8">
+        <p class="text-xl font-medium text-zinc-100">{site.author}</p>
 
-      <dl class="mt-6 border-t border-zinc-800">
-        {
-          t.about.facts.map((fact) => (
-            <div class="border-b border-zinc-800 py-4 last:border-b-0 last:pb-0">
-              <dt class="text-xs uppercase tracking-wide text-zinc-500">{fact.label}</dt>
-              <dd class="mt-1 text-sm leading-6 text-zinc-300">{fact.value}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </Card>
+        <dl class="mt-6 border-t border-zinc-800">
+          {
+            t.about.facts.map((fact) => (
+              <div class="border-b border-zinc-800 py-4 last:border-b-0 last:pb-0">
+                <dt class="text-xs uppercase tracking-wide text-zinc-500">{fact.label}</dt>
+                <dd class="mt-1 text-sm leading-6 text-zinc-300">{fact.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </Card>
+
+      {/*
+        Sur grand écran, la fiche est bien plus courte que le texte d'à côté : le
+        vide laissé dessous accueille les deux actions qu'un recruteur cherche en
+        la refermant. Sur mobile, la colonne n'a pas de vide à combler, et le hero
+        porte déjà « Me contacter » juste au-dessus.
+      */}
+      <div class="reveal mt-8 hidden px-1 lg:block">
+        <p class="text-zinc-400">{t.about.cta}</p>
+        <div class="mt-4 flex flex-wrap gap-4">
+          <Button href="#contact">{t.hero.contact}</Button>
+          <Button href={cv.href} download={cv.filename} variant="secondary">
+            {t.contact.cv}
+          </Button>
+        </div>
+      </div>
+    </div>
   </div>
 </Section>

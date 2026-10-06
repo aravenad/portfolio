@@ -79,6 +79,17 @@ describe("About", () => {
     expect(terms).toEqual(ui.fr.about.facts.map((fact) => fact.label));
     expect(body.querySelectorAll("dl dd")).toHaveLength(ui.fr.about.facts.length);
   });
+
+  it("renvoie vers le contact et le CV sous la fiche", async () => {
+    const { body } = await render(About);
+    const links = [...body.querySelectorAll("a")];
+
+    expect(body.textContent).toContain(ui.fr.about.cta);
+    expect(links.find((a) => a.getAttribute("href") === "#contact")?.textContent?.trim())
+      .toBe(ui.fr.hero.contact);
+    expect(links.find((a) => a.hasAttribute("download"))?.getAttribute("href"))
+      .toBe("/portfolio/cv-damien-aravena-bravo-public.pdf");
+  });
 });
 
 describe("Skills", () => {

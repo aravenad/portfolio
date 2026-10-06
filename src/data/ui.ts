@@ -66,6 +66,7 @@ const fr = {
       },
       { label: "Secteur", value: "Grenoble et alentours, en transports en commun" },
     ],
+    cta: "Un stage ou une alternance à me proposer ?",
   },
 
   skills: {
@@ -222,6 +223,7 @@ const en = {
       },
       { label: "Area", value: "Grenoble and surroundings, by public transport" },
     ],
+    cta: "An internship or a work-study position to offer?",
   },
 
   skills: {
