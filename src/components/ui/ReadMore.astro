@@ -4,7 +4,7 @@ import { useTranslations } from "../../data/ui";
 import { getLang } from "../../lib/i18n";
 
 interface Props {
-  /** Classes du bloc de texte : taille, interligne, espacement des paragraphes. */
+  /** Classes du bloc de texte : taille, couleur, interligne, marge. */
   class?: string;
 }
 
@@ -22,7 +22,14 @@ const t = useTranslations(getLang(Astro.url.pathname));
 ---
 
 <div data-read-more class="scroll-mt-24">
-  <div class:list={["read-more-text", className]}>
+  {/*
+    Paragraphes espacés par `gap`, pas par `space-y` : Tailwind 4 pose celui-ci
+    en marge basse sur tout paragraphe sauf le dernier, y compris le premier
+    quand les autres sont repliés. Cette marge, absente pendant l'animation
+    (`overflow: hidden` la garde dans la boîte), réapparaissait à la fin et
+    faisait retomber le bouton de 16 px.
+  */}
+  <div class:list={["read-more-text flex flex-col gap-4", className]}>
     <slot />
   </div>
   <button
@@ -86,29 +93,47 @@ const t = useTranslations(getLang(Astro.url.pathname));
         return height;
       };
 
+      /*
+       * Replier depuis le bas du texte : le texte se referme au-dessus du
+       * bouton, qui reste sous le doigt, la page remontant au même rythme que
+       * la hauteur diminue. Si le bouton était trop haut pour cela, la page
+       * remonte juste assez pour que le début du texte reste lisible sous le
+       * header. Rien ne bouge si le début du texte est déjà à l'écran.
+       *
+       * Rendait auparavant le début du texte d'un saut : le bouton passait sous
+       * l'écran, puis remontait pendant l'animation.
+       */
+      const collapsedScrollY = (to: number) => {
+        const top = text.getBoundingClientRect().top;
+        const headerOffset = parseFloat(getComputedStyle(block).scrollMarginTop) || 0;
+        if (top >= headerOffset) return window.scrollY;
+
+        const gap = button.getBoundingClientRect().top - text.getBoundingClientRect().bottom;
+        const anchoredTop = button.getBoundingClientRect().top - gap - to;
+        return window.scrollY - (Math.max(headerOffset, anchoredTop) - top);
+      };
+
       button.addEventListener(
         "click",
         () => {
           expanded = !expanded;
           button.setAttribute("aria-expanded", String(expanded));
 
-          // Replier fait disparaître le texte au-dessus du bouton : sans ce
-          // recalage, on se retrouverait loin plus bas, dans la section suivante.
-          if (!expanded && block.getBoundingClientRect().top < 0) {
-            block.scrollIntoView({ block: "start", behavior: "instant" });
-          }
-
           const from = text.getBoundingClientRect().height;
           running.forEach((animation) => animation.cancel());
           running = [];
 
+          const to = heightWhen(!expanded);
+          const startY = window.scrollY;
+          const endY = expanded ? startY : collapsedScrollY(to);
+
           if (!motionOk() || typeof text.animate !== "function") {
             block.toggleAttribute("data-collapsed", !expanded);
             text.style.overflow = "";
+            window.scrollTo({ top: endY, behavior: "instant" });
             return;
           }
 
-          const to = heightWhen(!expanded);
           // Ouvrir pose l'état final tout de suite, et la hauteur rattrape.
           // Fermer garde les paragraphes affichés pendant qu'ils s'effacent.
           block.removeAttribute("data-collapsed");
@@ -128,15 +153,34 @@ const t = useTranslations(getLang(Astro.url.pathname));
           );
           running = [height, ...fades];
 
+          // La page suit la hauteur affichée, image par image : même courbe,
+          // donc le bouton ne bouge pas. Le recadrage automatique du navigateur
+          // (`overflow-anchor`) est suspendu, il corrigerait à contretemps.
+          const root = document.documentElement;
+          if (endY !== startY) {
+            root.style.overflowAnchor = "none";
+            const follow = () => {
+              if (!running.includes(height)) return;
+              const progress = (from - text.getBoundingClientRect().height) / (from - to);
+              window.scrollTo({ top: startY + (endY - startY) * progress, behavior: "instant" });
+              requestAnimationFrame(follow);
+            };
+            requestAnimationFrame(follow);
+          }
+
           height.finished
             .then(() => {
               block.toggleAttribute("data-collapsed", !expanded);
               text.style.overflow = "";
               fades.forEach((fade) => fade.cancel());
               running = [];
+              window.scrollTo({ top: endY, behavior: "instant" });
             })
             // Annulée par un nouveau clic : c'est lui qui pose l'état suivant.
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => {
+              if (!running.length) root.style.overflowAnchor = "";
+            });
         },
         { signal },
       );

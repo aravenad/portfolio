@@ -113,6 +113,71 @@ test.describe("accueil allégé", () => {
     await expect(text).not.toHaveCSS("overflow", "hidden");
   });
 
+  /**
+   * Replie le texte d'À propos ouvert, le bouton placé à `fromBottom` px du bas
+   * de l'écran, et relève la position du bouton et du début du texte à chaque
+   * image, jusqu'après la fin de l'animation.
+   */
+  async function collapseFrames(page: import("@playwright/test").Page, fromBottom: number) {
+    const button = page.locator("#about [data-read-more] > button");
+    await button.click();
+    await expect(page.locator("#about [data-read-more]")).not.toHaveAttribute("data-collapsed");
+    await expect.poll(() => button.evaluate((b) => b.parentElement!.getAnimations({ subtree: true }).length)).toBe(0);
+
+    await button.evaluate((b, offset) => {
+      const top = b.getBoundingClientRect().top + window.scrollY - window.innerHeight + offset;
+      window.scrollTo({ top, behavior: "instant" });
+    }, fromBottom);
+
+    return button.evaluate(
+      (b) =>
+        new Promise<{ button: number; text: number }[]>((resolve) => {
+          const text = b.parentElement!.querySelector(".read-more-text")!;
+          const frames: { button: number; text: number }[] = [];
+          const sample = () =>
+            frames.push({ button: b.getBoundingClientRect().top, text: text.getBoundingClientRect().top });
+          const start = performance.now();
+          // Un relevé par image, programmé APRÈS le clic : il passe ainsi après
+          // le recalage de la page par le script, comme l'image peinte. Un
+          // relevé programmé avant tomberait entre la nouvelle hauteur et le
+          // recalage, un état que le navigateur ne peint jamais.
+          const record = () => {
+            sample();
+            if (performance.now() - start < 800) requestAnimationFrame(record);
+            else resolve(frames);
+          };
+          sample();
+          (b as HTMLButtonElement).click();
+          requestAnimationFrame(record);
+        }),
+    );
+  }
+
+  test("replier depuis le bas laisse le bouton sous le doigt", async ({ page }) => {
+    const frames = await collapseFrames(page, 120);
+    const buttonTops = frames.map((frame) => frame.button);
+
+    // Le texte se referme au-dessus du bouton, qui ne bouge pas d'un pixel...
+    expect(Math.max(...buttonTops) - Math.min(...buttonTops)).toBeLessThanOrEqual(1);
+    // ... et son début revient à l'écran.
+    expect(frames.at(-1)!.text).toBeGreaterThan(0);
+  });
+
+  test("replier quand le bouton est haut ramène le début du texte, sans rebond", async ({ page }) => {
+    const frames = await collapseFrames(page, 650);
+    const buttonTops = frames.map((frame) => frame.button);
+
+    // Le bouton descend d'un seul mouvement, sans jamais repartir en arrière...
+    for (let i = 1; i < buttonTops.length; i++) {
+      expect(buttonTops[i], `image ${i}`).toBeGreaterThanOrEqual(buttonTops[i - 1] - 0.5);
+    }
+    // ... et le début du texte s'arrête juste sous le header.
+    const headerOffset = await page
+      .locator("#about [data-read-more]")
+      .evaluate((block) => parseFloat(getComputedStyle(block).scrollMarginTop));
+    expect(Math.abs(frames.at(-1)!.text - headerOffset)).toBeLessThanOrEqual(1);
+  });
+
   test.describe("sous prefers-reduced-motion", () => {
     test.use({ reducedMotion: "reduce" });
 

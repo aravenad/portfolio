@@ -145,6 +145,22 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
    * plan se referme. Le pied de page étant persisté, il resterait sinon ouvert
    * par-dessus la page d'arrivée.
    */
+  /*
+   * Le pied de page est conservé d'une page à l'autre (`transition:persist`).
+   * Le routeur d'Astro rend alors le focus au lien qu'on vient de suivre, par
+   * un `focus()` qui fait défiler jusqu'à lui : on arrivait en bas de la page
+   * visitée, après une descente en douceur depuis le haut. Le lien perd son
+   * focus juste avant l'échange, et la page d'arrivée reste en haut, comme
+   * après un chargement complet.
+   *
+   * Posé une fois par document, comme les écouteurs de navigation du header :
+   * le module ne se réexécute pas d'une page à l'autre.
+   */
+  document.addEventListener("astro:before-swap", () => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement && active.closest("footer")) active.blur();
+  });
+
   onEachPage((signal) => {
     const map = document.getElementById("site-map");
 

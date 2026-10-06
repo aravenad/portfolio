@@ -56,3 +56,34 @@ test("une section de l'accueil, depuis l'accueil, referme aussi le plan", async 
   await expect(siteMap(page)).toBeHidden();
   await expect(page.locator("#contact")).toBeInViewport();
 });
+
+test.describe("en partant du bas de la page", () => {
+  // Le pied de page est conservé d'une page à l'autre, et le routeur rendait le
+  // focus au lien suivi : la page d'arrivée défilait alors jusqu'en bas.
+  test.beforeEach(async ({ page }) => {
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }),
+    );
+  });
+
+  test("le lien des mentions légales mène en haut de la page", async ({ page }) => {
+    await afterNavigation(page, () =>
+      page.locator("footer").getByRole("link", { name: "Mentions légales" }).first().click(),
+    );
+
+    await expect(page).toHaveURL(/\/legal$/);
+    // Assez pour qu'un défilement doux vers le bas ait eu le temps de partir.
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
+  test("un projet du plan du site mène en haut de sa fiche", async ({ page }) => {
+    await opener(page).click();
+    await afterNavigation(page, () =>
+      siteMap(page).locator('a[href*="/projects/"]').first().click(),
+    );
+
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+});
