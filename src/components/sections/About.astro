@@ -1,7 +1,7 @@
 ---
-import Arrow from "../ui/Arrow.astro";
 import Button from "../ui/Button.astro";
 import Card from "../ui/Card.astro";
+import ReadMore from "../ui/ReadMore.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { site } from "../../data/site";
@@ -27,27 +27,10 @@ const cv = publicCv();
     vient chercher, et quatre paragraphes la repousseraient loin sous le titre.
   */}
   <div class="mt-10 grid items-start gap-10 lg:grid-cols-2 lg:gap-20">
-    {/*
-      Sous lg, le texte suit la fiche et en ferait trois écrans : seul le
-      premier paragraphe reste ouvert, la suite attend « Lire la suite », et
-      « Réduire » la replie. Le repli n'est posé que par le script
-      (`data-collapsed`) : sans lui, tout reste lisible et le bouton masqué.
-    */}
-    <div data-about-text class="scroll-mt-24">
-      <div class="about-paragraphs space-y-4 text-lg leading-8 text-zinc-400">
-        {t.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-      </div>
-      <button
-        type="button"
-        hidden
-        aria-expanded="false"
-        class="group mt-4 inline-flex items-center gap-2 text-sm font-medium text-zinc-300 transition hover:text-accent lg:hidden"
-      >
-        <span class="group-aria-expanded:hidden">{t.about.readMore}</span>
-        <span class="hidden group-aria-expanded:inline">{t.about.readLess}</span>
-        <Arrow class="rotate-90 transition group-aria-expanded:-rotate-90" />
-      </button>
-    </div>
+    {/* Sous lg, le texte suit la fiche : replié, il ne la noie plus sous trois écrans. */}
+    <ReadMore class="space-y-4 text-lg leading-8 text-zinc-400">
+      {t.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+    </ReadMore>
 
     <div class="order-first lg:order-none">
       <Card class="p-5 sm:p-8">
@@ -84,38 +67,3 @@ const cv = publicCv();
   </div>
 </Section>
 
-<style>
-  @media (width < 64rem) {
-    [data-collapsed] .about-paragraphs > p:not(:first-child) {
-      display: none;
-    }
-  }
-</style>
-
-<script>
-  import { onEachPage } from "../../lib/enhance";
-
-  onEachPage((signal) => {
-    const block = document.querySelector<HTMLElement>("[data-about-text]");
-    const button = block?.querySelector("button");
-    if (!block || !button) return;
-
-    block.toggleAttribute("data-collapsed", true);
-    button.hidden = false;
-
-    button.addEventListener(
-      "click",
-      () => {
-        const expanded = block.toggleAttribute("data-collapsed") === false;
-        button.setAttribute("aria-expanded", String(expanded));
-
-        // Replier fait disparaître le texte au-dessus du bouton : sans ce
-        // recalage, on se retrouverait loin sous la section, dans la suivante.
-        if (!expanded && block.getBoundingClientRect().top < 0) {
-          block.scrollIntoView({ block: "start", behavior: "instant" });
-        }
-      },
-      { signal },
-    );
-  });
-</script>

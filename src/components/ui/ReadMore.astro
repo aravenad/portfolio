@@ -1,0 +1,76 @@
+---
+import Arrow from "./Arrow.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
+
+interface Props {
+  /** Classes du bloc de texte : taille, interligne, espacement des paragraphes. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const t = useTranslations(getLang(Astro.url.pathname));
+
+/*
+ * Un texte de plusieurs paragraphes qui, sous lg, ne garde ouvert que le
+ * premier : la suite attend « Lire la suite », et « Réduire » la replie. Au-delà
+ * de lg, le texte a sa colonne à lui et s'affiche en entier.
+ *
+ * Le repli n'est posé que par le script (`data-collapsed`) : sans lui, tout
+ * reste lisible et le bouton reste masqué.
+ */
+---
+
+<div data-read-more class="scroll-mt-24">
+  <div class:list={["read-more-text", className]}>
+    <slot />
+  </div>
+  <button
+    type="button"
+    hidden
+    aria-expanded="false"
+    class="group mt-4 inline-flex items-center gap-2 text-sm font-medium text-zinc-300 transition hover:text-accent lg:hidden"
+  >
+    <span class="group-aria-expanded:hidden">{t.readMore.more}</span>
+    <span class="hidden group-aria-expanded:inline">{t.readMore.less}</span>
+    <Arrow class="rotate-90 transition group-aria-expanded:-rotate-90" />
+  </button>
+</div>
+
+<style>
+  /* Les paragraphes viennent du slot : `:global` pour les atteindre. */
+  @media (width < 64rem) {
+    [data-collapsed] .read-more-text > :global(:not(:first-child)) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+
+  onEachPage((signal) => {
+    for (const block of document.querySelectorAll<HTMLElement>("[data-read-more]")) {
+      const button = block.querySelector(":scope > button");
+      if (!(button instanceof HTMLButtonElement)) continue;
+
+      block.toggleAttribute("data-collapsed", true);
+      button.hidden = false;
+
+      button.addEventListener(
+        "click",
+        () => {
+          const expanded = block.toggleAttribute("data-collapsed") === false;
+          button.setAttribute("aria-expanded", String(expanded));
+
+          // Replier fait disparaître le texte au-dessus du bouton : sans ce
+          // recalage, on se retrouverait loin plus bas, dans la section suivante.
+          if (!expanded && block.getBoundingClientRect().top < 0) {
+            block.scrollIntoView({ block: "start", behavior: "instant" });
+          }
+        },
+        { signal },
+      );
+    }
+  });
+</script>

@@ -67,8 +67,6 @@ const fr = {
       { label: "Secteur", value: "Grenoble et alentours, en transports en commun" },
     ],
     cta: "Un stage ou une alternance à me proposer ?",
-    readMore: "Lire la suite",
-    readLess: "Réduire",
   },
 
   skills: {
@@ -160,6 +158,8 @@ const fr = {
   },
 
   toc: { title: "Sur cette page" },
+
+  readMore: { more: "Lire la suite", less: "Réduire" },
   backToTop: "Revenir en haut de la page",
   footer: {
     rights: "Tous droits réservés.",
@@ -226,8 +226,6 @@ const en = {
       { label: "Area", value: "Grenoble and surroundings, by public transport" },
     ],
     cta: "An internship or a work-study position to offer?",
-    readMore: "Read more",
-    readLess: "Show less",
   },
 
   skills: {
@@ -320,6 +318,8 @@ const en = {
   },
 
   toc: { title: "On this page" },
+
+  readMore: { more: "Read more", less: "Show less" },
   backToTop: "Back to top",
   footer: {
     rights: "All rights reserved.",

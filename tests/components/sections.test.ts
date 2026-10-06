@@ -94,12 +94,12 @@ describe("About", () => {
   it("prépare le repli mobile sans masquer le texte sans script", async () => {
     // Le bouton n'apparaît, et le texte ne se replie, que si le script tourne.
     const { body } = await render(About);
-    const button = body.querySelector("[data-about-text] button");
+    const button = body.querySelector("[data-read-more] > button");
 
     expect(button?.hasAttribute("hidden")).toBe(true);
     expect(button?.getAttribute("aria-expanded")).toBe("false");
-    expect(button?.textContent).toContain(ui.fr.about.readMore);
-    expect(button?.textContent).toContain(ui.fr.about.readLess);
+    expect(button?.textContent).toContain(ui.fr.readMore.more);
+    expect(button?.textContent).toContain(ui.fr.readMore.less);
     expect(body.querySelector("[data-collapsed]")).toBeNull();
   });
 });
@@ -134,6 +134,16 @@ describe("Skills", () => {
 
     expect(java?.getAttribute("style")).toContain("--skill-color: #007396");
     expect(java?.getAttribute("style")).toContain("--skill-color-2: #ED8B00");
+  });
+
+  it("replie aussi son texte sur mobile, comme À propos", async () => {
+    const { body } = await render(Skills, {
+      props: { id: "soft-skills", title: "Compétences transversales", skills: softSkills, variant: "list" },
+      slots: { default: "<p>un</p><p>deux</p>" },
+    });
+
+    expect(body.querySelectorAll("[data-read-more] .read-more-text > p")).toHaveLength(2);
+    expect(body.querySelector("[data-read-more] > button")?.hasAttribute("hidden")).toBe(true);
   });
 
   it("passe en liste pour les compétences transversales", async () => {
