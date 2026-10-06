@@ -99,7 +99,7 @@ export const education: CareerEntry[] = [
     organization: "IUT2 (Université Grenoble Alpes)",
     location: "Grenoble",
     period: "Septembre 2023 – juin 2028",
-    description: "Année de césure de septembre 2025 à juillet 2026.",
+    description: "Parcours Réalisation d'applications. Année de césure de septembre 2025 à juillet 2026.",
     initials: "IUT2",
   },
   {
@@ -203,7 +203,7 @@ export const educationEn: CareerEntry[] = [
     organization: "IUT2 (Université Grenoble Alpes)",
     location: "Grenoble",
     period: "September 2023 – June 2028",
-    description: "Gap year from September 2025 to July 2026.",
+    description: "Application development track. Gap year from September 2025 to July 2026.",
     initials: "IUT2",
   },
   {

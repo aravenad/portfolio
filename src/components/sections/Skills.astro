@@ -1,6 +1,7 @@
 ---
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import SkillChip from "../ui/SkillChip.astro";
 import SkillList from "../ui/SkillList.astro";
 import SkillTile from "../ui/SkillTile.astro";
 import type { Skill } from "../../types";
@@ -31,11 +32,23 @@ const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
     <div class:list={[reverse && "lg:order-1"]}>
       {
         variant === "grid" ? (
-          <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
-            {skills.map((skill) => (
-              <SkillTile skill={skill} />
-            ))}
-          </div>
+          <Fragment>
+            {/*
+              Sur téléphone, seize tuiles carrées faisaient six rangées (près
+              d'un écran) pour des noms déjà cités dans le texte. Des pastilles
+              logo + nom disent la même chose en trois fois moins de hauteur.
+            */}
+            <ul data-skill-chips class="flex flex-wrap gap-2 sm:hidden">
+              {skills.map((skill) => (
+                <SkillChip skill={skill} />
+              ))}
+            </ul>
+            <div class="hidden grid-cols-4 gap-3 sm:grid">
+              {skills.map((skill) => (
+                <SkillTile skill={skill} />
+              ))}
+            </div>
+          </Fragment>
         ) : (
           <SkillList skills={skills} />
         )
@@ -43,3 +56,18 @@ const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
     </div>
   </div>
 </Section>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+
+  /*
+   * Safari iOS n'applique `:active` qu'aux éléments qui écoutent le toucher :
+   * sans cet écouteur vide, appuyer sur une pastille n'allumerait pas son logo.
+   */
+  onEachPage((signal) => {
+    document.querySelector("[data-skill-chips]")?.addEventListener("touchstart", () => {}, {
+      passive: true,
+      signal,
+    });
+  });
+</script>

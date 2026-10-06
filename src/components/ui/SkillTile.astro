@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import { brandStyle } from "../../lib/skills";
 import type { Skill } from "../../types";
 
 interface Props {
@@ -11,14 +12,7 @@ const { skill } = Astro.props;
 // Les couleurs de marque ne sont que transportées ici : c'est la règle de survol
 // plus bas qui les allume. Une tuile non survolée reste zinc-100, logo bicolore
 // compris.
-const brand =
-  [
-    skill.color && `--skill-color: ${skill.color}`,
-    skill.color2 && `--skill-color-2: ${skill.color2}`,
-    skill.colorLight && `--skill-color-light: ${skill.colorLight}`,
-  ]
-    .filter(Boolean)
-    .join("; ") || undefined;
+const brand = brandStyle(skill);
 ---
 
 <div

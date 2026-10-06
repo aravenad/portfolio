@@ -55,18 +55,20 @@ const fr = {
     facts: [
       {
         label: "Formation",
-        value: "BUT Informatique, 2e année, parcours Réalisation d'applications (IUT2, Grenoble)",
+        value: "BUT Informatique, 2e année · IUT2 Grenoble",
       },
       { label: "Métier visé", value: "Développeur web, et plus largement développeur d'applications" },
       { label: "Diplôme", value: "Baccalauréat STI2D, spécialité SIN, mention assez bien (2020)" },
       {
         label: "Recherche",
         value:
-          "Un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027 (prolongeable jusqu'au 9 juillet), puis une alternance en 3e année",
+          "Stage du 19 avril au 25 juin 2027 (jusqu'au 9 juillet possible), puis alternance en 3e année",
       },
       { label: "Secteur", value: "Grenoble et alentours, en transports en commun" },
     ],
     cta: "Un stage ou une alternance à me proposer ?",
+    readMore: "Lire la suite",
+    readLess: "Réduire",
   },
 
   skills: {
@@ -212,18 +214,20 @@ const en = {
     facts: [
       {
         label: "Studies",
-        value: "BUT in computer science, 2nd year, application development track (IUT2, Grenoble)",
+        value: "BUT in computer science, 2nd year · IUT2 Grenoble",
       },
       { label: "Target role", value: "Web developer, and more broadly application developer" },
       { label: "Diploma", value: "STI2D baccalaureate, SIN specialty, with honors (2020)" },
       {
         label: "Looking for",
         value:
-          "A 10 to 12-week internship, from April 19 to June 25, 2027 (extendable to July 9), then a work-study contract for my 3rd year",
+          "Internship from April 19 to June 25, 2027 (extendable to July 9), then work-study in my 3rd year",
       },
       { label: "Area", value: "Grenoble and surroundings, by public transport" },
     ],
     cta: "An internship or a work-study position to offer?",
+    readMore: "Read more",
+    readLess: "Show less",
   },
 
   skills: {

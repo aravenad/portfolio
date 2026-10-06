@@ -1,0 +1,49 @@
+---
+import { Icon } from "astro-icon/components";
+import { brandStyle } from "../../lib/skills";
+import type { Skill } from "../../types";
+
+interface Props {
+  skill: Skill;
+}
+
+const { skill } = Astro.props;
+---
+
+{/*
+  La forme compacte de SkillTile, pour les téléphones : même logo, mêmes
+  couleurs de marque, allumées au survol comme sur la tuile, et aussi à
+  l'appui, puisqu'un écran tactile n'a pas de survol durable.
+*/}
+<li
+  class="skill-chip inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-300 transition-colors"
+  style={brandStyle(skill)}
+>
+  {
+    skill.icon && (
+      <Icon
+        name={skill.icon}
+        aria-hidden="true"
+        class="skill-icon size-4 shrink-0 text-zinc-400 transition-colors"
+      />
+    )
+  }
+  {skill.label}
+</li>
+
+<style>
+  /* Mêmes règles que .skill-tile:hover dans SkillTile.astro. */
+  .skill-chip:is(:hover, :active) {
+    border-color: var(--color-zinc-600);
+    color: var(--color-zinc-100);
+  }
+
+  .skill-chip:is(:hover, :active) .skill-icon {
+    color: var(--skill-color, currentColor);
+    --logo-accent: var(--skill-color-2, currentColor);
+  }
+
+  :global(:root[data-theme="light"]) .skill-chip:is(:hover, :active) .skill-icon {
+    color: var(--skill-color-light, var(--skill-color, currentColor));
+  }
+</style>

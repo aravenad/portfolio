@@ -90,6 +90,18 @@ describe("About", () => {
     expect(links.find((a) => a.hasAttribute("download"))?.getAttribute("href"))
       .toBe("/portfolio/cv-damien-aravena-bravo-public.pdf");
   });
+
+  it("prépare le repli mobile sans masquer le texte sans script", async () => {
+    // Le bouton n'apparaît, et le texte ne se replie, que si le script tourne.
+    const { body } = await render(About);
+    const button = body.querySelector("[data-about-text] button");
+
+    expect(button?.hasAttribute("hidden")).toBe(true);
+    expect(button?.getAttribute("aria-expanded")).toBe("false");
+    expect(button?.textContent).toContain(ui.fr.about.readMore);
+    expect(button?.textContent).toContain(ui.fr.about.readLess);
+    expect(body.querySelector("[data-collapsed]")).toBeNull();
+  });
 });
 
 describe("Skills", () => {
@@ -107,6 +119,21 @@ describe("Skills", () => {
   it("dessine une tuile par compétence en variante grille", async () => {
     const { body } = await render(Skills, { props: base, slots: { default: "<p>x</p>" } });
     expect(body.querySelectorAll(".skill-tile")).toHaveLength(technicalSkills.length);
+  });
+
+  it("doublonne la grille de pastilles compactes pour les téléphones", async () => {
+    const { body } = await render(Skills, { props: base, slots: { default: "<p>x</p>" } });
+    const chips = [...body.querySelectorAll(".skill-chip")].map((chip) => chip.textContent?.trim());
+
+    expect(chips).toEqual(technicalSkills.map((skill) => skill.label));
+  });
+
+  it("donne aux pastilles les couleurs de marque des tuiles", async () => {
+    const { body } = await render(Skills, { props: base, slots: { default: "<p>x</p>" } });
+    const java = [...body.querySelectorAll(".skill-chip")].find((chip) => chip.textContent?.trim() === "Java");
+
+    expect(java?.getAttribute("style")).toContain("--skill-color: #007396");
+    expect(java?.getAttribute("style")).toContain("--skill-color-2: #ED8B00");
   });
 
   it("passe en liste pour les compétences transversales", async () => {
@@ -189,6 +216,16 @@ describe("Contact", () => {
     const github = body.querySelector(`a[href="${site.github}"]`);
 
     expect(github?.getAttribute("rel")).toBe("noreferrer");
+  });
+
+  it("garde LinkedIn et GitHub ensemble, hors du flux des boutons", async () => {
+    // Sur téléphone, laissées au flux, les icônes tombaient sur deux rangées.
+    const { body } = await render(Contact);
+    const linkedin = body.querySelector(`a[href="${site.linkedin}"]`);
+    const github = body.querySelector(`a[href="${site.github}"]`);
+
+    expect(linkedin?.parentElement).toBe(github?.parentElement);
+    expect(linkedin?.parentElement?.querySelector('a[href^="mailto:"]')).toBeNull();
   });
 
   it("propose LinkedIn et GitHub en icônes nommées pour les lecteurs d'écran", async () => {

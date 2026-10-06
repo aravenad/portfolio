@@ -42,7 +42,16 @@ const introWords = intro.split(/\s+/).filter(Boolean);
       {description}
     </p>
 
-    <div class="page-enter mt-10 flex flex-wrap gap-4" style="--index: 2">
+    {/*
+      Sur téléphone, « Voir mes projets » et « Me contacter » ne tiennent pas
+      côte à côte en français : laissés au flux, ils tombaient sur deux lignes de
+      largeurs inégales. Empilés pleine largeur, comme ceux du contact, ils
+      s'alignent quelle que soit la langue.
+    */}
+    <div
+      class="page-enter mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
+      style="--index: 2"
+    >
       <Button href="#projects">{t.hero.projects}</Button>
       <Button href="#contact" variant="secondary">{t.hero.contact}</Button>
     </div>

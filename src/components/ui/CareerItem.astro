@@ -56,11 +56,15 @@ const subtitle = title ? organization : undefined;
   </span>
 
   <div class="min-w-0 flex-1">
-    <h3 class="font-medium text-zinc-100">
+    {/*
+      Le titre et la pastille passent à la ligne d'un bloc : sur un écran étroit,
+      la pastille glissée dans le texte se coupait en deux (« À » / « venir »).
+    */}
+    <h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-zinc-100">
       {heading}
       {
         upcoming && (
-          <span class="ml-2 rounded-full border border-accent/30 px-2 py-0.5 align-[0.1em] text-xs font-normal text-accent">
+          <span class="whitespace-nowrap rounded-full border border-accent/30 px-2 py-0.5 text-xs font-normal text-accent">
             {t.career.upcoming}
           </span>
         )
