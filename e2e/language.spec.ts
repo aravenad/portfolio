@@ -21,7 +21,7 @@ test("le lien mène à la même page dans l'autre langue, et en revient", async 
   await expect(page.locator("html")).toHaveAttribute("lang", "fr");
 });
 
-for (const path of ["projects", "projects/page/2", "projects/developpement-application"]) {
+for (const path of ["projects", "projects/page/2", "projects/developpement-application", "legal"]) {
   test(`/${path} a son équivalent anglais`, async ({ page }) => {
     await page.goto(path);
 

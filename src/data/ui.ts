@@ -160,6 +160,47 @@ const fr = {
   toc: { title: "Sur cette page" },
 
   readMore: { more: "Lire la suite", less: "Réduire" },
+
+  legal: {
+    title: "Mentions légales",
+    metaTitle: `Mentions légales | ${site.author}`,
+    metaDescription:
+      "Mentions légales du portfolio de Damien Aravena Bravo : éditeur, contact, hébergeur et données personnelles.",
+    publisher: {
+      title: "Éditeur",
+      text: "Ce site est édité à titre personnel et non professionnel par Damien Aravena Bravo, étudiant en BUT Informatique, qui en est aussi le directeur de la publication.",
+      anonymity:
+        "Éditeur non professionnel, il ne publie pas son adresse postale, comme le permet l'article 1-1 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique : ses éléments d'identification sont connus de l'hébergeur.",
+    },
+    contact: {
+      title: "Contact",
+      text: "Pour toute question sur le site ou son contenu, écrivez à :",
+    },
+    host: {
+      title: "Hébergeur",
+      country: "États-Unis",
+    },
+    domain: {
+      title: "Nom de domaine",
+      text: (domain: string) =>
+        `Le nom de domaine ${domain} est enregistré auprès d'Infomaniak, qui en gère les DNS mais n'héberge pas le site :`,
+      country: "Suisse",
+    },
+    privacy: {
+      title: "Données personnelles",
+      paragraphs: [
+        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
+        "Votre navigateur garde deux réglages, qui n'en sortent jamais : votre choix du thème clair (stockage local), pour le retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
+        "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre. Vous pouvez demander à tout moment leur suppression, à la même adresse, et adresser une réclamation à la CNIL.",
+      ],
+      hostLogs: "Comme tout hébergeur, GitHub enregistre l'adresse IP des visiteurs à des fins de sécurité. Voir sa",
+      hostPolicy: "déclaration de confidentialité",
+    },
+    credits: {
+      title: "Propriété intellectuelle",
+      text: "Les textes et les illustrations du site sont la propriété de Damien Aravena Bravo. Les logos des technologies sont des marques de leurs propriétaires respectifs ; ils proviennent de Simple Icons (licence CC0) et, pour Java, de devicon (licence MIT).",
+    },
+  },
   backToTop: "Revenir en haut de la page",
   footer: {
     rights: "Tous droits réservés.",
@@ -170,6 +211,7 @@ const fr = {
     projects: "Projets",
     contact: "Contact",
     cv: "CV (PDF)",
+    legal: "Mentions légales",
   },
 };
 
@@ -320,6 +362,47 @@ const en = {
   toc: { title: "On this page" },
 
   readMore: { more: "Read more", less: "Show less" },
+
+  legal: {
+    title: "Legal notice",
+    metaTitle: `Legal notice | ${site.author}`,
+    metaDescription:
+      "Legal notice for Damien Aravena Bravo's portfolio: publisher, contact, host and personal data.",
+    publisher: {
+      title: "Publisher",
+      text: "This site is published in a personal, non-professional capacity by Damien Aravena Bravo, a computer science student (BUT), who is also its director of publication.",
+      anonymity:
+        "As a non-professional publisher, he does not publish his postal address, as allowed by article 1-1 of French law no. 2004-575 of 21 June 2004 on confidence in the digital economy: his identification details are known to the host.",
+    },
+    contact: {
+      title: "Contact",
+      text: "For any question about the site or its content, write to:",
+    },
+    host: {
+      title: "Host",
+      country: "United States",
+    },
+    domain: {
+      title: "Domain name",
+      text: (domain: string) =>
+        `The domain name ${domain} is registered with Infomaniak, which manages its DNS but does not host the site:`,
+      country: "Switzerland",
+    },
+    privacy: {
+      title: "Personal data",
+      paragraphs: [
+        "This site sets no cookies, uses no analytics and loads no third-party service: fonts and images are served by the site itself.",
+        "Your browser keeps two settings, which never leave it: your choice of the light theme (local storage), so it is there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
+        "Emails sent to the publisher are only used to reply to you. You can ask for their deletion at any time, at the same address, and lodge a complaint with the CNIL, the French data protection authority.",
+      ],
+      hostLogs: "Like any host, GitHub logs visitors' IP addresses for security purposes. See its",
+      hostPolicy: "privacy statement",
+    },
+    credits: {
+      title: "Intellectual property",
+      text: "The texts and illustrations of this site belong to Damien Aravena Bravo. Technology logos are trademarks of their respective owners; they come from Simple Icons (CC0 license) and, for Java, from devicon (MIT license).",
+    },
+  },
   backToTop: "Back to top",
   footer: {
     rights: "All rights reserved.",
@@ -329,6 +412,7 @@ const en = {
     projects: "Projects",
     contact: "Contact",
     cv: "Résumé (PDF, French)",
+    legal: "Legal notice",
   },
 } satisfies Dictionary;
 

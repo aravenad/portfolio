@@ -264,13 +264,21 @@ describe("Breadcrumb", () => {
 });
 
 describe("Footer", () => {
-  /** Les liens de la ligne du pied de page, hors plan du site. */
+  /** Les liens sociaux de la ligne du pied de page, hors plan du site. */
   const rowLinks = (body: HTMLElement) =>
-    [...body.querySelectorAll("footer > div a")].map((a) => a.getAttribute("href"));
+    [...body.querySelectorAll("footer > div ul a")].map((a) => a.getAttribute("href"));
 
   it("reprend tous les liens sociaux sur sa ligne", async () => {
     const { body } = await render(Footer);
     expect(rowLinks(body)).toEqual(socialLinks.map((link) => link.href));
+  });
+
+  it("mène aux mentions légales, depuis sa ligne comme depuis le plan", async () => {
+    const { body } = await render(Footer);
+
+    expect(body.querySelector('footer > div p a[href="/portfolio/legal"]')?.textContent?.trim())
+      .toBe("Mentions légales");
+    expect(body.querySelector('#site-map a[href="/portfolio/legal"]')).toBeTruthy();
   });
 
   it("coupe le référent sur les liens sortants, et sur eux seuls", async () => {

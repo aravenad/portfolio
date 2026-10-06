@@ -1,0 +1,98 @@
+---
+import Breadcrumb from "../ui/Breadcrumb.astro";
+import Container from "../ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { site } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { getLang } from "../../lib/i18n";
+
+/**
+ * Les mentions légales, dans la langue de l'URL. Rendues par `legal.astro`, en
+ * français et en anglais.
+ *
+ * Ce qu'exige l'article 1-1 de la LCEN d'un éditeur non professionnel : le nom
+ * et l'adresse de l'hébergeur. Le nom de l'éditeur et son e-mail vont au-delà,
+ * par choix ; son adresse postale et son téléphone restent privés.
+ */
+const t = useTranslations(getLang(Astro.url.pathname));
+const { legal } = t;
+
+const heading = "text-xl font-semibold text-zinc-100";
+const body = "mt-4 space-y-4 leading-7 text-zinc-400";
+const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 transition hover:text-accent hover:decoration-current";
+---
+
+<BaseLayout title={legal.metaTitle} description={legal.metaDescription}>
+  <Container class="pt-10">
+    <Breadcrumb items={[{ label: legal.title }]} />
+  </Container>
+
+  <article class="py-14 sm:py-20">
+    <Container>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{legal.title}</h1>
+
+      <div class="mt-12 max-w-2xl space-y-12">
+        <section aria-labelledby="legal-publisher">
+          <h2 id="legal-publisher" class={heading}>{legal.publisher.title}</h2>
+          <div class={body}>
+            <p>{legal.publisher.text}</p>
+            <p>{legal.publisher.anonymity}</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="legal-contact">
+          <h2 id="legal-contact" class={heading}>{legal.contact.title}</h2>
+          <div class={body}>
+            <p>
+              {legal.contact.text}{" "}
+              <a href={`mailto:${site.email}`} class={link}>{site.email}</a>
+            </p>
+          </div>
+        </section>
+
+        <section aria-labelledby="legal-host">
+          <h2 id="legal-host" class={heading}>{legal.host.title}</h2>
+          <address class:list={[body, "not-italic"]}>
+            <p>
+              <a href={site.host.url} rel="noreferrer" class={link}>{site.host.name}</a><br />
+              {site.host.street}<br />
+              {site.host.city}<br />
+              {legal.host.country}
+            </p>
+          </address>
+        </section>
+
+        <section aria-labelledby="legal-domain">
+          <h2 id="legal-domain" class={heading}>{legal.domain.title}</h2>
+          <div class={body}>
+            <p>{legal.domain.text(site.registrar.domain)}</p>
+            <address class="not-italic">
+              <a href={site.registrar.url} rel="noreferrer" class={link}>{site.registrar.name}</a><br />
+              {site.registrar.street}<br />
+              {site.registrar.city}<br />
+              {legal.domain.country}
+            </address>
+          </div>
+        </section>
+
+        <section aria-labelledby="legal-privacy">
+          <h2 id="legal-privacy" class={heading}>{legal.privacy.title}</h2>
+          <div class={body}>
+            {legal.privacy.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            <p>
+              {legal.privacy.hostLogs}{" "}
+              <a href={site.host.privacy} rel="noreferrer" class={link}>{legal.privacy.hostPolicy}</a>.
+            </p>
+          </div>
+        </section>
+
+        <section aria-labelledby="legal-credits">
+          <h2 id="legal-credits" class={heading}>{legal.credits.title}</h2>
+          <div class={body}>
+            <p>{legal.credits.text}</p>
+          </div>
+        </section>
+      </div>
+    </Container>
+  </article>
+</BaseLayout>

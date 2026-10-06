@@ -39,6 +39,8 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
       <button type="button" popovertarget="site-map" class="cursor-pointer transition hover:text-zinc-200">
         {t.footer.sitemapLabel}
       </button>
+      <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
+      <a href={localizedUrl("/legal", lang)} class="transition hover:text-zinc-200">{t.footer.legal}</a>
     </p>
 
     <ul class="flex items-center gap-6">
@@ -118,6 +120,9 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
           }
           <li>
             <a href={cv.href} download={cv.filename} class={mapLink}>{t.footer.cv}</a>
+          </li>
+          <li>
+            <a href={localizedUrl("/legal", lang)} class={mapLink}>{t.footer.legal}</a>
           </li>
         </ul>
       </div>

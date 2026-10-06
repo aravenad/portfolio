@@ -14,6 +14,8 @@ const HomeEn = (await import("../../src/pages/en/index.astro")).default;
 const ProjectsIndexEn = (await import("../../src/pages/en/projects/index.astro")).default;
 const ProjectsPageEn = (await import("../../src/pages/en/projects/page/[page].astro")).default;
 const ProjectDetailEn = (await import("../../src/pages/en/projects/[slug].astro")).default;
+const Legal = (await import("../../src/pages/legal.astro")).default;
+const LegalEn = (await import("../../src/pages/en/legal.astro")).default;
 
 /**
  * Une route générée. Le type est écrit à la main : un `import()` dynamique d'un
@@ -395,6 +397,64 @@ describe("version anglaise", () => {
       expect(link.getAttribute("href")).toMatch(/^\/portfolio\/en\/projects\//);
     }
     expect(document.querySelector("article header")?.textContent).toContain("Completed");
+  });
+});
+
+describe("mentions légales", () => {
+  // Ce que la LCEN (art. 1-1) demande, et ce que le site choisit d'y ajouter.
+  it("nomment l'éditeur, son contact et l'hébergeur avec son adresse", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    const text = document.body.textContent ?? "";
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Mentions légales");
+    expect(text).toContain(site.author);
+    expect(document.querySelector(`a[href="mailto:${site.email}"]`)).toBeTruthy();
+    expect(document.querySelector("address")?.textContent).toContain(site.host.street);
+    expect(document.querySelector("address")?.textContent).toContain(site.host.city);
+  });
+
+  it("ne publient ni adresse postale ni téléphone de l'éditeur", async () => {
+    // Choix assumé d'un éditeur non professionnel : les seules adresses de la
+    // page sont celles de l'hébergeur et du bureau d'enregistrement.
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    const addresses = [...document.querySelectorAll("address")].map((a) => a.textContent ?? "");
+
+    expect(addresses).toHaveLength(2);
+    expect(addresses[0]).toContain(site.host.name);
+    expect(addresses[1]).toContain(site.registrar.name);
+    expect(document.querySelector('a[href^="tel:"]')).toBeNull();
+  });
+
+  it("citent le bureau d'enregistrement sans le faire passer pour l'hébergeur", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    const section = document.querySelector('[aria-labelledby="legal-domain"]')?.textContent ?? "";
+
+    expect(section).toContain(site.registrar.domain);
+    expect(section).toContain("n'héberge pas le site");
+  });
+
+  it("titrent la page et la décrivent pour les moteurs", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+
+    expect(document.title).toBe(`Mentions légales | ${site.author}`);
+    expect(meta(document, "description")).toContain("hébergeur");
+  });
+
+  it("n'emploient aucune ancre de l'accueil, que la barre surveille", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+
+    for (const id of ["about", "skills", "soft-skills", "career", "projects", "contact"]) {
+      expect(document.getElementById(id), id).toBeNull();
+    }
+  });
+
+  it("existent en anglais, à la même adresse sous /en/", async () => {
+    const { document } = await renderPage(LegalEn, { request: request("/portfolio/en/legal") });
+
+    expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Legal notice");
+    expect(document.querySelector("address")?.textContent).toContain("United States");
+    expect(document.body.textContent).toContain("Switzerland");
   });
 });
 

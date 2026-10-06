@@ -3,8 +3,8 @@
 Portfolio personnel de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : vingt-deux pages HTML (onze en français, onze en
-anglais), une feuille de style et environ 28 Ko de JavaScript (9 Ko compressés).
+Site entièrement statique : vingt-quatre pages HTML (douze en français, douze
+en anglais), une feuille de style et environ 28 Ko de JavaScript (9 Ko compressés).
 Ce JavaScript se limite au routeur de transitions d'Astro et à une dizaine de
 petits comportements (menu, navigation active, apparition au défilement, thème,
 plan du site, texte replié sur téléphone).
@@ -24,6 +24,12 @@ Pensé aussi pour le téléphone, où un recruteur ouvre souvent le lien en prem
 Sur grand écran, l'espace libre sous la fiche d'À propos propose de prendre
 contact ou de télécharger le CV.
 
+Les mentions légales (`/legal`, liées depuis le pied de page) nomment l'éditeur,
+son contact, l'hébergeur (GitHub Pages) et le bureau d'enregistrement du domaine
+(Infomaniak), et disent ce que le site garde des visiteurs : rien hors du
+navigateur. Éditeur non professionnel, Damien n'y publie ni adresse
+postale ni téléphone, comme le permet l'article 1-1 de la LCEN.
+
 Architecture, fonctionnement, évolutions et workflow de publication :
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -34,7 +40,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 631 tests
+npm test         # 638 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -83,6 +89,7 @@ l'autre. Les tests signalent une version anglaise qui ne suit plus la française
 | :--- | :--- | :--- |
 | Textes de l'interface (titres, boutons, accueil, contact…) | `src/data/ui.ts` (`fr`) | `src/data/ui.ts` (`en`) |
 | Coordonnées, nom affiché dans la barre (`brand`) | `src/data/site.ts` | commun |
+| Mentions légales : textes / hébergeur et domaine (`host`, `registrar`) | `legal` dans `src/data/ui.ts` / `src/data/site.ts` | `legal` (`en`) / commun |
 | Navigation | `navLinks` dans `src/data/site.ts` | `navLinksEn` |
 | Compétences techniques | `technicalSkills` dans `src/data/skills.ts` | commun |
 | Compétences transversales | `softSkills` | `softSkillsEn` |

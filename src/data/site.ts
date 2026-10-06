@@ -16,6 +16,30 @@ export const site = {
   email: "damien.aravena@gmail.com",
   github: "https://github.com/aravenad",
   linkedin: "https://www.linkedin.com/in/aravenad/",
+  /**
+   * L'hébergeur, que les mentions légales doivent nommer (LCEN, art. 1-1).
+   * Adresse relevée le 6 octobre 2026 dans la déclaration de confidentialité
+   * de GitHub. GitHub ne publie pas de téléphone, et un éditeur non
+   * professionnel n'est tenu de donner que le nom et l'adresse.
+   */
+  host: {
+    name: "GitHub Pages (GitHub, Inc.)",
+    street: "88 Colin P. Kelly Jr. Street",
+    city: "San Francisco, CA 94107",
+    url: "https://pages.github.com",
+    privacy: "https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement",
+  },
+  /**
+   * Le bureau d'enregistrement du domaine, qui en gère aussi les DNS. Il
+   * n'héberge rien : la LCEN ne l'exige pas, il est cité par transparence.
+   */
+  registrar: {
+    domain: "damien-aravena.fr",
+    name: "Infomaniak Network SA",
+    street: "Rue Eugène-Marziano 25",
+    city: "1227 Les Acacias (Genève)",
+    url: "https://www.infomaniak.com",
+  },
 } as const;
 
 /**

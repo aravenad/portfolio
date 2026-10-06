@@ -14,6 +14,8 @@ const routes = [
   "en/",
   "en/projects",
   "en/projects/developpement-application",
+  "legal",
+  "en/legal",
 ];
 
 for (const route of routes) {
