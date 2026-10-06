@@ -584,6 +584,17 @@ html {
 }
 
 /*
+ * Sur téléphone, le premier titre de la fiche suit de près le sommaire replié :
+ * sa marge de chapitre (2,5em) s'ajoutait à l'écart déjà posé, et repoussait
+ * « Contexte » d'un vide de plus.
+ */
+@media (width < 64rem) {
+  .prose > :first-child {
+    margin-top: 0;
+  }
+}
+
+/*
  * Le header est collant sur 4rem : une ancre du sommaire s'arrêterait sinon
  * derrière lui, et le titre visé serait le seul mot que le lecteur ne verrait
  * pas. Même rôle que le `scroll-mt-16` des sections de l'accueil, avec une

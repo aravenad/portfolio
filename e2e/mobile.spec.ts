@@ -40,12 +40,46 @@ test("choisir une section referme le menu et y mène", async ({ page }) => {
   await expect(page.locator("#career")).toBeInViewport();
 });
 
+test("une section choisie au menu arrive avec son titre juste sous le header", async ({ page }) => {
+  // Arrêtée pile sous le header, la section laissait sa marge haute (6rem)
+  // entre lui et le titre : on avait l'impression d'arriver trop tôt.
+  await toggle(page).click();
+  await clickInPlace(page, navLink(page, "Parcours"));
+  await expect(page.locator("#career")).toBeInViewport();
+
+  const gap = async () =>
+    page.evaluate(
+      () =>
+        document.querySelector("#career h2")!.getBoundingClientRect().top -
+        document.querySelector("header")!.getBoundingClientRect().bottom,
+    );
+  await expect.poll(gap).toBeGreaterThanOrEqual(24);
+  await expect.poll(gap).toBeLessThanOrEqual(40);
+});
+
 test("les réglages de langue et de thème restent accessibles", async ({ page }) => {
   await page.locator("[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 
   await page.locator("a[data-lang-switch]").click();
   await expect(page).toHaveURL(/\/en\/$/);
+});
+
+test("le sommaire replié se loge contre le filet de l'en-tête de la fiche", async ({ page }) => {
+  // Un seul filet au-dessus du sommaire : le sien et celui de l'en-tête, séparés
+  // par un vide, faisaient une double ligne.
+  await page.goto("projects/developpement-application");
+  const [headerBottom, tocTop, tocBorderTop] = await page.evaluate(() => {
+    const details = document.querySelector("[data-toc-details]")!;
+    return [
+      document.querySelector("article header")!.getBoundingClientRect().bottom,
+      details.getBoundingClientRect().top,
+      getComputedStyle(details).borderTopWidth,
+    ];
+  });
+
+  expect(Math.abs(tocTop - headerBottom)).toBeLessThanOrEqual(1);
+  expect(tocBorderTop).toBe("0px");
 });
 
 test("le sommaire replié se referme sur la section choisie", async ({ page }) => {

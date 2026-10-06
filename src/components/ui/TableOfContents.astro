@@ -68,9 +68,11 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
         {/*
           Deux filets plutôt qu'une carte : c'est déjà la façon dont la fiche
           sépare ses parties — sous l'en-tête, au-dessus des projets voisins —
-          et un encadré ferait du sommaire un objet à part sur la page.
+          et un encadré ferait du sommaire un objet à part sur la page. Celui du
+          haut est le filet de l'en-tête, contre lequel le sommaire se loge ;
+          il n'en pose donc qu'un, en dessous.
         */}
-        <details data-toc-details class="border-y border-zinc-900 py-3">
+        <details data-toc-details class="border-b border-zinc-900 py-3">
           <summary
             class:list={[
               title,

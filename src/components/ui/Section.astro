@@ -10,7 +10,17 @@ interface Props extends HTMLAttributes<"section"> {
 const { id, class: className, ...rest } = Astro.props;
 ---
 
-<section id={id} class:list={["scroll-mt-16 py-24 sm:py-32 lg:py-40", className]} {...rest}>
+{/*
+  Une ancre de la navigation arrête la section sous le header collant (4rem).
+  Sur téléphone, sa marge haute (6rem) laissait alors le titre à 10rem du haut
+  de l'écran, un vide qui donnait l'impression d'arriver trop tôt : la section
+  remonte sous le header, et le titre s'arrête à 2rem de lui.
+*/}
+<section
+  id={id}
+  class:list={["scroll-mt-0 py-24 sm:scroll-mt-16 sm:py-32 lg:py-40", className]}
+  {...rest}
+>
   <Container>
     <slot />
   </Container>

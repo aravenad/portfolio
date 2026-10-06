@@ -294,6 +294,19 @@ describe("fiche d'un projet", () => {
     ]);
   });
 
+  it("légende chaque voisin : précédent, puis suivant", async () => {
+    const props = await propsFor("projet-4");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-4"),
+      props,
+    });
+    const captions = [...document.querySelectorAll('nav[aria-label*="précédent"] a')].map(
+      (link) => link.firstElementChild?.textContent?.trim(),
+    );
+
+    expect(captions).toEqual(["Précédent", "Suivant"]);
+  });
+
   it("n'invente pas de voisin avant le premier projet", async () => {
     const props = await propsFor("projet-1");
     const { document } = await renderPage(ProjectDetail, {

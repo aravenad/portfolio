@@ -60,7 +60,7 @@ const meta = [team, year?.toString()].filter(Boolean);
 
   <article class="py-14 sm:py-20">
     <Container>
-      <header class="border-b border-zinc-900 pb-12">
+      <header class="border-b border-zinc-900 pb-8 sm:pb-12">
         <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{title}</h1>
 
         <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">{summary}</p>
@@ -100,10 +100,15 @@ const meta = [team, year?.toString()].filter(Boolean);
         Les deux blocs sont placés explicitement sur la même ligne : c'est la
         hauteur du texte qui donne au sommaire collant sa course.
       */}
-      <div class="mt-14 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
+      {/*
+        Sous lg, le sommaire replié vient se loger contre le filet de l'en-tête,
+        qui lui sert de bord haut : un second filet, séparé du premier par un
+        vide, faisait une double ligne.
+      */}
+      <div class="lg:mt-14 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
         <TableOfContents headings={tocHeadings} class="lg:col-start-2 lg:row-start-1" />
 
-        <div class="prose mt-10 max-w-3xl lg:col-start-1 lg:row-start-1 lg:mt-0">
+        <div class="prose mt-8 max-w-3xl sm:mt-10 lg:col-start-1 lg:row-start-1 lg:mt-0">
           <Content />
 
           {
@@ -124,19 +129,28 @@ const meta = [team, year?.toString()].filter(Boolean);
       {
         (previous || next) && (
           <nav
-            class="mt-20 grid gap-4 border-t border-zinc-900 pt-10 text-sm sm:grid-cols-2"
+            class="mt-16 grid gap-6 border-t border-zinc-900 pt-10 text-sm sm:mt-20 sm:grid-cols-2 sm:gap-4"
             aria-label={t.projects.neighbors}
           >
+            {/*
+              Une légende au-dessus de chaque titre : sur téléphone, deux titres
+              empilés, alignés à gauche, ne disaient pas lequel venait avant. Le
+              suivant n'y passe pas à droite : le bouton de retour en haut, collé
+              au coin, le recouvrait en bas de page.
+            */}
             {previous ? (
               <a
                 href={getProjectHref(previous, lang)}
-                class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100"
+                class="group flex flex-col items-start gap-1 text-zinc-400 transition hover:text-zinc-100"
               >
-                <Arrow
-                  direction="left"
-                  class="text-zinc-600 transition group-hover:-translate-x-1 group-hover:text-accent"
-                />
-                {previous.data.title}
+                <span class="text-xs uppercase tracking-wide text-zinc-600">{t.pagination.previous}</span>
+                <span class="flex items-center gap-3">
+                  <Arrow
+                    direction="left"
+                    class="text-zinc-600 transition group-hover:-translate-x-1 group-hover:text-accent"
+                  />
+                  {previous.data.title}
+                </span>
               </a>
             ) : (
               <span />
@@ -145,10 +159,13 @@ const meta = [team, year?.toString()].filter(Boolean);
             {next && (
               <a
                 href={getProjectHref(next, lang)}
-                class="group flex items-center gap-3 text-zinc-400 transition hover:text-zinc-100 sm:justify-end"
+                class="group flex flex-col items-start gap-1 text-zinc-400 transition hover:text-zinc-100 sm:items-end sm:text-right"
               >
-                {next.data.title}
-                <Arrow class="text-zinc-600 transition group-hover:translate-x-1 group-hover:text-accent" />
+                <span class="text-xs uppercase tracking-wide text-zinc-600">{t.pagination.next}</span>
+                <span class="flex items-center gap-3">
+                  {next.data.title}
+                  <Arrow class="text-zinc-600 transition group-hover:translate-x-1 group-hover:text-accent" />
+                </span>
               </a>
             )}
           </nav>
