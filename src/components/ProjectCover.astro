@@ -3,9 +3,10 @@ import type { Cover } from "../types";
 
 interface Props {
   cover?: Cover;
+  class?: string;
 }
 
-const { cover } = Astro.props;
+const { cover, class: className } = Astro.props;
 
 /*
  * La couverture d'une carte projet. Pas de capture d'écran : les projets sont
@@ -33,7 +34,7 @@ const framing: Record<Cover, string> = {
 
 <div
   aria-hidden="true"
-  class="project-cover relative aspect-[16/9] overflow-hidden border-b border-zinc-800"
+  class:list={["project-cover relative overflow-hidden border-zinc-800", className]}
   style={cover ? framing[cover] : undefined}
 >
   {
