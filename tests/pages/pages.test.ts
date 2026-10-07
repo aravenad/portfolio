@@ -426,6 +426,12 @@ describe("mentions légales", () => {
     expect(document.querySelector("address")?.textContent).toContain(site.host.city);
   });
 
+  it("renvoient à la déclaration de confidentialité de GitHub en français", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    expect(document.querySelector('a[href*="privacy-statement"]')?.getAttribute("href"))
+      .toContain("docs.github.com/fr/");
+  });
+
   it("ne publient ni adresse postale ni téléphone de l'éditeur", async () => {
     // Choix assumé d'un éditeur non professionnel : les seules adresses de la
     // page sont celles de l'hébergeur et du bureau d'enregistrement.
@@ -467,6 +473,9 @@ describe("mentions légales", () => {
     expect(document.documentElement.getAttribute("lang")).toBe("en");
     expect(document.querySelector("h1")?.textContent?.trim()).toBe("Legal notice");
     expect(document.querySelector("address")?.textContent).toContain("United States");
+    // La déclaration de confidentialité de GitHub, dans la langue de la page.
+    expect(document.querySelector('a[href*="privacy-statement"]')?.getAttribute("href"))
+      .toContain("docs.github.com/en/");
     expect(document.body.textContent).toContain("Switzerland");
   });
 });

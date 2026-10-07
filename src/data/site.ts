@@ -29,7 +29,9 @@ export const site = {
     street: "88 Colin P. Kelly Jr. Street",
     city: "San Francisco, CA 94107",
     url: "https://pages.github.com",
-    privacy: "https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement",
+    /** Sa déclaration de confidentialité, dans la langue de la page. */
+    privacy: (lang: string) =>
+      `https://docs.github.com/${lang}/site-policy/privacy-policies/github-general-privacy-statement`,
   },
   /**
    * Le bureau d'enregistrement du domaine, qui en gère aussi les DNS. Il

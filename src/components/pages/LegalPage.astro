@@ -14,7 +14,8 @@ import { getLang } from "../../lib/i18n";
  * et l'adresse de l'hébergeur. Le nom de l'éditeur et son e-mail vont au-delà,
  * par choix ; son adresse postale et son téléphone restent privés.
  */
-const t = useTranslations(getLang(Astro.url.pathname));
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
 const { legal } = t;
 
 const heading = "text-xl font-semibold text-zinc-100";
@@ -81,7 +82,7 @@ const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 tra
             {legal.privacy.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
             <p>
               {legal.privacy.hostLogs}{" "}
-              <a href={site.host.privacy} rel="noreferrer" class={link}>{legal.privacy.hostPolicy}</a>.
+              <a href={site.host.privacy(lang)} rel="noreferrer" class={link}>{legal.privacy.hostPolicy}</a>.
             </p>
           </div>
         </section>
