@@ -31,14 +31,15 @@ main {padding:15mm 10mm 12mm 9mm}
 .intro {color:#52525b;font-size:9.4pt;line-height:1.6;margin-bottom:6mm}
 main h2 {border-bottom:1px solid #d4d4d8;padding-bottom:2.5mm;margin:6mm 0 4mm}
 .company {font-size:13.2pt;font-weight:700;letter-spacing:-.02em;margin:0;color:#18181b}
-.meta {color:#62626a;font-size:8.3pt;margin:1mm 0 3mm}
-.brands {font-size:8.5pt;color:#62626a;margin:0 0 4mm}
-.role {margin:0 0 3mm;padding-left:3mm;border-left:1px solid #d4d4d8}
+.meta {color:#62626a;font-size:8.3pt;margin:.6mm 0 3mm}
+.role {margin:0 0 3mm}
+.row {display:flex;justify-content:space-between;align-items:baseline;gap:4mm;margin-bottom:.9mm}
 h3 {font-size:10.2pt;color:#18181b;line-height:1.35;margin:0;font-weight:700}
-.date {font-size:8pt;color:#62626a;margin:1mm 0 1.7mm}
-.role p:last-child {margin-bottom:0;font-size:9pt;line-height:1.5}
-.education {margin-bottom:4mm}
-.education p {font-size:8.8pt;margin:1mm 0}
+.date {font-size:8pt;color:#62626a;white-space:nowrap}
+.role p {margin:0;font-size:9pt;line-height:1.5}
+.role .stack {font-size:8pt;color:#62626a;margin-top:.6mm}
+.education {margin-bottom:3mm}
+.education p {font-size:8.8pt;margin:0}
 .note {font-size:8pt!important;color:#62626a}
 </style>
 <div class="page">
@@ -62,19 +63,21 @@ h3 {font-size:10.2pt;color:#18181b;line-height:1.35;margin:0;font-weight:700}
 </aside>
 <main>
 <div class="title">Stage en développement<br>informatique / web</div>
-<p class="intro">Étudiant en BUT Informatique, je recherche en priorité un stage en développement web du <strong>19 avril au 25 juin 2027</strong>, prolongeable jusqu’au <strong>9 juillet 2027</strong>, idéalement à Grenoble ou alentour, pour mettre en pratique mes compétences en HTML/CSS et JavaScript. Je recherche aussi une alternance en développement, orientée web, pour ma troisième année.</p>
+<p class="intro">Étudiant en BUT Informatique, je recherche un stage en développement web à Grenoble ou alentour, du <strong>19 avril au 25 juin 2027</strong>.</p>
 <h2>Expérience professionnelle</h2>
 <p class="company">Horizon Groupe</p>
-<p class="meta">Juillet 2025 - juin 2026 · Villard-Bonnot</p>
-<p class="brands">Microstore · Iso Rhône-Alpes · Chryséis</p>
-<div class="role"><h3>Technicien informatique</h3><p class="date">Mai - juin 2026 · CDI</p><p>Masterisation et préparation d’équipements pour Saint-Gobain. Configuration de matériels Lenovo, Microsoft, Honeywell et Cisco.</p></div>
-<div class="role"><h3>Technicien diagnostic</h3><p class="date">Janvier - mai 2026 · CDI</p><p>Audit et qualification de parcs informatiques destinés au réemploi pour Capgemini, Saint-Gobain et Nexity.</p></div>
-<div class="role"><h3>Technicien réception</h3><p class="date">Septembre 2025 - janvier 2026 · CDI</p><p>Gestion des flux entrants de matériel informatique, contrôle des réceptions et suivi des stocks dans l’ERP.</p></div>
-<div class="role"><h3>Assistant administratif / Technicien réception</h3><p class="date">Juillet - août 2025 · CDD</p><p>Réception et saisie du matériel, suivi administratif et traçabilité des équipements.</p></div>
+<p class="meta">2025 - 2026 · Villard-Bonnot · Microstore · Iso Rhône-Alpes · Chryséis</p>
+<div class="role"><div class="row"><h3>Technicien informatique</h3><span class="date">Mai - juin 2026 · CDI</span></div><p>Masterisation et préparation d’équipements pour Saint-Gobain. Configuration de matériels Lenovo, Microsoft, Honeywell et Cisco.</p></div>
+<div class="role"><div class="row"><h3>Technicien diagnostic</h3><span class="date">Janv. - mai 2026 · CDI</span></div><p>Audit et qualification de parcs informatiques destinés au réemploi pour Capgemini, Saint-Gobain et Nexity.</p></div>
+<div class="role"><div class="row"><h3>Technicien réception</h3><span class="date">Sept. 2025 - janv. 2026 · CDI</span></div><p>Gestion des flux entrants de matériel informatique, contrôle des réceptions et suivi des stocks dans l’ERP.</p></div>
+<h2>Projets</h2>
+<div class="role"><div class="row"><h3>Portfolio · damien-aravena.fr</h3><span class="date">Personnel · 2026</span></div><p>Site bilingue français / anglais mené de la conception au déploiement : tests de bout en bout et mise en ligne continue sur GitHub Pages.</p><p class="stack">Astro · TypeScript · Tailwind CSS · Vitest · Playwright · GitHub Actions</p></div>
+<div class="role"><div class="row"><h3>Site web institutionnel</h3><span class="date">BUT · équipe de 4 · 2024</span></div><p>Du recueil des besoins aux maquettes, puis réalisation d’un site écoconçu présentant Capgemini à des élèves de troisième.</p><p class="stack">HTML5 · CSS3 · Whimsical · GitHub</p></div>
+<div class="role"><div class="row"><h3>Serveur web Debian</h3><span class="date">BUT · seul · 2025</span></div><p>Installation et configuration d’un serveur interrogeable depuis la machine hôte, documentée dans un guide rédigé en anglais.</p><p class="stack">Apache · PHP · PostgreSQL · Linux</p></div>
 <h2>Formation</h2>
-<div class="education"><h3>BUT Informatique</h3><p class="date">2023 - 2028 · En cours</p><p>IUT2 · Université Grenoble Alpes, Grenoble</p><p class="note">Césure professionnelle : sept. 2025 - juil. 2026.</p></div>
-<div class="education"><h3>Classe préparatoire TSI</h3><p class="date">2020 - 2023</p><p>Lycée Gaspard Monge, Chambéry</p></div>
-<div class="education"><h3>Baccalauréat STI2D</h3><p class="date">2020</p><p>Lycée Pablo Neruda, Saint-Martin-d’Hères</p></div>
+<div class="education"><div class="row"><h3>BUT Informatique</h3><span class="date">2023 - 2028 · En cours</span></div><p>IUT2 · Université Grenoble Alpes, Grenoble</p><p class="note">Césure professionnelle : sept. 2025 - juil. 2026.</p></div>
+<div class="education"><div class="row"><h3>Classe préparatoire TSI</h3><span class="date">2020 - 2023</span></div><p>Lycée Gaspard Monge, Chambéry</p></div>
+<div class="education"><div class="row"><h3>Baccalauréat STI2D</h3><span class="date">2020</span></div><p>Lycée Pablo Neruda, Saint-Martin-d’Hères</p></div>
 </main>
 </div>
 </html>
