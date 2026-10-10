@@ -87,3 +87,29 @@ test("une ancre de l'accueil atteinte depuis une autre page est rejointe", async
   await expect(page).toHaveURL(/:\d+\/#contact$/);
   await expect(page.locator("#contact")).toBeInViewport();
 });
+
+test("le fil d'Ariane passe dans la barre une fois défilé sous elle, et y mène", async ({
+  page,
+}) => {
+  await page.goto("projects/developpement-application");
+  // La fiche a son propre `<header>` : la barre est le seul `banner`.
+  const header = page.getByRole("banner");
+  const trail = page.locator("[data-header-trail]");
+
+  // En haut de page, le fil de la page suffit : celui de la barre reste caché.
+  await expect(header).not.toHaveAttribute("data-trail");
+  await expect(trail.getByRole("link", { name: "Projets" })).toBeHidden();
+
+  await scrollToY(page, 600);
+  await expect(header).toHaveAttribute("data-trail");
+  await expect(page.locator("[data-home-link]")).toBeVisible();
+  await expect(trail).toContainText("Développement d'une application");
+
+  const projects = trail.getByRole("link", { name: "Projets" });
+  await afterNavigation(page, () => clickInPlace(page, projects));
+  await expect(page).toHaveURL(/\/projects$/);
+
+  // Le header a persisté : il porte maintenant le fil de la liste, caché en haut.
+  await expect(header).not.toHaveAttribute("data-trail");
+  await expect(trail).toHaveText("Projets");
+});

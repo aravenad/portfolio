@@ -9,6 +9,7 @@ import {
   nextBarScrolled,
   normalizePath,
   readingLine,
+  trailInBar,
 } from "../../src/lib/nav";
 
 /**
@@ -143,6 +144,15 @@ describe("initialBarScrolled", () => {
     expect(initialBarScrolled(0)).toBe(false);
     expect(initialBarScrolled(BAR.down)).toBe(false);
     expect(initialBarScrolled(900)).toBe(true);
+  });
+});
+
+describe("trailInBar", () => {
+  it("attend que le fil de la page soit passé entièrement sous la barre", () => {
+    expect(trailInBar(120, 64)).toBe(false);
+    expect(trailInBar(65, 64)).toBe(false);
+    expect(trailInBar(64, 64)).toBe(true);
+    expect(trailInBar(-300, 64)).toBe(true);
   });
 });
 

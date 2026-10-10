@@ -89,6 +89,21 @@ export function initialBarScrolled(y: number): boolean {
 }
 
 /**
+ * Le fil d'Ariane passe-t-il dans la barre ?
+ *
+ * Dès que celui de la page a glissé entièrement sous elle, et pas avant : la
+ * barre se réduit aux premiers pixels de défilement, quand le fil de la page est
+ * encore bien visible juste en dessous. Il s'y lirait alors deux fois. Au même
+ * seuil, il repart en remontant, au moment où celui de la page réapparaît.
+ *
+ * `breadcrumbBottom` : bas du fil de la page, `barBottom` : bas de la barre,
+ * tous deux dans la fenêtre.
+ */
+export function trailInBar(breadcrumbBottom: number, barBottom: number): boolean {
+  return breadcrumbBottom <= barBottom;
+}
+
+/**
  * Ligne de lecture du surlignage au défilement : au premier tiers de la
  * fenêtre, sous le header collant.
  */

@@ -1,4 +1,5 @@
 ---
+import Chevron from "./Chevron.astro";
 import { useTranslations } from "../../data/ui";
 import { getLang, localizedUrl } from "../../lib/i18n";
 
@@ -22,25 +23,12 @@ const t = useTranslations(lang);
 const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
 ---
 
-<nav aria-label={t.breadcrumb.label} class="text-sm">
+<nav aria-label={t.breadcrumb.label} data-breadcrumb class="text-sm">
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500">
     {
       crumbs.map((crumb, index) => (
         <li class="crumb flex items-center gap-x-2" style={`--index: ${index}`}>
-          {index > 0 && (
-            <svg
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-              class="size-3.5 text-zinc-700"
-            >
-              <path d="m6 3.5 4.5 4.5L6 12.5" />
-            </svg>
-          )}
+          {index > 0 && <Chevron />}
 
           {crumb.href ? (
             <a href={localizedUrl(crumb.href, lang)} class="transition hover:text-zinc-200">
@@ -56,6 +44,48 @@ const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
     }
   </ol>
 </nav>
+
+{/*
+  Le même fil, tel que la barre l'affiche une fois celui-ci défilé sous elle
+  (voir Header.astro). Le header persiste d'une page à l'autre et ne se rend
+  donc qu'une fois : c'est à chaque page de lui fournir son fil, qu'il recopie.
+
+  L'accueil n'y figure pas : le nom du site, juste avant, en tient lieu. Ni
+  `<nav>` ni `aria-current` : le fil de la page reste le seul que les lecteurs
+  d'écran annoncent comme tel. Sous 1024 px, la place manque à côté des liens :
+  il ne reste que le dernier niveau, qui remplace le nom du site : sans chevron
+  devant, et du poids du nom.
+*/}
+<template data-trail-source>
+  <ol class="flex min-w-0 items-center gap-x-2 text-sm text-zinc-500 lg:pr-4 lg:pl-2">
+    {
+      items.map((crumb, index) => {
+        const last = index === items.length - 1;
+
+        return (
+          <li
+            class:list={[
+              "trail-crumb items-center gap-x-2",
+              last ? "flex min-w-0" : "hidden shrink-0 lg:flex",
+            ]}
+            style={`--index: ${index}`}
+          >
+            <Chevron class={last ? "max-lg:hidden" : undefined} />
+            {crumb.href ? (
+              <a href={localizedUrl(crumb.href, lang)} class="transition hover:text-zinc-200">
+                {crumb.label}
+              </a>
+            ) : (
+              <span class="truncate text-zinc-300 max-lg:font-medium max-lg:text-zinc-200">
+                {crumb.label}
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</template>
 
 <style>
   /*

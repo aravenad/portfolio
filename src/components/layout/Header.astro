@@ -66,13 +66,31 @@ const setting = [
   </div>
 
   <Container class="header-bar relative flex h-16 items-center justify-between gap-4">
-    <a
-      href={localizedUrl("/", lang)}
-      data-home-link
-      class="font-semibold tracking-tight transition hover:text-white"
-    >
-      {site.brand}
-    </a>
+    {/*
+      Le nom, puis le fil d'Ariane de la page une fois celui-ci défilé sous la
+      barre : le nom en devient le premier niveau, à la place de « Accueil ». Le
+      fil est recopié du `<template>` que rend chaque Breadcrumb (script plus
+      bas) ; vide sur les pages qui n'en ont pas.
+
+      Sous 1024 px, à côté du nom et des liens, il ne restait au titre que trois
+      lettres : le fil s'y pose donc par-dessus le nom, qui s'efface le temps
+      qu'il est là. `flex-1` lui donne toute la place jusqu'aux liens.
+    */}
+    <div class="header-start relative flex min-w-0 flex-1 items-center">
+      <a
+        href={localizedUrl("/", lang)}
+        data-home-link
+        class="shrink-0 font-semibold tracking-tight transition hover:text-white"
+      >
+        {site.brand}
+      </a>
+
+      <div
+        data-header-trail
+        class="header-trail absolute inset-0 flex min-w-0 items-center lg:static"
+      >
+      </div>
+    </div>
 
     {/*
       Navigation, langue et thème, écartés ensemble vers le bord en haut de page.
@@ -80,7 +98,7 @@ const setting = [
       langue, le thème, puis le bouton du menu, au bord. Au-delà, la navigation
       repasse en tête (`sm:order-first`).
     */}
-    <div class="header-end -mr-2 flex items-center gap-1 sm:gap-0">
+    <div class="header-end -mr-2 flex shrink-0 items-center gap-1 sm:gap-0">
       <a
         href={switchLangPath(currentPath, otherLang)}
         hreflang={otherLang}
@@ -260,14 +278,15 @@ const setting = [
       transition: transform var(--bar-duration) var(--bar-ease);
     }
 
-    /* Le logo garde aussi son survol, que cette règle écraserait sinon. */
-    .header-bar > [data-home-link] {
-      transition:
-        transform var(--bar-duration) var(--bar-ease),
-        color 0.15s;
+    /*
+     * Le groupe du nom, et non le nom seul : le fil d'Ariane qui le suit doit
+     * partir du même endroit. Le survol du nom reste sur le lien lui-même.
+     */
+    .header-start {
+      transition: transform var(--bar-duration) var(--bar-ease);
     }
 
-    header:not([data-scrolled]) .header-bar > [data-home-link] {
+    header:not([data-scrolled]) .header-start {
       transform: translateX(calc(-1 * var(--spread)));
     }
 
@@ -312,17 +331,124 @@ const setting = [
     }
   }
 
+  /*
+   * Fil d'Ariane de la barre (script plus bas). Il entre comme celui de la page,
+   * en cascade : chaque niveau glisse de 4 px vers la droite, à 40 ms
+   * d'intervalle, sur la même courbe à léger dépassement. Il repart d'un bloc,
+   * plus vite : une sortie n'a rien à raconter.
+   *
+   * Caché, il est aussi `visibility: hidden`, et pas seulement transparent : ses
+   * liens sortent de l'ordre de tabulation et de ce que lit un lecteur d'écran.
+   * La visibilité bascule à la fin du fondu de sortie, au début de l'entrée.
+   *
+   * `:global` : les niveaux viennent du `<template>` de Breadcrumb, et ne
+   * portent donc pas l'attribut de portée des styles de ce composant.
+   */
+  .header-trail :global(.trail-crumb) {
+    opacity: 0;
+    translate: -4px 0;
+    visibility: hidden;
+    transition:
+      opacity 0.15s ease-in,
+      translate 0.15s ease-in,
+      visibility 0s linear 0.15s;
+  }
+
+  header[data-scrolled][data-trail] .header-trail :global(.trail-crumb) {
+    opacity: 1;
+    translate: none;
+    visibility: visible;
+    transition:
+      opacity 0.25s ease-out,
+      translate 0.25s cubic-bezier(0.34, 1.12, 0.64, 1),
+      visibility 0s;
+    transition-delay: calc(var(--index) * 40ms);
+  }
+
+  /*
+   * Posé par-dessus le nom sous 1024 px, le conteneur du fil ne doit pas lui
+   * prendre ses clics quand il est vide ou caché : seuls ses niveaux visibles
+   * en reçoivent.
+   */
+  .header-trail {
+    pointer-events: none;
+  }
+
+  .header-trail :global(.trail-crumb) {
+    pointer-events: auto;
+  }
+
+  /*
+   * Au-delà de 1024 px, le nom devient le premier niveau du fil : il en prend
+   * le gris, la taille, la graisse et l'approche, comme « Projets », pour que
+   * seule la page courante ressorte. Son survol reste celui du nom.
+   *
+   * Noto Sans est variable : la graisse s'interpole au lieu de sauter, comme la
+   * taille. Le nom se réduit en même temps que le fil arrive, sur la même durée,
+   * et le fil glisse de ce qu'il perd en largeur sans que ce soit un à-coup.
+   */
+  @media (width >= 64rem) {
+    [data-home-link] {
+      transition:
+        color 0.15s,
+        font-size 0.25s ease-out,
+        font-weight 0.25s ease-out,
+        letter-spacing 0.25s ease-out;
+    }
+
+    header[data-scrolled][data-trail] [data-home-link] {
+      font-size: var(--text-sm);
+      font-weight: 400;
+      letter-spacing: normal;
+    }
+
+    header[data-scrolled][data-trail] [data-home-link]:not(:hover) {
+      color: var(--color-zinc-500);
+    }
+  }
+
+  /*
+   * Sous 1024 px, le nom s'efface pendant que le fil prend sa place, puis
+   * revient quand il repart. Même rythme que le fil, dans les deux sens.
+   */
+  @media (width < 64rem) {
+    [data-home-link] {
+      transition:
+        color 0.15s,
+        opacity 0.15s ease-in,
+        visibility 0s;
+    }
+
+    header[data-scrolled][data-trail] [data-home-link] {
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        color 0.15s,
+        opacity 0.15s ease-in,
+        visibility 0s linear 0.15s;
+    }
+  }
+
+  /* Sans mouvement, il ne reste que le fondu. */
+  @media (prefers-reduced-motion: reduce) {
+    .header-trail :global(.trail-crumb) {
+      translate: none;
+    }
+  }
+
   /* Premier affichage déjà défilé (rechargement, ancre) : pas d'animation. */
   header[data-instant] .header-backdrop,
-  header[data-instant] .header-bar > [data-home-link],
+  header[data-instant] .header-start,
   header[data-instant] .header-end,
-  header[data-instant] :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
+  header[data-instant] :is([data-nav-link], [data-lang-switch], [data-theme-toggle]),
+  header[data-instant] .header-trail :global(.trail-crumb),
+  header[data-instant] [data-home-link] {
     transition: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .header-backdrop,
-    .header-bar > [data-home-link],
+    .header-start,
     .header-end,
     :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
       transition: none;
@@ -463,7 +589,7 @@ const setting = [
 
 <script>
   import { onEachPage } from "../../lib/enhance";
-  import { barReturnThreshold, initialBarScrolled, nextBarScrolled } from "../../lib/nav";
+  import { barReturnThreshold, initialBarScrolled, nextBarScrolled, trailInBar } from "../../lib/nav";
 
   /**
    * Bascule la barre entre ses deux états selon le défilement.
@@ -520,11 +646,57 @@ const setting = [
     const update = () => {
       const y = window.scrollY;
       set(nextBarScrolled({ scrolled: header.hasAttribute("data-scrolled"), y, lastY, returnAt }));
+      placeTrail();
       lastY = y;
     };
 
+    /*
+     * Fil d'Ariane de la barre : recopié du `<template>` du Breadcrumb de la
+     * page, puis affiché dès que le fil de la page est passé sous la barre
+     * (`trailInBar`, src/lib/nav.ts). Vidé sur une page qui n'en a pas.
+     *
+     * Le header persiste : en arrivant d'une page où il était affiché, l'ancien
+     * fil repart d'abord en fondu, et n'est remplacé qu'une fois invisible. Il
+     * ne peut pas revenir entre-temps : tant que la copie n'est pas faite, son
+     * placement est suspendu.
+     */
+    const bar = header.querySelector<HTMLElement>(".header-bar");
+    const trail = header.querySelector<HTMLElement>("[data-header-trail]");
+    const crumbs = document.querySelector<HTMLElement>("main [data-breadcrumb]");
+    const source = document.querySelector<HTMLTemplateElement>("main template[data-trail-source]");
+    let filled = false;
+
+    const placeTrail = () => {
+      if (!filled) return;
+
+      const inBar =
+        crumbs && bar
+          ? trailInBar(crumbs.getBoundingClientRect().bottom, bar.getBoundingClientRect().bottom)
+          : false;
+
+      header.toggleAttribute("data-trail", inBar);
+    };
+
+    const fillTrail = () => {
+      trail?.replaceChildren(...(source ? [source.content.cloneNode(true)] : []));
+      filled = true;
+      placeTrail();
+    };
+
+    if (header.hasAttribute("data-trail")) {
+      header.removeAttribute("data-trail");
+      // La durée du fondu de sortie, dans le style plus haut.
+      const timer = window.setTimeout(fillTrail, 150);
+      signal.addEventListener("abort", () => window.clearTimeout(timer));
+    } else {
+      fillTrail();
+    }
+
     // Sans sens de défilement connu (chargement, navigation) : seul le seuil bas compte.
-    const sync = () => set(initialBarScrolled(window.scrollY));
+    const sync = () => {
+      set(initialBarScrolled(window.scrollY));
+      placeTrail();
+    };
 
     if (firstPage) {
       firstPage = false;
@@ -540,6 +712,8 @@ const setting = [
     }
 
     window.addEventListener("scroll", update, { passive: true, signal });
+    // Un fil qui passe sur deux lignes, ou une barre qui change de hauteur.
+    window.addEventListener("resize", placeTrail, { signal });
   });
 </script>
 
