@@ -337,6 +337,15 @@ const setting = [
    * d'intervalle, sur la même courbe à léger dépassement. Il repart d'un bloc,
    * plus vite : une sortie n'a rien à raconter.
    *
+   * ⚠️ LE NOM ET LE FIL SE SUCCÈDENT, ILS NE SE CHEVAUCHENT PAS. Le nom change
+   * d'abord (il se réduit au-delà de 1024 px, s'efface en deçà), le fil n'entre
+   * qu'ensuite ; au retour, le fil repart avant que le nom ne revienne. Menés
+   * ensemble, le nom qui rétrécissait tirait le fil de 11 px vers la gauche
+   * pendant qu'il glissait de 4 px vers la droite : le premier chevron avançait,
+   * puis reculait d'un cran avant la fin. Sous 1024 px, l'effacement du nom se
+   * chevauchait avec l'entrée au même endroit. `--trail-wait` est cette attente,
+   * soit la durée du changement du nom comme du départ du fil.
+   *
    * Caché, il est aussi `visibility: hidden`, et pas seulement transparent : ses
    * liens sortent de l'ordre de tabulation et de ce que lit un lecteur d'écran.
    * La visibilité bascule à la fin du fondu de sortie, au début de l'entrée.
@@ -344,14 +353,18 @@ const setting = [
    * `:global` : les niveaux viennent du `<template>` de Breadcrumb, et ne
    * portent donc pas l'attribut de portée des styles de ce composant.
    */
+  header {
+    --trail-wait: 0.15s;
+  }
+
   .header-trail :global(.trail-crumb) {
     opacity: 0;
     translate: -4px 0;
     visibility: hidden;
     transition:
-      opacity 0.15s ease-in,
-      translate 0.15s ease-in,
-      visibility 0s linear 0.15s;
+      opacity var(--trail-wait) ease-in,
+      translate var(--trail-wait) ease-in,
+      visibility 0s linear var(--trail-wait);
   }
 
   header[data-scrolled][data-trail] .header-trail :global(.trail-crumb) {
@@ -362,7 +375,7 @@ const setting = [
       opacity 0.25s ease-out,
       translate 0.25s cubic-bezier(0.34, 1.12, 0.64, 1),
       visibility 0s;
-    transition-delay: calc(var(--index) * 40ms);
+    transition-delay: calc(var(--trail-wait) + var(--index) * 40ms);
   }
 
   /*
@@ -384,22 +397,28 @@ const setting = [
    * seule la page courante ressorte. Son survol reste celui du nom.
    *
    * Noto Sans est variable : la graisse s'interpole au lieu de sauter, comme la
-   * taille. Le nom se réduit en même temps que le fil arrive, sur la même durée,
-   * et le fil glisse de ce qu'il perd en largeur sans que ce soit un à-coup.
+   * taille. Le nom se réduit avant que le fil n'arrive, et reprend sa taille une
+   * fois le fil reparti (voir `--trail-wait`). La couleur, elle, n'attend pas :
+   * la même transition sert au survol, qui doit répondre tout de suite.
    */
   @media (width >= 64rem) {
     [data-home-link] {
       transition:
         color 0.15s,
-        font-size 0.25s ease-out,
-        font-weight 0.25s ease-out,
-        letter-spacing 0.25s ease-out;
+        font-size var(--trail-wait) ease-out var(--trail-wait),
+        font-weight var(--trail-wait) ease-out var(--trail-wait),
+        letter-spacing var(--trail-wait) ease-out var(--trail-wait);
     }
 
     header[data-scrolled][data-trail] [data-home-link] {
       font-size: var(--text-sm);
       font-weight: 400;
       letter-spacing: normal;
+      transition:
+        color 0.15s,
+        font-size var(--trail-wait) ease-out,
+        font-weight var(--trail-wait) ease-out,
+        letter-spacing var(--trail-wait) ease-out;
     }
 
     header[data-scrolled][data-trail] [data-home-link]:not(:hover) {
@@ -408,15 +427,15 @@ const setting = [
   }
 
   /*
-   * Sous 1024 px, le nom s'efface pendant que le fil prend sa place, puis
-   * revient quand il repart. Même rythme que le fil, dans les deux sens.
+   * Sous 1024 px, le nom s'efface avant que le fil ne prenne sa place, et ne
+   * revient qu'une fois le fil reparti (voir `--trail-wait`).
    */
   @media (width < 64rem) {
     [data-home-link] {
       transition:
         color 0.15s,
-        opacity 0.15s ease-in,
-        visibility 0s;
+        opacity var(--trail-wait) ease-out var(--trail-wait),
+        visibility 0s linear var(--trail-wait);
     }
 
     header[data-scrolled][data-trail] [data-home-link] {
@@ -424,8 +443,8 @@ const setting = [
       visibility: hidden;
       transition:
         color 0.15s,
-        opacity 0.15s ease-in,
-        visibility 0s linear 0.15s;
+        opacity var(--trail-wait) ease-in,
+        visibility 0s linear var(--trail-wait);
     }
   }
 
