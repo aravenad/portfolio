@@ -38,7 +38,7 @@ justifie : ce document n'en donne que la carte.
 | `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) | Nom stable : c'est lui qui fait l'URL |
 | `tests/` | Vitest, rangé comme `src/` | Voir §5 |
 | `e2e/` | Playwright : le site construit, dans Chromium | Voir §5 |
-| `tools/` | Sources des images générées, archives | Jamais compilé ni servi |
+| `tools/` | Sources des images générées | Jamais compilé ni servi |
 
 ## 3. Du contenu à la page
 
@@ -281,6 +281,13 @@ test ───┤            ├──> deploy
 | :--- | :--- |
 | `og.html` | Source de l'image d'aperçu `public/og-v5.png` (§6) |
 | `chrome-fade/` | Source et script de rendu du masque de fondu du fond |
-| `chrome.svg` | Ancienne matière procédurale, gardée comme source des bandeaux du CV |
-| `cv-kit/` | Valeurs de la direction artistique pour le CV, et son export public |
-| `background-archive/` | Instantané du fond précédent, pour pouvoir y revenir |
+
+Le dossier `tools/` ne contient dans le dépôt que ces sources. L'ancien fond
+(`background-archive/`, commit `7b8785d`) et l'étude du fond (`metal-study/`)
+ne vivent qu'en local.
+
+Le CV n'est pas fabriqué ici. Ses sources, ses variantes et les candidatures
+vivent dans `candidatures/`, exclu du dépôt parce qu'il porte le téléphone et
+l'adresse mail. Le site n'en reçoit que l'export public, copié à la main dans
+`public/cv-damien-aravena-bravo-public.pdf` : un nouveau CV public, c'est ce
+seul fichier à remplacer, sous le même nom.

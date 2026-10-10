@@ -43,19 +43,16 @@ Claude outputs/
 # livrable — seuls les fichiers retenus vivent dans src/assets/.
 tools/metal-study/
 
-# CV : la version complète porte le téléphone et l'adresse mail, que le site
-# n'affiche nulle part. Le dépôt est public et un commit est définitif — même
-# supprimé, le fichier resterait dans l'historique. Seule `cv-public.html` est
-# suivie, et c'est son export qui est servi depuis public/.
-tools/cv-kit/cv.html
-# Même raison pour les variantes de candidature, qui portent elles aussi le
-# téléphone : toute nouvelle `cv-*.html` est écartée par défaut, et seule la
-# version publique est explicitement suivie.
-tools/cv-kit/cv-*.html
-!tools/cv-kit/cv-public.html
-# Journal de travail du CV : il décrit aussi les candidatures hors portfolio
-# (emplois à temps partiel, disponibilités), sans rapport avec ce dépôt public.
-tools/cv-kit/CV-NOTES.md
+# Tout ce qui sert aux candidatures, hors du site : kit CV (sources HTML,
+# bandeaux, notes), CV exportés, lettres de motivation, analyses d'offres. Ils
+# portent le téléphone, l'adresse mail et des disponibilités, que le dépôt
+# public ne doit jamais contenir : un commit est définitif, même supprimé. Le
+# site n'en garde que l'export public, copié dans public/.
+candidatures/
+
+# ancien fond, archivé le 21 septembre 2026 : le commit 7b8785d le contient
+# déjà en entier, la copie n'est qu'une aide locale.
+tools/background-archive/
 
 # sorties générées : PDF exportés et aperçus de contrôle
 output/
