@@ -248,6 +248,36 @@ body::after {
   }
 }
 
+/*
+ * En clair, l'encre est graphite et le reflet doit l'éclaircir. Les mêmes stops
+ * passaient de 18 % à 40 % de luminance : un écart qui se voit sur un blanc,
+ * pas sur une encre sombre. Le reflet monte donc jusqu'à `zinc-600` (57 %), ce
+ * qui reste lisible sur le gris perle pour des corps de cette taille.
+ */
+:root[data-theme="light"] .text-chrome {
+  background-image: linear-gradient(
+    172deg,
+    var(--color-white) 0%,
+    var(--color-white) 46%,
+    var(--color-zinc-600) 63%,
+    var(--color-zinc-200) 78%,
+    var(--color-zinc-500) 100%
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme="light"] .text-chrome {
+    background-image: linear-gradient(
+      110deg,
+      var(--color-white) 32%,
+      var(--color-zinc-600) 44%,
+      var(--color-white) 50%,
+      var(--color-zinc-500) 57%,
+      var(--color-white) 68%
+    );
+  }
+}
+
 @keyframes text-chrome-shine {
   from {
     background-position: 0 0;
@@ -280,6 +310,86 @@ body::after {
  */
 :root[data-theme="light"] .surface-lit {
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 55%);
+}
+
+/*
+ * Relief des boutons : une arête lumineuse en haut, un bord bas plus sombre et
+ * une ombre portée courte, pour un objet posé sur la page plutôt qu'un contour
+ * dessiné dessus. Au clic, le bouton descend d'un pixel et perd son ombre : il
+ * s'enfonce.
+ *
+ * En sombre, une ombre se perd sur un fond presque noir : le relief y tient
+ * surtout aux deux arêtes, et au survol l'arête du haut s'avive. En clair,
+ * c'est l'ombre portée qui le donne.
+ *
+ * Les survols sont limités aux appareils qui survolent, comme ceux de
+ * Tailwind : sur un écran tactile, un survol resterait collé après le toucher.
+ */
+.surface-raised {
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 10%),
+    inset 0 -1px 0 oklch(0% 0 0 / 40%),
+    0 1px 0 oklch(0% 0 0 / 60%),
+    0 2px 6px -1px oklch(0% 0 0 / 60%);
+}
+
+/*
+ * Le bouton plein du thème sombre est blanc : son arête du haut doit être
+ * franche pour se voir, et au survol il s'allume, d'un halo qui se lit sur le
+ * noir là où un changement de teinte entre deux blancs ne se voyait pas.
+ */
+.surface-glow {
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 90%),
+    inset 0 -1px 0 oklch(0% 0 0 / 22%),
+    0 1px 0 oklch(0% 0 0 / 60%),
+    0 2px 6px -1px oklch(0% 0 0 / 60%);
+}
+
+@media (hover: hover) {
+  .surface-raised:hover {
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 16%),
+      inset 0 -1px 0 oklch(0% 0 0 / 40%),
+      0 1px 0 oklch(0% 0 0 / 60%),
+      0 2px 6px -1px oklch(0% 0 0 / 60%);
+  }
+
+  .surface-glow:hover {
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 90%),
+      inset 0 -1px 0 oklch(0% 0 0 / 15%),
+      0 0 0 1px oklch(100% 0 0 / 15%),
+      0 4px 22px -4px oklch(100% 0 0 / 45%);
+  }
+}
+
+/* Après les survols, pour l'emporter sur eux : le bouton pressé est survolé. */
+.surface-raised:active {
+  translate: 0 1px;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 10%);
+}
+
+:root[data-theme="light"] .surface-raised {
+  box-shadow:
+    inset 0 1px 0 oklch(100% 0 0 / 60%),
+    inset 0 -1px 0 oklch(0% 0 0 / 6%),
+    0 1px 1px oklch(0% 0 0 / 7%),
+    0 2px 3px -1px oklch(0% 0 0 / 6%);
+}
+
+@media (hover: hover) {
+  :root[data-theme="light"] .surface-raised:hover {
+    box-shadow:
+      inset 0 1px 0 oklch(100% 0 0 / 60%),
+      inset 0 -1px 0 oklch(0% 0 0 / 6%),
+      0 1px 1px oklch(0% 0 0 / 9%),
+      0 3px 6px -2px oklch(0% 0 0 / 12%);
+  }
+}
+
+:root[data-theme="light"] .surface-raised:active {
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 60%);
 }
 
 /*

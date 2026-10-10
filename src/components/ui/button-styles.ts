@@ -2,21 +2,34 @@
  * Les surfaces cliquables du site, partagées par Button et Pagination pour que
  * les deux ne divergent plus.
  *
- * Au survol, un bouton devient « plein » : un aplat, sous l'arête lumineuse de
- * `surface-lit`. Le contour se remplit, le plein perd son dégradé.
+ * Chaque bouton est un objet en relief (`surface-raised`, dans global.css) : un
+ * dégradé qui s'assombrit vers le bas, entre deux arêtes, avec une ombre
+ * portée. Au survol il s'éclaircit sans perdre son dégradé, donc son volume ;
+ * au clic, il s'enfonce.
  */
 
 /**
- * Bouton à contour. Le remplissage est un cran plus marqué en sombre
- * (`zinc-800`) qu'en clair (`zinc-900`, soit un gris perle une fois l'échelle
- * retournée) : un même écart de luminance se voit moins sur un fond noir.
+ * Bouton à contour. Rempli à peine plus clair que le fond, pour avoir une
+ * matière sur laquelle poser le relief. En clair, l'échelle retournée donnerait
+ * un bouton plus sombre que la page : il prend un blanc cassé, comme une touche,
+ * et s'assombrit d'un cran au survol.
  */
-export const outlineButton =
-  "surface-lit border border-zinc-700 hover:bg-zinc-800 light:hover:bg-zinc-900";
+export const outlineButton = [
+  "surface-raised border border-zinc-700/80 bg-gradient-to-b from-zinc-800/70 to-zinc-900",
+  "hover:border-zinc-600 hover:from-zinc-700/80 hover:to-zinc-800",
+  "light:border-zinc-700 light:from-[oklch(99%_0.002_286)] light:to-[oklch(96.5%_0.004_286)]",
+  "light:hover:border-zinc-700 light:hover:from-[oklch(97.5%_0.002_286)] light:hover:to-[oklch(93.5%_0.004_286)]",
+].join(" ");
 
 /**
- * Bouton plein : un dégradé haut-bas au repos, comme les surfaces éclairées du
- * site, qui devient un aplat au survol. Blanc en sombre, graphite en clair.
+ * Bouton plein : blanc en sombre, graphite en clair, le bas toujours le plus
+ * sombre (d'où le dégradé inversé en clair, où `white` est l'encre graphite).
+ * Au survol, il s'allume : blanc franc et halo en sombre (`surface-glow`), un
+ * graphite plus clair en clair.
  */
-export const solidButton =
-  "surface-lit bg-gradient-to-b from-white to-zinc-300 text-black hover:from-zinc-200 hover:to-zinc-200";
+export const solidButton = [
+  "surface-raised surface-glow bg-gradient-to-b from-zinc-100 to-zinc-300 text-black",
+  "hover:from-white hover:to-zinc-200",
+  "light:from-zinc-300 light:to-white",
+  "light:hover:from-zinc-400 light:hover:to-zinc-100",
+].join(" ");
