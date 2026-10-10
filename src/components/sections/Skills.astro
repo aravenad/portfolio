@@ -44,7 +44,14 @@ const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
                 <SkillChip skill={skill} />
               ))}
             </ul>
-            <div class="hidden grid-cols-4 gap-3 sm:grid">
+            {/*
+              À côté du texte, la colonne plafonne la grille à 512 px. Entre
+              640 et 1023 px, la grille passe sous le texte et prenait toute la
+              largeur : des tuiles de 230 px. `max-w-lg` leur garde la taille
+              qu'elles ont sur grand écran, et la grille se centre sous le
+              texte, qui lui court sur toute la largeur.
+            */}
+            <div class="mx-auto hidden max-w-lg grid-cols-4 gap-3 sm:grid">
               {skills.map((skill) => (
                 <SkillTile skill={skill} />
               ))}
