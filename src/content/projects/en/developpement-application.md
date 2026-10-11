@@ -52,7 +52,7 @@ run their project. We chose music festivals and named the application
 
 ### Phase 1: framing
 
-The project charter set out the functional requirements, as use cases ranked by
+The [project charter](https://github.com/aravenad/musigma/blob/master/conception/note-de-cadrage.pdf) set out the functional requirements, as use cases ranked by
 priority, and the non-functional ones. We analyzed twelve risks in it, from
 disagreements within the team to a tool going down, each scored before and
 after mitigation, then ranked in a criticality matrix. Roles were assigned with
@@ -61,10 +61,10 @@ code on the university's GitLab.
 
 ### Phase 2: design
 
-The design document described each use case in detail, then the architecture in
-UML: class, sequence and object diagrams. The user interface document went from
+The [design document](https://github.com/aravenad/musigma/blob/master/conception/dossier-de-conception.pdf) described each use case in detail, then the architecture in
+UML: class, sequence and object diagrams. The [user interface document](https://github.com/aravenad/musigma/blob/master/conception/conception-des-interfaces.pdf) went from
 personas to mockups, checked against usability criteria. In parallel, we
-modeled ticket sales as a linear program: in our example, selling 2,000 VIP and
+modeled ticket sales as a [linear program](https://github.com/aravenad/musigma/blob/master/conception/optimisation-des-ventes.pdf): in our example, selling 2,000 VIP and
 3,000 standard tickets brings in at most €205,000, a result found graphically
 and then confirmed in R.
 

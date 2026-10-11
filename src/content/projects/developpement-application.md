@@ -52,7 +52,7 @@ festivals de musique et appelé l'application **Musigma**.
 
 ### Phase 1 : cadrage
 
-La note de cadrage posait les besoins fonctionnels, sous forme de cas
+La [note de cadrage](https://github.com/aravenad/musigma/blob/master/conception/note-de-cadrage.pdf) posait les besoins fonctionnels, sous forme de cas
 d'utilisation classés par priorité, et les besoins non fonctionnels. Nous y
 avons analysé douze risques, de la mésentente dans l'équipe à la panne d'un
 outil, chacun noté avant et après mitigation, puis classés dans une matrice de
@@ -62,11 +62,11 @@ GitLab de l'université.
 
 ### Phase 2 : conception
 
-Le dossier de conception décrivait chaque cas d'utilisation en détail, puis
+Le [dossier de conception](https://github.com/aravenad/musigma/blob/master/conception/dossier-de-conception.pdf) décrivait chaque cas d'utilisation en détail, puis
 l'architecture en UML : diagrammes de classes, de séquence et d'objets. Le
-document des interfaces partait de personas pour aboutir à des maquettes,
+[document des interfaces](https://github.com/aravenad/musigma/blob/master/conception/conception-des-interfaces.pdf) partait de personas pour aboutir à des maquettes,
 vérifiées avec des critères ergonomiques. En parallèle, nous avons modélisé la
-vente des tickets comme un programme linéaire : sur notre exemple, vendre
+vente des tickets comme un [programme linéaire](https://github.com/aravenad/musigma/blob/master/conception/optimisation-des-ventes.pdf) : sur notre exemple, vendre
 2 000 tickets VIP et 3 000 tickets standard rapporte au plus 205 000 €, un
 résultat trouvé graphiquement puis confirmé en R.
 
