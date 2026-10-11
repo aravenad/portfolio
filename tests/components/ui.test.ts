@@ -461,32 +461,17 @@ describe("TableOfContents", () => {
     expect(body.firstElementChild?.getAttribute("class")).toContain("lg:col-start-2");
   });
 
-  it("ne pose aucun filet permanent le long de la liste", async () => {
-    // Un filet continu ferait un cadre là où la page n'en a pas. La bordure
-    // n'est là que pour le survol ; l'entrée courante est marquée par la
-    // couleur du texte et par le curseur.
+  it("ne pose aucun filet le long de la liste, ni au survol", async () => {
+    // Un filet ferait un cadre là où la page n'en a pas : l'entrée courante
+    // n'est marquée que par la couleur de son texte.
     const { body } = await render(TableOfContents, { props: { headings } });
     const classes = body
       .querySelector('[data-toc="sidebar"] [data-toc-link]')!
       .getAttribute("class")!;
 
-    expect(classes).toContain("border-transparent");
+    expect(classes).not.toMatch(/border/);
     expect(classes).toContain("aria-[current]:text-accent");
-  });
-
-  it("donne son curseur à chaque forme, invisible tant que rien ne le place", async () => {
-    // Le curseur est posé par le script. S'il n'arrive jamais, une hauteur nulle
-    // le laisse invisible plutôt que collé en haut de la liste.
-    const { body } = await render(TableOfContents, { props: { headings } });
-    const cursors = [...body.querySelectorAll("[data-toc-cursor]")];
-
-    expect(cursors).toHaveLength(2);
-
-    for (const cursor of cursors) {
-      expect(cursor.getAttribute("style")).toContain("height: 0");
-      expect(cursor.getAttribute("aria-hidden")).toBe("true");
-      expect(cursor.closest("[data-toc-list]")).toBeTruthy();
-    }
+    expect(body.querySelector("[data-toc-cursor]")).toBeNull();
   });
 
   it("garde de quoi coller", async () => {

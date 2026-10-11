@@ -4,13 +4,9 @@ import {
   HEADER_HEIGHT,
   activeHeadingIndex,
   anchorFromHash,
-  cursorBox,
   getTocEntries,
   groupByAnchor,
-  lerp,
   readingLine,
-  sectionEnd,
-  sectionRatio,
 } from "../../src/lib/toc";
 
 /** Un titre de Markdown, réduit à ce dont le sommaire se sert. */
@@ -124,47 +120,6 @@ describe("activeHeadingIndex", () => {
   });
 });
 
-describe("sectionRatio", () => {
-  it("part de zéro au titre de la section", async () => {
-    expect(sectionRatio(100, 300, 100)).toBe(0);
-  });
-
-  it("atteint un au titre suivant", async () => {
-    expect(sectionRatio(100, 300, 300)).toBe(1);
-  });
-
-  it("avance proportionnellement entre les deux", async () => {
-    expect(sectionRatio(100, 300, 150)).toBeCloseTo(0.25);
-  });
-
-  it("reste borné de part et d'autre", async () => {
-    // Le point de lecture sort de la section à chaque changement : sans bornes,
-    // le curseur filerait hors de la liste.
-    expect(sectionRatio(100, 300, -500)).toBe(0);
-    expect(sectionRatio(100, 300, 900)).toBe(1);
-  });
-
-  it("ne divise pas par zéro sur une section vide", async () => {
-    // Deux titres qui se suivent, un `h2` immédiatement suivi d'un `h3`.
-    expect(sectionRatio(200, 200, 200)).toBe(0);
-  });
-});
-
-describe("lerp", () => {
-  it("rend les bornes aux extrémités", async () => {
-    expect(lerp(10, 50, 0)).toBe(10);
-    expect(lerp(10, 50, 1)).toBe(50);
-  });
-
-  it("rend le milieu à mi-course", async () => {
-    expect(lerp(10, 50, 0.5)).toBe(30);
-  });
-
-  it("fonctionne vers le haut comme vers le bas", async () => {
-    expect(lerp(50, 10, 0.5)).toBe(30);
-  });
-});
-
 describe("le défilement d'une fiche, de bout en bout", () => {
   /*
    * Les deux fonctions prises ensemble, sur une fiche aux proportions réelles :
@@ -186,11 +141,6 @@ describe("le défilement d'une fiche, de bout en bout", () => {
   const starts = Array.from({ length: COUNT }, (_, index) => LEAD + index * SECTION);
   const maxScroll = LEAD + COUNT * SECTION + TAIL - VIEWPORT;
 
-  /** Hauteur d'une entrée du sommaire, texte sur une ligne. */
-  const ITEM = 36;
-  /** Fin du corps de la fiche, qui borne la dernière section. */
-  const BODY_END = LEAD + COUNT * SECTION;
-
   /** L'entrée surlignée à cette position de défilement. */
   const activeAt = (scrollY: number) =>
     activeHeadingIndex(
@@ -198,19 +148,6 @@ describe("le défilement d'une fiche, de bout en bout", () => {
       readingLine(VIEWPORT, maxScroll - scrollY),
       VIEWPORT,
     );
-
-  /** Le haut du curseur dans la liste, à cette position de défilement. */
-  const cursorAt = (scrollY: number) => {
-    const active = activeAt(scrollY);
-
-    if (active === -1) return null;
-
-    const line = readingLine(VIEWPORT, maxScroll - scrollY);
-    const end = active + 1 < COUNT ? starts[active + 1] : BODY_END;
-    const ratio = sectionRatio(starts[active], end, scrollY + line);
-
-    return lerp(active * ITEM, Math.min(active + 1, COUNT - 1) * ITEM, ratio);
-  };
 
   /** Le surlignage relevé tous les 5 px, du haut de la fiche jusqu'en bas. */
   const trace = Array.from({ length: Math.floor(maxScroll / 5) + 1 }, (_, step) =>
@@ -239,45 +176,6 @@ describe("le défilement d'une fiche, de bout en bout", () => {
 
   it("commence sur la première", async () => {
     expect(activeAt(0)).toBe(0);
-  });
-
-  /*
-   * Le curseur est ce qui répond au reproche d'un sommaire saccadé : le
-   * surlignage ne change qu'une fois par section — huit fois sur toute la
-   * fiche — alors que le curseur doit avancer à chaque pixel de défilement.
-   */
-  describe("le curseur de lecture", () => {
-    const path = Array.from({ length: Math.floor(maxScroll / 5) + 1 }, (_, step) =>
-      cursorAt(step * 5),
-    ) as number[];
-
-    it("est posé dès le premier pixel", async () => {
-      expect(path[0]).not.toBeNull();
-    });
-
-    it("ne recule jamais", async () => {
-      const backwards = path.filter((top, step) => step > 0 && top < path[step - 1]);
-
-      expect(backwards).toHaveLength(0);
-    });
-
-    it("avance sans jamais sauter", async () => {
-      // Un saut, c'est précisément ce que faisait le surlignage seul : il
-      // passait d'une entrée à l'autre d'un coup, soit 36 px.
-      const steps = path.map((top, step) => (step > 0 ? top - path[step - 1] : 0));
-
-      expect(Math.max(...steps)).toBeLessThan(ITEM / 4);
-    });
-
-    it("avance vraiment, et pas seulement aux changements de section", async () => {
-      // Sans interpolation, le curseur ne prendrait que huit positions.
-      expect(new Set(path).size).toBeGreaterThan(path.length / 2);
-    });
-
-    it("parcourt toute la liste, de la première entrée à la dernière", async () => {
-      expect(path[0]).toBe(0);
-      expect(path.at(-1)).toBe((COUNT - 1) * ITEM);
-    });
   });
 });
 
@@ -346,46 +244,3 @@ describe("anchorFromHash", () => {
     expect(anchorFromHash("#")).toBe("");
   });
 });
-
-describe("sectionEnd", () => {
-  const tops = [100, 400, 900];
-
-  it("termine une section au titre suivant", () => {
-    expect(sectionEnd(tops, 0, 1500)).toBe(400);
-    expect(sectionEnd(tops, 1, 1500)).toBe(900);
-  });
-
-  it("termine la dernière section au bas du corps de la fiche", () => {
-    expect(sectionEnd(tops, 2, 1500)).toBe(1500);
-  });
-
-  it("donne une longueur nulle à la dernière section sans corps mesurable", () => {
-    // `sectionRatio` renvoie alors 0 : le curseur reste sur son entrée.
-    expect(sectionEnd(tops, 2)).toBe(900);
-    expect(sectionRatio(900, sectionEnd(tops, 2), 1200)).toBe(0);
-  });
-});
-
-describe("cursorBox", () => {
-  const current = { top: 0, height: 20 };
-  const next = { top: 40, height: 60 };
-
-  it("se pose sur l'entrée courante en début de section", () => {
-    expect(cursorBox(current, next, 0)).toEqual(current);
-  });
-
-  it("arrive exactement sur l'entrée suivante en fin de section", () => {
-    // C'est ce qui rend le passage continu : l'entrée suivante devient
-    // courante à l'instant où le curseur l'atteint.
-    expect(cursorBox(current, next, 1)).toEqual(next);
-  });
-
-  it("interpole la position et la hauteur ensemble", () => {
-    expect(cursorBox(current, next, 0.5)).toEqual({ top: 20, height: 40 });
-  });
-
-  it("reste sur la dernière entrée, qui n'a personne vers qui glisser", () => {
-    expect(cursorBox(current, undefined, 0.7)).toEqual(current);
-  });
-});
-

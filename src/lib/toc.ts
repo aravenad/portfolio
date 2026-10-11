@@ -95,30 +95,6 @@ export function activeHeadingIndex(
 }
 
 /**
- * Fraction déjà parcourue d'une section, entre 0 et 1.
- *
- * C'est ce qui rend le curseur continu : le surlignage, lui, ne peut que sauter
- * d'une entrée à l'autre — un état par entrée, qui ne change qu'une fois tous
- * les deux cents pixels sur une fiche réelle. Entre deux changements, rien ne
- * bougeait. La fraction, elle, avance à chaque pixel de défilement.
- *
- * Le point de lecture est la ligne de lecture elle-même, si bien que le curseur
- * et le surlignage ne peuvent pas se contredire : la fraction retombe à zéro
- * exactement quand la ligne franchit le titre suivant.
- */
-export function sectionRatio(start: number, end: number, point: number): number {
-  // Une section vide — deux titres qui se suivent — n'a pas de milieu.
-  if (end <= start) return 0;
-
-  return Math.min(Math.max((point - start) / (end - start), 0), 1);
-}
-
-/** Interpolation linéaire, pour glisser d'une entrée du sommaire à la suivante. */
-export function lerp(from: number, to: number, ratio: number): number {
-  return from + (to - from) * ratio;
-}
-
-/**
  * Regroupe des liens par ancre visée, dans l'ordre de leur première apparition.
  *
  * Le sommaire est rendu deux fois — une forme repliée sous `lg`, une colonne
@@ -163,37 +139,4 @@ export function anchorFromHash(hash: string): string {
     // Un « % » isolé dans une ancre écrite à la main : on la garde telle quelle.
     return raw;
   }
-}
-
-/**
- * Bas de la section `active`, dans la fenêtre : le haut du titre suivant, ou,
- * pour la dernière section, le bas du corps de la fiche.
- *
- * Sans cette fin, la dernière section n'aurait pas de longueur et le curseur
- * s'y figerait dès le premier pixel. À défaut de corps mesurable, elle se
- * termine où elle commence — le curseur reste alors sur son entrée.
- */
-export function sectionEnd(tops: number[], active: number, bodyBottom?: number): number {
-  return tops[active + 1] ?? bodyBottom ?? tops[active];
-}
-
-/**
- * Position et hauteur du curseur de lecture, glissé de l'entrée courante vers
- * la suivante selon la fraction de section parcourue.
- *
- * À la fraction 1, il est exactement sur l'entrée suivante, qui devient
- * courante au même instant : le passage est continu. La dernière section n'a
- * personne vers qui glisser — sans `next`, le curseur reste sur son entrée.
- */
-export function cursorBox(
-  current: { top: number; height: number },
-  next: { top: number; height: number } | undefined,
-  ratio: number,
-): { top: number; height: number } {
-  const target = next ?? current;
-
-  return {
-    top: lerp(current.top, target.top, ratio),
-    height: lerp(current.height, target.height, ratio),
-  };
 }

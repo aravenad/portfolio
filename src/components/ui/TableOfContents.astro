@@ -17,9 +17,8 @@ const entries = getTocEntries(headings);
 const t = useTranslations(getLang(Astro.url.pathname));
 
 /*
- * Le titre est aligné sur les entrées, pas sur le bord du bloc : la gouttière
- * qu'il laisse à gauche est celle où vient se poser le filet de l'entrée
- * courante.
+ * Le titre est aligné sur les entrées de premier niveau, en retrait du bord du
+ * bloc comme elles.
  */
 const title = "pl-4 text-sm font-semibold text-zinc-100";
 ---
@@ -128,29 +127,27 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
   import {
     activeHeadingIndex,
     anchorFromHash,
-    cursorBox,
     groupByAnchor,
     readingLine,
-    sectionEnd,
-    sectionRatio,
   } from "../../lib/toc";
 
   /**
-   * Surligne l'entrée de la dernière section commencée.
+   * Surligne l'entrée de la dernière section commencée, ou celle qu'on vient
+   * de choisir dans le sommaire.
    *
-   * La règle est dans src/lib/toc.ts, où elle est testée ; il ne reste ici que
-   * les mesures du navigateur.
+   * Les règles sont dans src/lib/toc.ts, où elles sont testées ; il ne reste ici
+   * que les mesures du navigateur.
    *
    * ⚠️ Les deux formes du sommaire sont dans le document, donc CHAQUE titre est
    * visé par deux liens. Les parcourir à plat casserait le surlignage : les
    * hauts de titres ne seraient plus croissants, et « le dernier passé sous la
    * ligne » désignerait n'importe quoi. D'où le regroupement par ancre, qui
-   * rend un titre par section, dans l'ordre du document — et allume les deux
+   * rend un titre par section, dans l'ordre du document, et allume les deux
    * liens d'un coup, puisqu'on ne sait pas lequel est affiché.
    *
    * `aria-current="location"` porte l'état pour le style et pour les lecteurs
    * d'écran à la fois ; « location » plutôt que « page » car la fiche entière
-   * est la page — seule la position dans le document change.
+   * est la page : seule la position dans le document change.
    *
    * Sans JavaScript, seul le surlignage manque : les entrées du sommaire sont
    * de simples ancres et continuent de mener où il faut.
@@ -161,33 +158,67 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
     const sections = [
       ...groupByAnchor(links, (link) => anchorFromHash(link.hash)),
     ]
-      .map(([anchor, group]) => ({ heading: document.getElementById(anchor), links: group }))
+      .map(([anchor, group]) => ({
+        anchor,
+        heading: document.getElementById(anchor),
+        links: group,
+      }))
       .filter(
-        (section): section is { heading: HTMLElement; links: HTMLAnchorElement[] } =>
+        (
+          section,
+        ): section is { anchor: string; heading: HTMLElement; links: HTMLAnchorElement[] } =>
           section.heading !== null,
       );
 
     if (sections.length === 0) return;
 
     /*
-     * La fin de la dernière section : le bas du corps de la fiche, pris sur le
-     * conteneur des titres. Sans elle, cette section n'aurait pas de longueur
-     * et le curseur s'y figerait dès le premier pixel.
+     * L'entrée choisie dans le sommaire, tenue jusqu'à ce que le lecteur
+     * reprenne le défilement lui-même.
+     *
+     * ⚠️ SANS ELLE, LE CLIC ALLUME SOUVENT UNE AUTRE ENTRÉE. La règle de
+     * franchissement ne sait pas qu'on a visé un titre : elle prend le dernier
+     * passé sous la ligne de lecture. Deux cas la trompent, mesurés sur la fiche
+     * du site web :
+     *
+     * - un `h2` suivi aussitôt d'un `h3` : le saut pose le `h2` en haut, le `h3`
+     *   passe la ligne avec lui, et c'est lui qui s'allume ;
+     * - les dernières sections : la page ne peut plus défiler assez, la ligne
+     *   descend (`readingLine`) et rattrape le titre suivant.
+     *
+     * Le saut est lui-même un défilement, doux qui plus est : les évènements
+     * `scroll` ne disent pas qui défile. Un délai de silence pour dater la fin
+     * du saut a été essayé puis écarté : Chrome marque déjà une pause de 85 ms
+     * avant de démarrer, et une machine chargée dépassait le délai, si bien que
+     * le saut relâchait sa propre entrée. Ce sont donc les gestes du lecteur
+     * qui la relâchent (molette, toucher, clavier, clic), qu'un saut d'ancre
+     * n'émet jamais.
+     *
+     * Le clic sur une entrée commence par un `pointerdown`, et la touche Entrée
+     * par un `keydown` : tous deux relâchent l'entrée précédente avant que le
+     * `click` ne tienne la nouvelle.
+     *
+     * Reste la barre de défilement, qu'on peut tirer sans émettre aucun de ces
+     * gestes (Firefox). Une fois le saut terminé (`scrollend`), l'entrée est
+     * aussi relâchée dès que son titre quitte l'écran.
      */
-    const body = sections[0].heading.parentElement;
+    let pinned: string | null = null;
+    let landed = false;
 
-    const cursors = [
-      ...document.querySelectorAll<HTMLElement>("[data-toc-cursor]"),
-    ];
+    const pinnedHeading = () =>
+      sections.find(({ anchor }) => anchor === pinned)?.heading ?? null;
 
     const update = () => {
-      const viewport = window.innerHeight;
-      const remaining =
-        document.documentElement.scrollHeight - viewport - window.scrollY;
+      let active = sections.findIndex(({ anchor }) => anchor === pinned);
 
-      const line = readingLine(viewport, remaining);
-      const tops = sections.map(({ heading }) => heading.getBoundingClientRect().top);
-      const active = activeHeadingIndex(tops, line, viewport);
+      if (active === -1) {
+        const viewport = window.innerHeight;
+        const remaining =
+          document.documentElement.scrollHeight - viewport - window.scrollY;
+        const tops = sections.map(({ heading }) => heading.getBoundingClientRect().top);
+
+        active = activeHeadingIndex(tops, readingLine(viewport, remaining), viewport);
+      }
 
       for (const [index, section] of sections.entries()) {
         for (const link of section.links) {
@@ -198,62 +229,82 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
           }
         }
       }
-
-      // Rien à montrer tant que le lecteur est dans le chapeau de la fiche.
-      if (active === -1) {
-        for (const cursor of cursors) cursor.style.height = "0px";
-        return;
-      }
-
-      const next = sections[active + 1];
-      const end = sectionEnd(tops, active, body?.getBoundingClientRect().bottom);
-      const ratio = sectionRatio(tops[active], end, line);
-
-      /*
-       * Le curseur glisse de l'entrée courante vers la suivante à mesure que la
-       * section est parcourue. À la fraction 1 il est exactement sur l'entrée
-       * suivante, qui devient courante au même instant : le passage est continu,
-       * il n'y a jamais de saut à masquer.
-       *
-       * Les deux formes du sommaire ont chacune leur curseur, et `groupByAnchor`
-       * range les liens d'une section dans l'ordre du document — le n-ième lien
-       * de chaque section appartient donc toujours à la même liste que le
-       * n-ième de la suivante.
-       *
-       * La dernière section n'a personne vers qui glisser : le curseur s'y
-       * arrête, ce qui est le comportement voulu en fin de fiche.
-       */
-      sections[active].links.forEach((link, form) => {
-        const cursor = link
-          .closest("[data-toc-list]")
-          ?.querySelector<HTMLElement>("[data-toc-cursor]");
-
-        if (!cursor) return;
-
-        const target = next?.links[form];
-        const box = cursorBox(
-          { top: link.offsetTop, height: link.offsetHeight },
-          target && { top: target.offsetTop, height: target.offsetHeight },
-          ratio,
-        );
-
-        cursor.style.top = `${box.top}px`;
-        cursor.style.height = `${box.height}px`;
-      });
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true, signal });
-    window.addEventListener("resize", update, { signal });
+    const hold = (anchor: string) => {
+      if (!sections.some((section) => section.anchor === anchor)) return;
+
+      pinned = anchor;
+      landed = false;
+      update();
+    };
+
+    const release = () => {
+      if (pinned === null) return;
+
+      pinned = null;
+      update();
+    };
 
     /*
-     * Replié, le sommaire compact ne mesure rien : ses entrées n'ont ni
-     * position ni hauteur, et son curseur resterait en haut. Le déploiement
-     * n'est pas un défilement — il faut le lui dire.
+     * L'ancre est tenue dès le clic, avant que le navigateur ne lance le saut.
+     * `hashchange` couvre l'autre chemin vers un titre : les flèches précédent
+     * et suivant du navigateur.
      */
-    document
-      .querySelector("[data-toc-details]")
-      ?.addEventListener("toggle", update, { signal });
+    for (const link of links) {
+      link.addEventListener("click", () => hold(anchorFromHash(link.hash)), { signal });
+    }
+
+    window.addEventListener("hashchange", () => hold(anchorFromHash(location.hash)), {
+      signal,
+    });
+
+    for (const gesture of ["wheel", "touchstart", "keydown", "pointerdown"]) {
+      window.addEventListener(gesture, release, { capture: true, passive: true, signal });
+    }
+
+    window.addEventListener(
+      "scrollend",
+      () => {
+        if (pinned !== null) landed = true;
+      },
+      { signal },
+    );
+
+    /*
+     * Une fiche ouverte sur une ancre (lien partagé, rechargement) : le
+     * navigateur y a sauté, avec les mêmes pièges qu'au clic. Seulement si le
+     * titre est à l'écran, toutefois : un rechargement rend la position de
+     * lecture, qui peut être bien plus bas que l'ancre restée dans l'adresse.
+     */
+    const initial = location.hash && document.getElementById(anchorFromHash(location.hash));
+
+    if (initial) {
+      const { top } = initial.getBoundingClientRect();
+
+      if (top >= 0 && top < window.innerHeight) {
+        pinned = initial.id;
+        landed = true;
+      }
+    }
+
+    update();
+    window.addEventListener(
+      "scroll",
+      () => {
+        const heading = pinnedHeading();
+
+        if (heading && landed) {
+          const { top, bottom } = heading.getBoundingClientRect();
+
+          if (bottom < 0 || top > window.innerHeight) pinned = null;
+        }
+
+        update();
+      },
+      { passive: true, signal },
+    );
+    window.addEventListener("resize", update, { signal });
   });
 
   /**

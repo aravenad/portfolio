@@ -122,6 +122,33 @@ test.describe("fiche projet", () => {
   });
 });
 
+test("le sommaire allume l'entrée cliquée, même quand la ligne de lecture en désignerait une autre", async ({
+  page,
+}) => {
+  // Les deux pièges de la règle de franchissement, sur une vraie fiche : un `h2`
+  // suivi aussitôt d'un `h3` (« Réalisation »), et une section de fin de page
+  // que la ligne, descendue, dépasse (« Compétences mobilisées »).
+  await page.goto("projects/mise-en-oeuvre-site-web");
+  const sidebar = page.locator('nav[data-toc="sidebar"]');
+
+  for (const id of ["réalisation", "competences-mobilisees"]) {
+    const link = sidebar.locator(`a[href="#${id}"]`);
+
+    await link.click();
+    await expect(page.locator(`[id="${id}"]`)).toBeInViewport();
+    // Au-delà du délai de pose : l'entrée doit tenir une fois le saut fini.
+    await page.waitForTimeout(400);
+    await expect(link).toHaveAttribute("aria-current", "location");
+    await expect(sidebar.locator("[aria-current]")).toHaveCount(1);
+  }
+
+  // Le lecteur reprend la main : le surlignage suit de nouveau le défilement.
+  await page.mouse.wheel(0, -1500);
+  await expect(sidebar.locator('a[href="#competences-mobilisees"]')).not.toHaveAttribute(
+    "aria-current",
+  );
+});
+
 test("la pagination change de page et y place l'indicateur", async ({ page }) => {
   await page.goto("projects");
   const pagination = page.locator("[data-pagination]");
