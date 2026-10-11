@@ -11,6 +11,8 @@ import { satteri } from '@astrojs/markdown-satteri';
 
 import { satteriFrenchSpacing } from './src/lib/typography.ts';
 
+import { satteriExternalLinks } from './src/lib/external-links.ts';
+
 // https://astro.build/config
 export default defineConfig({
   // Publié par GitHub Pages sous un domaine à soi : le site vit à la racine,
@@ -35,8 +37,13 @@ export default defineConfig({
 
   // Espace insécable devant « ; : ? ! » dans le corps des fiches, comme dans
   // les données (src/lib/typography.ts) : un signe ne part plus seul à la ligne.
+  // Les liens vers un autre site s'y ouvrent dans un nouvel onglet, flèche à
+  // l'appui (src/lib/external-links.ts).
   markdown: {
-    processor: satteri({ mdastPlugins: [satteriFrenchSpacing] }),
+    processor: satteri({
+      mdastPlugins: [satteriFrenchSpacing],
+      hastPlugins: [satteriExternalLinks],
+    }),
   },
 
   vite: {
