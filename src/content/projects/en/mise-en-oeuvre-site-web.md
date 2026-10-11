@@ -12,6 +12,7 @@ links:
   site: "https://aravenad.github.io/site-capgemini-3e/"
   repo: "https://github.com/aravenad/site-capgemini-3e"
 role:
+  - "Project lead of the team of four."
   - "Research on Capgemini’s organization, strategy and values for the company fact sheet, then its layout with a teammate."
   - "Mockup of the home page in Whimsical."
   - "HTML structure of the whole site, which I moved ahead on my own so the group could focus on the CSS, then work on the CSS."

@@ -12,6 +12,7 @@ links:
   site: "https://aravenad.github.io/site-capgemini-3e/"
   repo: "https://github.com/aravenad/site-capgemini-3e"
 role:
+  - "Chef de projet de l’équipe de quatre."
   - "Recherches sur l’organisation, la stratégie et les valeurs de Capgemini pour la fiche de synthèse, puis mise en page de cette fiche avec un camarade."
   - "Maquette de la page d’accueil sur Whimsical."
   - "Structure HTML de l’ensemble du site, que j’ai avancée de mon côté pour laisser le groupe se concentrer sur le CSS, puis participation au CSS."
