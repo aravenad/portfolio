@@ -121,11 +121,12 @@ const meta = [team, year?.toString()].filter(Boolean);
                   target="_blank"
                   rel="noopener noreferrer"
                   variant="secondary"
-                  class="gap-2.5"
+                  class="group gap-2.5"
                 >
                   <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />
                   {t.projects.links.repo}
                   <span class="sr-only">{` ${t.projects.links.newTab}`}</span>
+                  <Arrow class="-rotate-45 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Button>
               )}
             </nav>

@@ -251,6 +251,8 @@ describe("fiche d'un projet", () => {
       expect(link.getAttribute("target")).toBe("_blank");
       expect(link.getAttribute("rel")).toContain("noopener");
       expect(link.querySelector(".sr-only")?.textContent?.trim()).toBe("(nouvel onglet)");
+      // La flèche oblique d'Arrow.astro, le signe visible du nouvel onglet.
+      expect(link.querySelector('svg.-rotate-45 path[d^="M2.5 8h11"]')).not.toBeNull();
     }
   });
 
