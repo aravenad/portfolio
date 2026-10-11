@@ -263,10 +263,22 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
       window.addEventListener(gesture, release, { capture: true, passive: true, signal });
     }
 
+    /*
+     * ⚠️ Un `scrollend` ne date la fin du saut que si le titre visé est à
+     * l'écran. Celui du défilement d'avant le clic peut arriver juste après
+     * lui, avant que le saut ne démarre : pris pour l'arrivée, il relâchait
+     * l'entrée au premier pas du saut, le titre étant encore hors de l'écran.
+     */
     window.addEventListener(
       "scrollend",
       () => {
-        if (pinned !== null) landed = true;
+        const heading = pinnedHeading();
+
+        if (heading) {
+          const { top, bottom } = heading.getBoundingClientRect();
+
+          if (bottom >= 0 && top <= window.innerHeight) landed = true;
+        }
       },
       { signal },
     );
