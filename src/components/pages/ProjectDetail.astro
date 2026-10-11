@@ -1,8 +1,10 @@
 ---
 import { render } from "astro:content";
+import { Icon } from "astro-icon/components";
 import Arrow from "../ui/Arrow.astro";
 import Badge from "../ui/Badge.astro";
 import Breadcrumb from "../ui/Breadcrumb.astro";
+import Button from "../ui/Button.astro";
 import Container from "../ui/Container.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -23,7 +25,8 @@ interface Props {
  * (`getProjectPaths`).
  */
 const { project, previous, next } = Astro.props;
-const { title, summary, tags, status, team, year, role, competences, learned } = project.data;
+const { title, summary, tags, status, team, year, links, role, competences, learned } =
+  project.data;
 const { Content, headings } = await render(project);
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
@@ -89,6 +92,45 @@ const meta = [team, year?.toString()].filter(Boolean);
             )
           }
         </p>
+
+        {/*
+          Le site en ligne passe en bouton plein : c'est lui qu'on vient voir.
+          Le dépôt suit, à contour, avec le logo GitHub. Sur téléphone, les deux
+          prennent la largeur, l'un sous l'autre.
+
+          Les deux s'ouvrent dans un nouvel onglet : on y passe pour revenir à
+          la fiche, qui doit rester où on l'a laissée. Le libellé masqué le dit
+          aux lecteurs d'écran, la flèche oblique le suggère aux autres.
+        */}
+        {
+          (links.site || links.repo) && (
+            <nav
+              aria-label={t.projects.links.label}
+              class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
+            >
+              {links.site && (
+                <Button href={links.site} target="_blank" rel="noopener noreferrer" class="group gap-2">
+                  {t.projects.links.site}
+                  <span class="sr-only">{` ${t.projects.links.newTab}`}</span>
+                  <Arrow class="-rotate-45 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Button>
+              )}
+              {links.repo && (
+                <Button
+                  href={links.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="secondary"
+                  class="gap-2.5"
+                >
+                  <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />
+                  {t.projects.links.repo}
+                  <span class="sr-only">{` ${t.projects.links.newTab}`}</span>
+                </Button>
+              )}
+            </nav>
+          )
+        }
       </header>
 
       {/*

@@ -112,6 +112,12 @@ const fr = {
     pageOf: (page: number, total: number) => `Page ${page} sur ${total}`,
     discover: "Découvrir le projet",
     neighbors: "Projets précédent et suivant",
+    links: {
+      label: "Liens du projet",
+      site: "Voir le site",
+      repo: "Voir le code",
+      newTab: "(nouvel onglet)",
+    },
     sections: {
       role: { slug: "mon-role", title: "Mon rôle" },
       competences: { slug: "competences-mobilisees", title: "Compétences mobilisées" },
@@ -313,6 +319,12 @@ const en = {
     pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
     discover: "Discover the project",
     neighbors: "Previous and next projects",
+    links: {
+      label: "Project links",
+      site: "Visit the site",
+      repo: "View the code",
+      newTab: "(opens in a new tab)",
+    },
     sections: {
       role: { slug: "my-role", title: "My role" },
       competences: { slug: "skills-used", title: "Skills used" },

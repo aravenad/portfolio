@@ -38,6 +38,16 @@ const schema = z.object({
   featured: z.boolean().default(false),
   /** Motif de la couverture sur la carte, identique dans les deux langues. */
   cover: z.enum(COVERS).optional(),
+  /**
+   * Liens publics du projet, en boutons sous l'en-tête de la fiche : le site
+   * en ligne et le dépôt du code. Chacun n'est rendu que s'il est renseigné.
+   */
+  links: z
+    .object({
+      site: z.url().optional(),
+      repo: z.url().optional(),
+    })
+    .default({}),
   /*
    * Les rubriques attendues par la grille du PPP, en plus du corps Markdown.
    * Chacune n'apparaît sur la fiche, et dans son sommaire, qu'une fois

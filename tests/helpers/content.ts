@@ -13,6 +13,7 @@ export interface FixtureProject {
     order: number;
     featured: boolean;
     cover?: Cover;
+    links: { site?: string; repo?: string };
     role: string[];
     competences: Competence[];
     learned: string[];
@@ -34,6 +35,14 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
     year: 2026 - index,
     order: index + 1,
     featured: index < 3,
+    // Le troisième a ses deux liens, le quatrième son dépôt seul : chaque
+    // bouton doit pouvoir manquer sans emporter l'autre.
+    links:
+      index === 2
+        ? { site: "https://exemple.fr/projet-3/", repo: "https://github.com/exemple/projet-3" }
+        : index === 3
+          ? { repo: "https://github.com/exemple/projet-4" }
+          : {},
     // Seul le troisième remplit les rubriques du PPP : les autres prouvent
     // qu'une fiche incomplète n'en montre rien.
     role: index === 2 ? ["Conception de la base", "Tests unitaires"] : [],

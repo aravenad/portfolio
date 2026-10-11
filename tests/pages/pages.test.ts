@@ -226,6 +226,51 @@ describe("fiche d'un projet", () => {
     expect(links.slice(-3)).toEqual(["Mon rôle", "Compétences mobilisées", "Ce que j'ai appris"]);
   });
 
+  it("propose le site en ligne et le dépôt en boutons sous l'en-tête", async () => {
+    const props = await propsFor("projet-3");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-3"),
+      props,
+    });
+    const links = [...document.querySelectorAll('article header nav[aria-label="Liens du projet"] a')];
+
+    expect(links.map((link) => [link.textContent?.trim(), link.getAttribute("href")])).toEqual([
+      ["Voir le site (nouvel onglet)", "https://exemple.fr/projet-3/"],
+      ["Voir le code (nouvel onglet)", "https://github.com/exemple/projet-3"],
+    ]);
+  });
+
+  it("ouvre ces liens dans un nouvel onglet, sans lui laisser la main sur la fiche", async () => {
+    const props = await propsFor("projet-3");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-3"),
+      props,
+    });
+
+    for (const link of document.querySelectorAll('[aria-label="Liens du projet"] a')) {
+      expect(link.getAttribute("target")).toBe("_blank");
+      expect(link.getAttribute("rel")).toContain("noopener");
+      expect(link.querySelector(".sr-only")?.textContent?.trim()).toBe("(nouvel onglet)");
+    }
+  });
+
+  it("ne rend que les liens renseignés, et rien sans lien", async () => {
+    const withRepo = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-4"),
+      props: await propsFor("projet-4"),
+    });
+    const without = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props: await propsFor("projet-1"),
+    });
+    const nav = '[aria-label="Liens du projet"]';
+
+    expect(
+      [...withRepo.document.querySelectorAll(`${nav} a`)].map((link) => link.textContent?.trim()),
+    ).toEqual(["Voir le code (nouvel onglet)"]);
+    expect(without.document.querySelector(nav)).toBeNull();
+  });
+
   it("ne montre aucune rubrique du PPP tant qu'elle est vide", async () => {
     const props = await propsFor("projet-1");
     const { document } = await renderPage(ProjectDetail, {
