@@ -147,7 +147,9 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ### Thèmes
 
 - **Le sombre est le thème par défaut** : c'est la palette de Tailwind, sans
-  attribut. Le clair s'active par le bouton du header, qui pose
+  attribut, à un gris près : `zinc-500` y est éclairci pour que le plus
+  discret des textes tienne 4,5:1. Aucun texte n'est écrit en `zinc-600` ni
+  plus sombre, nuances réservées aux puces, filets et bordures. Le clair s'active par le bouton du header, qui pose
   `<html data-theme="light">` et mémorise le choix (`localStorage`, clé `theme`).
 - **Aucun flash** : un script en ligne du `<head>` applique le thème mémorisé
   avant le premier rendu, et le reporte sur la page suivante à chaque
@@ -173,7 +175,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ## 5. Tests
 
 ```sh
-npm test          # 651 tests, quelques secondes
+npm test          # 653 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 57 tests de bout en bout, une quarantaine de secondes
 ```
@@ -199,8 +201,8 @@ Côté Vitest :
 - **`astro:content`** n'existe pas hors d'un build : les tests le remplacent par
   sept projets factices (`tests/helpers/content.ts`).
 - **Les données** sont vérifiées sur ce qui ne se voit pas à la relecture :
-  format des périodes du parcours, contraste des couleurs de marque (dans les
-  deux thèmes), icônes existantes, schéma et cohérence des fiches.
+  format des périodes du parcours, contraste des couleurs de marque et des
+  gris de texte (dans les deux thèmes, `tests/styles/contrast.test.ts`), icônes existantes, schéma et cohérence des fiches.
 - **Les deux langues** sont vérifiées ensemble : dictionnaires de même forme,
   contenus anglais alignés sur les français, et pages anglaises dont aucun lien
   ne ramène vers le français.
@@ -217,7 +219,7 @@ Côté Vitest :
 | **Ajouter une page** | Son contenu dans `components/pages/`, enveloppé dans `BaseLayout`, liens via `localizedUrl()` ; puis un fichier qui le rend dans `src/pages/` et un dans `src/pages/en/`. Ajouter un test dans `tests/pages/`. |
 | **Ajouter une langue** | L'ajouter à `languages` (`src/lib/i18n.ts`), lui donner un dictionnaire dans `ui.ts`, ses contenus (`…De`…), une collection dans `content.config.ts`, et ses fichiers dans `src/pages/<code>/`. Le sélecteur du header, prévu pour deux langues, devient alors une liste. |
 | **Ajouter un comportement JS** | La règle dans `src/lib/` avec son test, le câblage dans le `<script>` du composant via `onEachPage((signal) => …)`, et un test de ce que voit le visiteur dans `e2e/`. |
-| **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind. |
+| **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind, sauf `zinc-500`, redéfini dans `@theme` ; un gris de texte sous 4,5:1 fait échouer les tests. |
 | **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
 | **Changer de domaine** | Mettre à jour `site` dans `astro.config.mjs` et `SITE_ORIGIN` dans `tests/helpers/render.ts`, le domaine personnalisé dans les réglages Pages du dépôt, puis les DNS chez le registraire (Infomaniak). Pour revenir sur `aravenad.github.io/portfolio`, remettre aussi `base: '/portfolio'` et le préfixe `/portfolio/` dans `e2e/` et `playwright.config.ts`. |

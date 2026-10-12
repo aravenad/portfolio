@@ -11,9 +11,19 @@
  * le site (Fontsource, version variable) plutôt que laissée à la police système,
  * qui changeait d'un appareil à l'autre (Segoe UI, San Francisco, Roboto…).
  * Seul le romain est importé : le site n'emploie pas d'italique.
+ *
+ * `zinc-500`, plus clair que celui de Tailwind (55,2 %) en thème sombre. C'est
+ * le gris le plus discret qui porte du texte (dates, lieux, pied de page) :
+ * à 55,2 %, il ne tenait que 4,1:1 sur le fond et 3,7:1 sur une carte, sous les
+ * 4,5:1 exigés pour du texte. À 61 %, 5,2:1 et 4,7:1, et il reste nettement
+ * sous le `zinc-400` du texte courant (7,6:1). Vérifié par les tests.
+ *
+ * D'où la règle : aucun texte en `zinc-600` ni plus sombre. Ces nuances sont
+ * réservées aux puces, filets, séparateurs et bordures.
  */
 @theme {
   --color-accent: oklch(90% 0.032 250);
+  --color-zinc-500: oklch(61% 0.016 286);
   --font-sans: "Noto Sans Variable", "Noto Sans", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
@@ -26,7 +36,8 @@
 
 /*
  * Thème clair, sur choix du visiteur (bouton du header, src/lib/theme.ts). Le
- * sombre reste le thème par défaut : c'est la palette de Tailwind, intacte.
+ * sombre reste le thème par défaut : c'est la palette de Tailwind, intacte à
+ * `zinc-500` près (voir `@theme`).
  *
  * LE CLAIR RETOURNE L'ÉCHELLE ZINC, IL NE LA REMPLACE PAS. Sur ce site, chaque
  * nuance est un rôle : `zinc-950` est le fond, `zinc-100` les titres, `zinc-400`

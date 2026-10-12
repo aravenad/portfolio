@@ -186,7 +186,7 @@ const meta = [team, year?.toString()].filter(Boolean);
                 href={getProjectHref(previous, lang)}
                 class="group flex flex-col items-start gap-1 text-zinc-400 transition hover:text-zinc-100"
               >
-                <span class="text-xs uppercase tracking-wide text-zinc-600">{t.pagination.previous}</span>
+                <span class="text-xs uppercase tracking-wide text-zinc-500">{t.pagination.previous}</span>
                 <span class="flex items-center gap-3">
                   <Arrow
                     direction="left"
@@ -204,7 +204,7 @@ const meta = [team, year?.toString()].filter(Boolean);
                 href={getProjectHref(next, lang)}
                 class="group flex flex-col items-start gap-1 text-zinc-400 transition hover:text-zinc-100 sm:items-end sm:text-right"
               >
-                <span class="text-xs uppercase tracking-wide text-zinc-600">{t.pagination.next}</span>
+                <span class="text-xs uppercase tracking-wide text-zinc-500">{t.pagination.next}</span>
                 <span class="flex items-center gap-3">
                   {next.data.title}
                   <Arrow class="text-zinc-600 transition group-hover:translate-x-1 group-hover:text-accent" />
