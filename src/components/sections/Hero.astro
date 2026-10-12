@@ -21,21 +21,22 @@ const introWords = intro.split(/\s+/).filter(Boolean);
 <section class="flex min-h-[calc(100svh-4rem)] flex-col justify-center py-24 sm:py-32">
   <Container>
     {/*
-      Le titre est lu d'un bloc par les lecteurs d'écran (`aria-label`) : les
-      mots découpés pour l'animation leur sont masqués, sans quoi certains les
-      annonceraient un par un.
+      Le titre est lu d'un bloc, par une phrase réservée aux lecteurs d'écran :
+      les mots découpés pour l'animation leur sont masqués, sans quoi certains
+      les annonceraient un par un. Pas d'`aria-label` : Orca lit le texte d'un
+      titre, pas son nom, et n'annonçait plus qu'un « en-tête 1 » vide.
     */}
-    <h1
-      class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl"
-      aria-label={`${intro} ${name}.`}
-    >
-      {introWords.map((word, index) => (
-        <Fragment>
-          <span class="blur-word" style={`--word: ${index}`} aria-hidden="true">{word}</span>{" "}
-        </Fragment>
-      ))}<span class="blur-word" style={`--word: ${introWords.length}`} aria-hidden="true"
-        ><span class="text-chrome">{name}</span>.</span
-      >
+    <h1 class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
+      <span class="sr-only">{`${intro} ${name}.`}</span>
+      <span aria-hidden="true">
+        {introWords.map((word, index) => (
+          <Fragment>
+            <span class="blur-word" style={`--word: ${index}`}>{word}</span>{" "}
+          </Fragment>
+        ))}<span class="blur-word" style={`--word: ${introWords.length}`}
+          ><span class="text-chrome">{name}</span>.</span
+        >
+      </span>
     </h1>
 
     <p class="page-enter mt-6 max-w-2xl text-lg leading-8 text-zinc-400" style="--index: 1">

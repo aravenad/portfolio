@@ -396,7 +396,7 @@ describe("version anglaise", () => {
     expect(document.documentElement.getAttribute("lang")).toBe("en");
     expect(document.title).toBe(site.title);
     expect(meta(document, "og:locale")).toBe("en_US");
-    expect(document.querySelector("h1")?.textContent?.replace(/\s+/g, " ").trim())
+    expect(document.querySelector("h1 .sr-only")?.textContent?.replace(/\s+/g, " ").trim())
       .toBe("Hi, I'm Damien.");
     expect(document.getElementById("projects")?.textContent).toContain("See all projects");
   });

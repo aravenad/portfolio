@@ -25,7 +25,21 @@ describe("Hero", () => {
 
   it("porte l'unique h1 de l'accueil", async () => {
     const { body } = await render(Hero, { props });
-    expect(body.querySelector("h1")?.textContent?.replace(/\s+/g, " ").trim())
+    expect(body.querySelectorAll("h1")).toHaveLength(1);
+  });
+
+  it("fait lire le titre d'un bloc, en texte et non en aria-label", async () => {
+    // Orca lit le texte d'un titre, pas son nom : avec un `aria-label` et les
+    // mots masqués, il n'annonçait qu'un « en-tête 1 » vide.
+    const { body } = await render(Hero, { props });
+    const title = body.querySelector("h1");
+
+    expect(title?.hasAttribute("aria-label")).toBe(false);
+    expect(title?.querySelector(".sr-only")?.textContent).toBe("Bonjour, moi c'est Damien.");
+    for (const word of title?.querySelectorAll(".blur-word") ?? []) {
+      expect(word.closest('[aria-hidden="true"]')).not.toBeNull();
+    }
+    expect(title?.querySelector('[aria-hidden="true"]')?.textContent?.replace(/\s+/g, " ").trim())
       .toBe("Bonjour, moi c'est Damien.");
   });
 
