@@ -18,6 +18,8 @@ const routes = [
   "en/legal",
   "accessibility",
   "en/accessibility",
+  "sitemap",
+  "en/sitemap",
 ];
 
 for (const route of routes) {
@@ -171,4 +173,21 @@ test("la pagination change de page et y place l'indicateur", async ({ page }) =>
       return Math.abs(a!.x - b!.x);
     })
     .toBeLessThanOrEqual(1);
+});
+
+test("le sommaire des mentions légales mène à chaque partie, sous le header", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("legal");
+  const sidebar = page.locator('nav[data-toc="sidebar"]');
+
+  await sidebar.getByRole("link", { name: "Propriété intellectuelle" }).click();
+
+  const heading = page.locator("#legal-credits");
+  await expect(heading).toBeInViewport();
+  // Le titre n'est pas resté derrière le header collant (4rem).
+  expect((await heading.boundingBox())?.y).toBeGreaterThanOrEqual(64);
+  await expect(sidebar.getByRole("link", { name: "Propriété intellectuelle" })).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
 });

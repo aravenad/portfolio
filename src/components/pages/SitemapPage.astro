@@ -1,0 +1,117 @@
+---
+import Breadcrumb from "../ui/Breadcrumb.astro";
+import Container from "../ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { navLinks, navLinksEn, socialLinks } from "../../data/site";
+import { useTranslations } from "../../data/ui";
+import { publicCv } from "../../lib/cv";
+import { getLang, localizedUrl } from "../../lib/i18n";
+import { getProjectHref, getProjects } from "../../lib/projects";
+
+/**
+ * Le plan du site, dans la langue de l'URL. Rendu par `sitemap.astro`, en
+ * français et en anglais, et annoncé par un lien du pied de page.
+ *
+ * Il ouvrait autrefois par-dessus la page (`popover`). Le RGAA le définit
+ * comme une page (critères 12.3 et 12.4) : il en est devenu une, qu'on peut
+ * aussi auditer, partager et retrouver dans l'historique.
+ *
+ * Tout y est tiré des données : une section de l'accueil ou un projet ajouté
+ * y apparaît sans y toucher.
+ */
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const { sitemap } = t;
+const sections = lang === "en" ? navLinksEn : navLinks;
+const projects = await getProjects(lang);
+const cv = publicCv();
+
+const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : undefined);
+
+/**
+ * Titre de groupe : petit, en capitales espacées. Jamais un lien : rien ne l'en
+ * distinguerait des titres qui n'en sont pas (RGAA 10.6). Les pages d'accueil
+ * et des projets ouvrent donc leur liste.
+ */
+const groupTitle = "text-sm font-semibold tracking-wider text-zinc-100 uppercase";
+const list = "mt-4 space-y-3";
+const link = "transition hover:text-zinc-100";
+---
+
+<BaseLayout title={sitemap.metaTitle} description={sitemap.metaDescription}>
+  <Container class="pt-10">
+    <Breadcrumb items={[{ label: sitemap.title }]} />
+  </Container>
+
+  <article class="py-14 sm:py-20">
+    <Container>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{sitemap.title}</h1>
+
+      {/*
+        Quatre groupes, du plus fréquenté au plus discret. Les projets ont la
+        colonne la plus large : leurs titres sont les plus longs.
+      */}
+      <div class="mt-12 grid gap-12 text-zinc-400 sm:grid-cols-2 lg:grid-cols-[1fr_2fr_1fr_1fr] lg:gap-10">
+        <section aria-labelledby="sitemap-home">
+          <h2 id="sitemap-home" class={groupTitle}>{sitemap.home}</h2>
+          <ul class={list}>
+            <li>
+              <a href={localizedUrl("/", lang)} class={link}>{sitemap.homePage}</a>
+            </li>
+            {
+              sections.map((section) => (
+                <li>
+                  <a href={localizedUrl(section.href, lang)} class={link}>{section.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section aria-labelledby="sitemap-projects">
+          <h2 id="sitemap-projects" class={groupTitle}>{sitemap.projects}</h2>
+          <ul class={list}>
+            <li>
+              <a href={localizedUrl("/projects", lang)} class={link}>{sitemap.allProjects}</a>
+            </li>
+            {
+              projects.map((project) => (
+                <li>
+                  <a href={getProjectHref(project, lang)} class={link}>{project.data.title}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section aria-labelledby="sitemap-contact">
+          <h2 id="sitemap-contact" class={groupTitle}>{sitemap.contact}</h2>
+          <ul class={list}>
+            {
+              socialLinks.map((social) => (
+                <li>
+                  <a href={social.href} rel={outbound(social.href)} class={link}>{social.label}</a>
+                </li>
+              ))
+            }
+            <li>
+              <a href={cv.href} download={cv.filename} class={link}>{sitemap.cv}</a>
+            </li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="sitemap-about">
+          <h2 id="sitemap-about" class={groupTitle}>{sitemap.about}</h2>
+          <ul class={list}>
+            <li>
+              <a href={localizedUrl("/legal", lang)} class={link}>{t.legal.title}</a>
+            </li>
+            <li>
+              <a href={localizedUrl("/accessibility", lang)} class={link}>{t.accessibility.title}</a>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </Container>
+  </article>
+</BaseLayout>

@@ -253,7 +253,7 @@ const fr = {
       method:
         "Il s'agit d'un auto-audit : l'éditeur a évalué son site lui-même, critère par critère, avec Ara, l'outil d'audit de la direction interministérielle du numérique (DINUM).",
       pages:
-        "Pages auditées : l'accueil et chacune de ses sections, la liste des projets, les huit fiches projet et les mentions légales.",
+        "Pages auditées : l'accueil et chacune de ses sections, la liste des projets, les huit fiches projet, les mentions légales, cette déclaration et le plan du site.",
       technologies: "Technologies utilisées : HTML, CSS et JavaScript.",
       environment:
         "Vérifications faites dans Firefox 153 ESR sous Linux, au clavier et à la souris, en thème sombre et en thème clair, sur grand écran et en largeur de téléphone.",
@@ -272,15 +272,26 @@ const fr = {
     },
   },
   backToTop: "Revenir en haut de la page",
-  footer: {
-    rights: "Tous droits réservés.",
-    /** Le plan du site : un lien du pied de page, ouvert par-dessus la page. */
-    sitemapLabel: "Plan du site",
-    close: "Fermer le plan du site",
+  /**
+   * Le plan du site, une page à part entière : le RGAA le définit comme une
+   * page (critères 12.3 et 12.4), et une page se partage et s'audite.
+   */
+  sitemap: {
+    title: "Plan du site",
+    metaTitle: `Plan du site | ${site.author}`,
+    metaDescription:
+      "Plan du site du portfolio de Damien Aravena Bravo : les sections de l'accueil, chaque projet, le contact et les pages d'information.",
     home: "Accueil",
+    homePage: "Page d'accueil",
     projects: "Projets",
+    allProjects: "Tous les projets",
     contact: "Contact",
     cv: "CV (PDF)",
+    about: "À propos du site",
+  },
+  footer: {
+    rights: "Tous droits réservés.",
+    sitemap: "Plan du site",
     legal: "Mentions légales",
     accessibility: "Accessibilité",
   },
@@ -513,7 +524,7 @@ const en = {
       method:
         "It is a self-assessment: the publisher audited his own site, criterion by criterion, with Ara, the audit tool of DINUM, the French government's digital agency.",
       pages:
-        "Audited pages: the home page and each of its sections, the project list, the eight project pages and the legal notice.",
+        "Audited pages: the home page and each of its sections, the project list, the eight project pages, the legal notice, this statement and the site map.",
       technologies: "Technologies used: HTML, CSS and JavaScript.",
       environment:
         "Checked in Firefox 153 ESR on Linux, with keyboard and mouse, in dark and light themes, on a wide screen and at phone width.",
@@ -532,14 +543,22 @@ const en = {
     },
   },
   backToTop: "Back to top",
-  footer: {
-    rights: "All rights reserved.",
-    sitemapLabel: "Site map",
-    close: "Close the site map",
+  sitemap: {
+    title: "Site map",
+    metaTitle: `Site map | ${site.author}`,
+    metaDescription:
+      "Site map of Damien Aravena Bravo's portfolio: the home page sections, every project, contact and information pages.",
     home: "Home",
+    homePage: "Home page",
     projects: "Projects",
+    allProjects: "All projects",
     contact: "Contact",
     cv: "Résumé (PDF, French)",
+    about: "About this site",
+  },
+  footer: {
+    rights: "All rights reserved.",
+    sitemap: "Site map",
     legal: "Legal notice",
     accessibility: "Accessibility",
   },

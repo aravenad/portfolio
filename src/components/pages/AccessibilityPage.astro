@@ -2,6 +2,7 @@
 import Arrow from "../ui/Arrow.astro";
 import Breadcrumb from "../ui/Breadcrumb.astro";
 import Container from "../ui/Container.astro";
+import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
@@ -26,7 +27,18 @@ const auditDate = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "fr-FR", {
   timeZone: "UTC",
 }).format(new Date(audit.date));
 
-const heading = "text-xl font-semibold text-zinc-100";
+/** Les parties de la page, dans l'ordre : leurs titres font le sommaire. */
+const tocHeadings = [
+  { slug: "a11y-status", text: a11y.status.title },
+  { slug: "a11y-results", text: a11y.results.title },
+  { slug: "a11y-audit", text: a11y.audit.title },
+  { slug: "a11y-display", text: a11y.display.title },
+  { slug: "a11y-contact", text: a11y.contact.title },
+].map((heading) => ({ ...heading, depth: 2 }));
+
+// `scroll-mt-22` : comme les titres des fiches, une ancre du sommaire ne
+// s'arrête pas derrière le header collant.
+const heading = "scroll-mt-22 text-xl font-semibold text-zinc-100";
 const body = "mt-4 space-y-4 leading-7 text-zinc-400";
 const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 transition hover:text-accent hover:decoration-current";
 ---
@@ -40,66 +52,74 @@ const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 tra
     <Container>
       <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{a11y.title}</h1>
 
-      <div class="mt-12 max-w-2xl space-y-12">
-        <p class="leading-7 text-zinc-400">{a11y.intro}</p>
+      {/* Le sommaire des mentions légales et des fiches projet, à la même place. */}
+      <div class="mt-10 lg:mt-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
+        <TableOfContents
+          headings={tocHeadings}
+          class="border-t border-zinc-900 lg:col-start-2 lg:row-start-1 lg:border-0"
+        />
 
-        <section aria-labelledby="a11y-status">
-          <h2 id="a11y-status" class={heading}>{a11y.status.title}</h2>
-          <div class={body}>
-            <p>{a11y.status.text(audit.rgaa)}</p>
-          </div>
-        </section>
+        <div class="mt-10 max-w-2xl space-y-12 lg:col-start-1 lg:row-start-1 lg:mt-0">
+          <p class="leading-7 text-zinc-400">{a11y.intro}</p>
 
-        <section aria-labelledby="a11y-results">
-          <h2 id="a11y-results" class={heading}>{a11y.results.title}</h2>
-          <div class={body}>
-            <p>{a11y.results.text}</p>
-            <ul class="list-disc space-y-1 pl-5 marker:text-zinc-600">
-              <li>{a11y.results.conform(audit.conform)}</li>
-              <li>{a11y.results.nonConform(audit.nonConform)}</li>
-              <li>{a11y.results.notApplicable(audit.notApplicable)}</li>
-            </ul>
-            <p>
-              {/* Comme les liens externes des fiches : nouvel onglet, annoncé, et flèche oblique. */}
-              <a href={audit.report} target="_blank" rel="noopener noreferrer" class:list={[link, "group"]}>
-                {a11y.results.report}
-                <span class="sr-only">{` ${a11y.results.newTab}`}</span>
-                <Arrow class="ml-1 inline-block -rotate-45 align-[-0.15em] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            </p>
-          </div>
-        </section>
+          <section aria-labelledby="a11y-status">
+            <h2 id="a11y-status" class={heading}>{a11y.status.title}</h2>
+            <div class={body}>
+              <p>{a11y.status.text(audit.rgaa)}</p>
+            </div>
+          </section>
 
-        <section aria-labelledby="a11y-audit">
-          <h2 id="a11y-audit" class={heading}>{a11y.audit.title}</h2>
-          <div class={body}>
-            <p>
-              {a11y.audit.date} <time datetime={audit.date}>{auditDate}</time>. {a11y.audit.method}
-            </p>
-            <p>{a11y.audit.pages}</p>
-            <p>{a11y.audit.technologies}</p>
-            <p>{a11y.audit.environment}</p>
-          </div>
-        </section>
+          <section aria-labelledby="a11y-results">
+            <h2 id="a11y-results" class={heading}>{a11y.results.title}</h2>
+            <div class={body}>
+              <p>{a11y.results.text}</p>
+              <ul class="list-disc space-y-1 pl-5 marker:text-zinc-600">
+                <li>{a11y.results.conform(audit.conform)}</li>
+                <li>{a11y.results.nonConform(audit.nonConform)}</li>
+                <li>{a11y.results.notApplicable(audit.notApplicable)}</li>
+              </ul>
+              <p>
+                {/* Comme les liens externes des fiches : nouvel onglet, annoncé, et flèche oblique. */}
+                <a href={audit.report} target="_blank" rel="noopener noreferrer" class:list={[link, "group"]}>
+                  {a11y.results.report}
+                  <span class="sr-only">{` ${a11y.results.newTab}`}</span>
+                  <Arrow class="ml-1 inline-block -rotate-45 align-[-0.15em] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              </p>
+            </div>
+          </section>
 
-        <section aria-labelledby="a11y-display">
-          <h2 id="a11y-display" class={heading}>{a11y.display.title}</h2>
-          <div class={body}>
-            <p>{a11y.display.settings}</p>
-            <p>{a11y.display.motion}</p>
-          </div>
-        </section>
+          <section aria-labelledby="a11y-audit">
+            <h2 id="a11y-audit" class={heading}>{a11y.audit.title}</h2>
+            <div class={body}>
+              <p>
+                {a11y.audit.date} <time datetime={audit.date}>{auditDate}</time>. {a11y.audit.method}
+              </p>
+              <p>{a11y.audit.pages}</p>
+              <p>{a11y.audit.technologies}</p>
+              <p>{a11y.audit.environment}</p>
+            </div>
+          </section>
 
-        <section aria-labelledby="a11y-contact">
-          <h2 id="a11y-contact" class={heading}>{a11y.contact.title}</h2>
-          <div class={body}>
-            <p>
-              {a11y.contact.text}{" "}
-              <a href={`mailto:${site.email}`} class={link}>{site.email}</a>{" "}
-              {a11y.contact.after}
-            </p>
-          </div>
-        </section>
+          <section aria-labelledby="a11y-display">
+            <h2 id="a11y-display" class={heading}>{a11y.display.title}</h2>
+            <div class={body}>
+              <p>{a11y.display.settings}</p>
+              <p>{a11y.display.motion}</p>
+            </div>
+          </section>
+
+          <section aria-labelledby="a11y-contact">
+            <h2 id="a11y-contact" class={heading}>{a11y.contact.title}</h2>
+            <div class={body}>
+              <p>
+                {a11y.contact.text}{" "}
+                <a href={`mailto:${site.email}`} class={link}>{site.email}</a>{" "}
+                {a11y.contact.after}
+              </p>
+            </div>
+          </section>
+        </div>
       </div>
     </Container>
   </article>

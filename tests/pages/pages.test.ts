@@ -18,6 +18,8 @@ const Legal = (await import("../../src/pages/legal.astro")).default;
 const LegalEn = (await import("../../src/pages/en/legal.astro")).default;
 const Accessibility = (await import("../../src/pages/accessibility.astro")).default;
 const AccessibilityEn = (await import("../../src/pages/en/accessibility.astro")).default;
+const Sitemap = (await import("../../src/pages/sitemap.astro")).default;
+const SitemapEn = (await import("../../src/pages/en/sitemap.astro")).default;
 
 /**
  * Une route générée. Le type est écrit à la main : un `import()` dynamique d'un
@@ -578,6 +580,92 @@ describe("déclaration d'accessibilité", () => {
     expect(document.documentElement.getAttribute("lang")).toBe("en");
     expect(document.querySelector("h1")?.textContent?.trim()).toBe("Accessibility");
     expect(document.querySelector("time")?.textContent).toBe("12 October 2026");
+  });
+});
+
+describe("sommaire des pages d'information", () => {
+  /** Les entrées du sommaire, dans sa forme de grand écran. */
+  const toc = (document: Document) =>
+    [...document.querySelectorAll('[data-toc="sidebar"] a')].map((a) => a.getAttribute("href"));
+
+  it("mène à chaque partie des mentions légales", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    const ids = [...document.querySelectorAll("article h2")].map((h2) => `#${h2.id}`);
+
+    expect(ids).toHaveLength(6);
+    expect(toc(document)).toEqual(ids);
+  });
+
+  it("mène à chaque partie de la déclaration d'accessibilité", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+    const ids = [...document.querySelectorAll("article h2")].map((h2) => `#${h2.id}`);
+
+    expect(ids).toHaveLength(5);
+    expect(toc(document)).toEqual(ids);
+  });
+
+  it("garde les titres visés hors de portée du header collant", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+
+    for (const h2 of document.querySelectorAll("article h2")) {
+      expect(h2.classList.contains("scroll-mt-22"), h2.id).toBe(true);
+    }
+  });
+
+  it("se traduit avec la page", async () => {
+    const { document } = await renderPage(AccessibilityEn, { request: request("/portfolio/en/accessibility") });
+
+    expect(document.querySelector('[data-toc="compact"]')?.getAttribute("aria-label")).toBe("On this page");
+    expect(document.querySelector('[data-toc="sidebar"] a')?.textContent?.trim()).toBe("Compliance status");
+  });
+});
+
+describe("plan du site", () => {
+  it("est une page, titrée et décrite pour les moteurs", async () => {
+    const { document } = await renderPage(Sitemap, { request: request("/portfolio/sitemap") });
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Plan du site");
+    expect(document.title).toBe(`Plan du site | ${site.author}`);
+    expect(meta(document, "description")).toContain("chaque projet");
+  });
+
+  it("mène à chaque section de l'accueil, à chaque projet et aux pages d'information", async () => {
+    const { document } = await renderPage(Sitemap, { request: request("/portfolio/sitemap") });
+    const hrefs = [...document.querySelectorAll("article a")].map((a) => a.getAttribute("href"));
+
+    for (const id of ["about", "skills", "career", "contact"]) {
+      expect(hrefs, id).toContain(`/portfolio/#${id}`);
+    }
+    expect(hrefs).toContain("/portfolio/projects");
+    for (const project of fixtureProjects) {
+      expect(hrefs, project.id).toContain(`/portfolio/projects/${project.id}`);
+    }
+    expect(hrefs).toContain("/portfolio/legal");
+    expect(hrefs).toContain("/portfolio/accessibility");
+    expect(hrefs).toContain(`mailto:${site.email}`);
+    expect(document.querySelector("article a[download]")).toBeTruthy();
+  });
+
+  it("titre chaque groupe de liens", async () => {
+    const { document } = await renderPage(Sitemap, { request: request("/portfolio/sitemap") });
+    const groups = [...document.querySelectorAll("article h2")].map((h2) => h2.textContent?.trim());
+
+    expect(groups).toEqual(["Accueil", "Projets", "Contact", "À propos du site"]);
+    // Un titre-lien ne se distinguerait pas des autres titres (RGAA 10.6).
+    expect(document.querySelector("article h2 a")).toBeNull();
+  });
+
+  it("existe en anglais, avec des liens restés en anglais", async () => {
+    const { document } = await renderPage(SitemapEn, { request: request("/portfolio/en/sitemap") });
+    const internal = [...document.querySelectorAll("article a:not([download])")]
+      .map((a) => a.getAttribute("href") ?? "")
+      .filter((href) => href.startsWith("/"));
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Site map");
+    expect(internal.length).toBeGreaterThan(0);
+    for (const href of internal) {
+      expect(href).toMatch(/^\/portfolio\/en(\/|$)/);
+    }
   });
 });
 

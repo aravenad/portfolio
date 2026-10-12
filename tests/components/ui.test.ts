@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Le pied de page liste les projets dans son plan du site.
-vi.mock("astro:content", async () => (await import("../helpers/content")).contentModule);
-
 import Arrow from "../../src/components/ui/Arrow.astro";
 import BackToTop from "../../src/components/ui/BackToTop.astro";
 import Badge from "../../src/components/ui/Badge.astro";
@@ -14,8 +11,7 @@ import Footer from "../../src/components/layout/Footer.astro";
 import Section from "../../src/components/ui/Section.astro";
 import SectionHeading from "../../src/components/ui/SectionHeading.astro";
 import TableOfContents from "../../src/components/ui/TableOfContents.astro";
-import { navLinks, socialLinks } from "../../src/data/site";
-import { fixtureProjects } from "../helpers/content";
+import { socialLinks } from "../../src/data/site";
 import { at, render } from "../helpers/render";
 
 beforeEach(() => {
@@ -273,21 +269,32 @@ describe("Footer", () => {
     expect(rowLinks(body)).toEqual(socialLinks.map((link) => link.href));
   });
 
-  it("mène aux mentions légales, depuis sa ligne comme depuis le plan", async () => {
+  it("mène au plan du site, aux mentions légales et à l'accessibilité, dans cet ordre", async () => {
     const { body } = await render(Footer);
+    const row = [...body.querySelectorAll("footer > div p a")].map((a) => [
+      a.textContent?.trim(),
+      a.getAttribute("href"),
+    ]);
 
-    expect(body.querySelector('footer > div p a[href="/portfolio/legal"]')?.textContent?.trim())
-      .toBe("Mentions légales");
-    expect(body.querySelector('#site-map a[href="/portfolio/legal"]')).toBeTruthy();
+    expect(row).toEqual([
+      ["Plan du site", "/portfolio/sitemap"],
+      ["Mentions légales", "/portfolio/legal"],
+      ["Accessibilité", "/portfolio/accessibility"],
+    ]);
   });
 
-  it("mène à la déclaration d'accessibilité, juste après les mentions légales", async () => {
-    const { body } = await render(Footer);
-    const row = [...body.querySelectorAll("footer > div p a")].map((a) => a.textContent?.trim());
+  it("garde ces liens dans la langue de la page", async () => {
+    const { body } = await render(Footer, at("/portfolio/en/projects"));
+    const hrefs = [...body.querySelectorAll("footer > div p a")].map((a) => a.getAttribute("href"));
 
-    expect(row.slice(-2)).toEqual(["Mentions légales", "Accessibilité"]);
-    expect(body.querySelector('footer > div p a[href="/portfolio/accessibility"]')).toBeTruthy();
-    expect(body.querySelector('#site-map a[href="/portfolio/accessibility"]')).toBeTruthy();
+    expect(hrefs).toEqual(["/portfolio/en/sitemap", "/portfolio/en/legal", "/portfolio/en/accessibility"]);
+  });
+
+  it("n'ouvre plus de plan par-dessus la page : c'en est une", async () => {
+    const { body } = await render(Footer);
+
+    expect(body.querySelector("[popover]")).toBeNull();
+    expect(body.querySelector("footer button")).toBeNull();
   });
 
   it("coupe le référent sur les liens sortants, et sur eux seuls", async () => {
@@ -297,54 +304,6 @@ describe("Footer", () => {
       const href = link.getAttribute("href") ?? "";
       expect(link.getAttribute("rel"), href).toBe(href.startsWith("http") ? "noreferrer" : null);
     }
-  });
-
-  describe("plan du site", () => {
-    it("s'ouvre depuis un bouton de la ligne, sans script", async () => {
-      const { body } = await render(Footer);
-      const map = body.querySelector("#site-map");
-      const opener = body.querySelector("footer > div button[popovertarget='site-map']");
-
-      expect(map?.hasAttribute("popover")).toBe(true);
-      expect(map?.tagName).toBe("NAV");
-      expect(map?.getAttribute("aria-label")).toBe("Plan du site");
-      expect(opener?.textContent?.trim()).toBe("Plan du site");
-    });
-
-    it("liste les sections de l'accueil, chaque projet et le CV", async () => {
-      const { body } = await render(Footer);
-      const hrefs = [...body.querySelectorAll("#site-map a")].map((a) => a.getAttribute("href"));
-
-      for (const link of navLinks) {
-        expect(hrefs, link.label).toContain(`/portfolio${link.href}`);
-      }
-      for (const project of fixtureProjects) {
-        expect(hrefs, project.id).toContain(`/portfolio/projects/${project.id}`);
-      }
-      expect(body.querySelector("#site-map a[download]")?.getAttribute("href")).toBe(
-        "/portfolio/cv-damien-aravena-bravo-public.pdf",
-      );
-    });
-
-    it("se ferme par un bouton étiqueté, pas par une croix muette", async () => {
-      const { body } = await render(Footer);
-      const close = body.querySelector("#site-map button[popovertargetaction='hide']");
-
-      expect(close?.getAttribute("aria-label")).toBe("Fermer le plan du site");
-    });
-
-    it("reste dans la langue de la page", async () => {
-      const { body } = await render(Footer, at("/portfolio/en/projects"));
-      const internal = [...body.querySelectorAll("#site-map a:not([download])")]
-        .map((a) => a.getAttribute("href") ?? "")
-        .filter((href) => href.startsWith("/"));
-
-      expect(body.querySelector("#site-map")?.getAttribute("aria-label")).toBe("Site map");
-      expect(internal.length).toBeGreaterThan(0);
-      for (const href of internal) {
-        expect(href).toMatch(/^\/portfolio\/en(\/|$)/);
-      }
-    });
   });
 
   it("affiche l'année en cours", async () => {
