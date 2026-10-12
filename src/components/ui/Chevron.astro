@@ -1,5 +1,9 @@
 ---
-/** Chevron de séparation du fil d'Ariane, dans la page comme dans la barre. */
+/**
+ * Chevron de séparation du fil d'Ariane, dans la page comme dans la barre. Du
+ * gris du texte voisin : en `zinc-700`, il tombait à 1,9:1, sous les 3:1 qu'un
+ * élément graphique doit tenir (RGAA 3.3).
+ */
 interface Props {
   class?: string;
 }
@@ -15,7 +19,7 @@ const { class: className } = Astro.props;
   stroke-linecap="round"
   stroke-linejoin="round"
   aria-hidden="true"
-  class:list={["size-3.5 shrink-0 text-zinc-700", className]}
+  class:list={["size-3.5 shrink-0 text-zinc-500", className]}
 >
   <path d="m6 3.5 4.5 4.5L6 12.5" />
 </svg>
