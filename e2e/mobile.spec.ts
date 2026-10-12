@@ -1,4 +1,4 @@
-import { clickInPlace, expect, navLink, test } from "./helpers";
+import { clickInPlace, expect, navLink, tabOrder, test } from "./helpers";
 
 /**
  * Sur téléphone : le menu déroulant, les réglages de la barre et le sommaire
@@ -55,6 +55,17 @@ test("une section choisie au menu arrive avec son titre juste sous le header", a
     );
   await expect.poll(gap).toBeGreaterThanOrEqual(24);
   await expect.poll(gap).toBeLessThanOrEqual(40);
+});
+
+test("le focus suit l'ordre visuel de la barre, puis entre dans le menu (RGAA 12.8)", async ({
+  page,
+}) => {
+  const home = page.locator("[data-home-link]");
+  expect(await tabOrder(page, home, 3)).toEqual(["EN", "Thème clair", "Ouvrir le menu"]);
+
+  // Ouvert, le panneau suit directement son bouton.
+  await toggle(page).click();
+  expect(await tabOrder(page, toggle(page), 2)).toEqual(["À propos", "Compétences"]);
 });
 
 test("les réglages de langue et de thème restent accessibles", async ({ page }) => {

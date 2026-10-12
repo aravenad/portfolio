@@ -111,6 +111,32 @@ export async function clickInPlace(page: Page, locator: Locator): Promise<void> 
   await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
 }
 
-/** Le lien de la barre de navigation qui porte ce libellé. */
+/**
+ * Le lien de navigation affiché qui porte ce libellé : celui de la barre large
+ * sur bureau, celui du menu replié sur téléphone. Le header en a un de chaque,
+ * et `getByRole` ignore celui qui est en `display: none`. `[data-nav-link]`
+ * écarte le « Projets » du fil d'Ariane, recopié dans la barre.
+ */
 export const navLink = (page: Page, name: string) =>
-  page.locator("#nav-menu").getByRole("link", { name, exact: true });
+  page.getByRole("link", { name, exact: true }).and(page.locator("[data-nav-link]"));
+
+/**
+ * Les `count` éléments atteints à la touche Tab depuis `from`, nommés par leur
+ * texte ou, à défaut, leur `aria-label`.
+ */
+export async function tabOrder(page: Page, from: Locator, count: number): Promise<string[]> {
+  await from.focus();
+  const names: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    await page.keyboard.press("Tab");
+    names.push(
+      await page.evaluate(() => {
+        const element = document.activeElement!;
+        return element.textContent?.trim() || element.getAttribute("aria-label") || "";
+      }),
+    );
+  }
+
+  return names;
+}

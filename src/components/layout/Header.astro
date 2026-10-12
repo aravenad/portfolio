@@ -15,20 +15,20 @@ const otherLang = lang === "fr" ? "en" : "fr";
 const ariaCurrent = (href: string) => ariaCurrentFor(localizedUrl(href, lang), currentPath);
 
 /**
- * Les petits boutons de la barre : menu, langue, thème. Sous 640 px, ils sont
+ * Les petits boutons de la barre : menu, langue, thème. Sous 48rem, ils sont
  * seuls à côté du logo et marquent le survol d'un fond, comme le menu.
  */
 const control =
   "flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white";
 
 /**
- * Langue et thème au-delà de 640 px : ils rejoignent les liens de navigation et
+ * Langue et thème au-delà de 48rem : ils rejoignent les liens de navigation et
  * en prennent le survol (la couleur seule, sans fond) et le texte. Un pavé
  * plein, posé sur la matière du haut de page, s'y lisait comme un autocollant.
  */
 const setting = [
   control,
-  "text-sm font-medium sm:text-zinc-400 sm:hover:bg-transparent sm:hover:text-zinc-100",
+  "text-sm font-medium md:text-zinc-400 md:hover:bg-transparent md:hover:text-zinc-100",
 ];
 ---
 
@@ -94,11 +94,50 @@ const setting = [
 
     {/*
       Navigation, langue et thème, écartés ensemble vers le bord en haut de page.
-      Sous 640 px, les liens vivent dans le panneau déplié : restent visibles la
-      langue, le thème, puis le bouton du menu, au bord. Au-delà, la navigation
-      repasse en tête (`sm:order-first`).
+
+      Deux listes des mêmes liens, chacune à sa place dans l'ordre de tabulation
+      (RGAA 12.8) : celle de la barre large avant la langue et le thème, celle du
+      menu replié après son bouton. Une seule liste, remontée en tête de la barre
+      par CSS (`order`), faisait passer le focus du nom à « EN » puis au thème,
+      avant de revenir aux liens qu'on voyait pourtant en premier. Une seule des
+      deux est affichée à la fois : l'autre, en `display: none`, sort aussi de
+      l'arbre d'accessibilité, et un lecteur d'écran ne lit qu'une navigation.
+
+      Sous 48rem, les liens vivent dans le panneau déplié : restent visibles la
+      langue, le thème, puis le bouton du menu, au bord. En rem et non en px : la
+      barre large demande 43rem, et ce seuil suit la taille de police choisie par
+      le visiteur (RGAA 10.4). L'ancien seuil, 40rem, était trop juste : le nom
+      recouvrait « À propos » à 640 px, et jusqu'à 1 350 px avec une police à 200 %.
     */}
-    <div class="header-end -mr-2 flex shrink-0 items-center gap-1 sm:gap-0">
+    <div class="header-end -mr-2 flex shrink-0 items-center gap-1 md:gap-0">
+      {/*
+        Un filet sépare la navigation des deux réglages : ce sont des
+        préférences, pas des destinations.
+      */}
+      <nav
+        aria-label={t.header.navLabel}
+        data-nav-bar
+        class="hidden md:flex md:items-center md:after:ml-4 md:after:mr-1 md:after:h-4 md:after:w-px md:after:bg-current md:after:opacity-25 md:after:content-['']"
+      >
+        <ul class="flex items-center gap-6 text-sm">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={localizedUrl(link.href, lang)}
+                  data-nav-link
+                  data-sections={link.sections?.join(" ")}
+                  aria-current={ariaCurrent(link.href)}
+                  class="block font-medium text-zinc-400 transition hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent"
+                >
+                  <span>{link.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
       <a
         href={switchLangPath(currentPath, otherLang)}
         hreflang={otherLang}
@@ -136,15 +175,8 @@ const setting = [
         </svg>
       </button>
 
-      {/*
-        Au-delà de 640 px, un filet sépare la navigation des deux réglages : ce
-        sont des préférences, pas des destinations.
-      */}
-      <nav
-        aria-label={t.header.navLabel}
-        class="sm:order-first sm:flex sm:items-center sm:after:ml-4 sm:after:mr-1 sm:after:h-4 sm:after:w-px sm:after:bg-current sm:after:opacity-25 sm:after:content-['']"
-      >
-        {/* Quatre liens ne tiennent pas à côté du logo sous 640px. */}
+      <nav aria-label={t.header.navLabel} class="md:hidden">
+        {/* Cinq liens ne tiennent pas à côté du logo sous 48rem. */}
         <button
           type="button"
           data-nav-toggle
@@ -153,7 +185,7 @@ const setting = [
           aria-label={t.header.openMenu}
           data-label-open={t.header.openMenu}
           data-label-close={t.header.closeMenu}
-          class:list={[control, "sm:hidden"]}
+          class={control}
         >
           <svg
             viewBox="0 0 24 24"
@@ -180,16 +212,10 @@ const setting = [
           suffit pas à effacer ce qui passe dessous : mesuré sur Chrome, le titre
           de l'accueil restait net et lisible derrière les liens. Le fond doit
           donc couvrir seul ; le flou n'est qu'un complément là où il s'applique.
-
-          ⚠️ `sm:z-auto` N'EST PAS DÉCORATIF. La `<nav>` est un conteneur flex au-delà
-          de 640 px (pour son filet), ce qui fait de cette liste un élément flex :
-          son `-z-10`, fait pour le panneau mobile, s'appliquerait alors aussi en
-          position statique. Les liens passaient derrière la barre, qui prenait
-          leurs clics et les recouvrait de son fond au défilement.
         */}
         <ul
           id="nav-menu"
-          class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex sm:static sm:z-auto sm:flex sm:flex-row sm:items-center sm:gap-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+          class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex"
         >
           {
             links.map((link) => (
@@ -199,7 +225,7 @@ const setting = [
                   data-nav-link
                   data-sections={link.sections?.join(" ")}
                   aria-current={ariaCurrent(link.href)}
-                  class="block rounded-lg px-3 py-2.5 font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent sm:p-0 sm:hover:bg-transparent"
+                  class="block rounded-lg px-3 py-2.5 font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent"
                 >
                   <span>{link.label}</span>
                 </a>
@@ -306,11 +332,11 @@ const setting = [
    *
    * La couleur suit le même rythme que le reste ; seul le survol reste vif.
    *
-   * Grand écran seulement : sous 640 px, les liens vivent dans le panneau
+   * Grand écran seulement : sous 48rem, les liens vivent dans le panneau
    * déplié, qui a son propre fond. Seul le bouton du menu reste sur la matière,
    * et son `zinc-300` y tient déjà.
    */
-  @media (width >= 40rem) {
+  @media (width >= 48rem) {
     :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
       transition:
         color var(--bar-duration) var(--bar-ease),
@@ -527,7 +553,7 @@ const setting = [
     position: absolute;
   }
 
-  @media (width >= 40rem) {
+  @media (width >= 48rem) {
     [data-nav-link][aria-current] > span::after,
     [data-nav-link][data-active] > span::after {
       bottom: -0.5rem;
@@ -740,8 +766,8 @@ const setting = [
 <script>
   import { onEachPage } from "../../lib/enhance";
   /**
-   * Menu repliable sous 640px. Le même `<ul>` sert aux deux tailles : dupliquer
-   * les liens dédoublerait aussi les cibles du surlignage au défilement.
+   * Menu repliable sous 48rem. Ses liens sont une seconde liste, propre au
+   * panneau : voir le balisage, plus haut.
    */
   onEachPage((signal) => {
     const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
@@ -790,7 +816,8 @@ const setting = [
       );
 
       // Repasser en grand écran laisserait sinon l'état « ouvert » derrière soi.
-      window.matchMedia("(min-width: 640px)").addEventListener(
+      // Le seuil du style, en rem lui aussi : il suit la taille de police.
+      window.matchMedia("(width >= 48rem)").addEventListener(
         "change",
         (event) => {
           if (event.matches) setOpen(false);
@@ -823,21 +850,24 @@ const setting = [
    * Sur une page sans section observable, seul l'`aria-current="page"` rendu par
    * le serveur reste en place — mais encore faut-il effacer d'abord le
    * surlignage de la page précédente : voir plus bas.
+   *
+   * Chaque section a deux liens, un par liste (barre large et menu replié) : les
+   * deux s'allument ensemble, et le menu s'ouvre déjà sur la bonne section.
    */
   onEachPage((signal) => {
     const links = [
       ...document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]"),
     ];
 
-    const linkBySection = new Map<string, HTMLAnchorElement>();
+    const linksBySection = new Map<string, HTMLAnchorElement[]>();
 
     for (const link of links) {
       for (const id of (link.dataset.sections ?? "").split(" ").filter(Boolean)) {
-        linkBySection.set(id, link);
+        linksBySection.set(id, [...(linksBySection.get(id) ?? []), link]);
       }
     }
 
-    const sections = [...linkBySection.keys()]
+    const sections = [...linksBySection.keys()]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => section !== null);
 
@@ -871,10 +901,10 @@ const setting = [
           atBottom,
         );
 
-        const active = index >= 0 ? linkBySection.get(sections[index].id) : undefined;
+        const active = index >= 0 ? (linksBySection.get(sections[index].id) ?? []) : [];
 
         for (const link of links) {
-          if (link === active) {
+          if (active.includes(link)) {
             link.dataset.active = "";
           } else {
             delete link.dataset.active;

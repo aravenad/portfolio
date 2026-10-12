@@ -12,9 +12,22 @@ import { at, render } from "../helpers/render";
  * deux, qui ont chacune produit un bug cette semaine.
  */
 
-/** Le lien de navigation portant ce libellé. */
+/**
+ * Les deux listes des mêmes liens : celle de la barre large et celle du menu
+ * replié. Chacune est à sa place dans l'ordre de tabulation (RGAA 12.8).
+ */
+const lists = { barre: "[data-nav-bar]", menu: "#nav-menu" } as const;
+
+/** Les libellés des liens d'une liste. */
+function labels(document: Document, list: string) {
+  return [...document.querySelectorAll(`${list} [data-nav-link]`)].map((node) =>
+    node.textContent?.trim(),
+  );
+}
+
+/** Le lien de la barre large portant ce libellé. */
 function link(document: Document, label: string) {
-  const found = [...document.querySelectorAll("[data-nav-link]")].find(
+  const found = [...document.querySelectorAll(`${lists.barre} [data-nav-link]`)].find(
     (node) => node.textContent?.trim() === label,
   );
   expect(found, `lien « ${label} » absent du header`).toBeTruthy();
@@ -22,11 +35,24 @@ function link(document: Document, label: string) {
   return found as Element;
 }
 
-/** Les libellés des liens marqués, quelle que soit la valeur d'`aria-current`. */
+/**
+ * Les libellés des liens marqués, quelle que soit la valeur d'`aria-current`.
+ * Ceux de la barre large, après avoir vérifié que le menu marque les mêmes.
+ */
 function marked(document: Document) {
-  return [...document.querySelectorAll("[data-nav-link][aria-current]")].map((node) =>
-    node.textContent?.trim(),
+  const [bar, menu] = [lists.barre, lists.menu].map((list) =>
+    [...document.querySelectorAll(`${list} [data-nav-link][aria-current]`)].map(
+      (node) => `${node.textContent?.trim()}=${node.getAttribute("aria-current")}`,
+    ),
   );
+  expect(menu, "le menu replié ne marque pas les mêmes liens").toEqual(bar);
+
+  return bar.map((entry) => entry.split("=")[0]);
+}
+
+/** Les éléments focalisables du header, dans l'ordre du code. */
+function focusOrder(document: Document) {
+  return [...document.querySelectorAll("header a, header button")];
 }
 
 beforeEach(() => {
@@ -34,13 +60,49 @@ beforeEach(() => {
 });
 
 describe("Header", () => {
-  it("affiche tous les liens de navigation, dans l'ordre déclaré", async () => {
-    const { document } = await render(Header, at("/portfolio/"));
-    const labels = [...document.querySelectorAll("[data-nav-link]")].map((node) =>
-      node.textContent?.trim(),
-    );
+  it.each(Object.entries(lists))(
+    "affiche tous les liens de navigation, dans l'ordre déclaré (%s)",
+    async (_, list) => {
+      const { document } = await render(Header, at("/portfolio/"));
 
-    expect(labels).toEqual(navLinks.map((navLink) => navLink.label));
+      expect(labels(document, list)).toEqual(navLinks.map((navLink) => navLink.label));
+    },
+  );
+
+  describe("ordre de tabulation (RGAA 12.8)", () => {
+    // Une seule liste, remontée en tête par CSS au-delà de 640 px, faisait
+    // passer le focus du nom à « EN » et au thème avant les liens qu'on voyait
+    // en premier. L'ordre du code doit donc être celui de chaque disposition.
+    it("place les liens de la barre large avant la langue et le thème", async () => {
+      const { document } = await render(Header, at("/portfolio/"));
+      const order = focusOrder(document);
+      const lastBarLink = [...document.querySelectorAll(`${lists.barre} a`)].at(-1)!;
+
+      expect(order.indexOf(lastBarLink)).toBeLessThan(
+        order.indexOf(document.querySelector("[data-lang-switch]")!),
+      );
+    });
+
+    it("place le bouton du menu après les réglages, et son panneau juste après lui", async () => {
+      const { document } = await render(Header, at("/portfolio/"));
+      const order = focusOrder(document);
+      const toggle = order.indexOf(document.querySelector("[data-nav-toggle]")!);
+      const firstMenuLink = order.indexOf(document.querySelector(`${lists.menu} a`)!);
+
+      expect(order.indexOf(document.querySelector("[data-theme-toggle]")!)).toBeLessThan(toggle);
+      expect(firstMenuLink).toBe(toggle + 1);
+    });
+
+    it("n'affiche qu'une des deux listes à chaque taille", async () => {
+      // Sous 48rem la barre large, au-delà le menu : `display: none`, qui les
+      // retire aussi de la tabulation et de l'arbre d'accessibilité.
+      const { document } = await render(Header, at("/portfolio/"));
+      const bar = document.querySelector(lists.barre)?.getAttribute("class")?.split(/\s+/);
+      const menu = document.querySelector(lists.menu)?.closest("nav")?.getAttribute("class")?.split(/\s+/);
+
+      expect(bar).toEqual(expect.arrayContaining(["hidden", "md:flex"]));
+      expect(menu).toContain("md:hidden");
+    });
   });
 
   it("préfixe chaque destination par la base du site", async () => {
@@ -51,14 +113,13 @@ describe("Header", () => {
     }
   });
 
-  it("expose les sections du scroll-spy dans le DOM", async () => {
+  it.each(Object.entries(lists))("expose les sections du scroll-spy dans le DOM (%s)", async (_, list) => {
     const { document } = await render(Header, at("/portfolio/"));
+    const sections = [...document.querySelectorAll(`${list} [data-nav-link]`)].map((node) =>
+      node.getAttribute("data-sections"),
+    );
 
-    for (const navLink of navLinks) {
-      expect(link(document, navLink.label).getAttribute("data-sections")).toBe(
-        navLink.sections?.join(" "),
-      );
-    }
+    expect(sections).toEqual(navLinks.map((navLink) => navLink.sections?.join(" ")));
   });
 
   it("ramène le logo à l'accueil", async () => {
@@ -174,15 +235,15 @@ describe("Header", () => {
       expect(classes).not.toContain("top-16");
     });
 
-    it("ne passe pas derrière la barre sur grand écran", async () => {
-      // Le `-z-10` du panneau mobile s'appliquait aussi au-delà de 640 px dès
-      // que la liste était un élément flex : les liens passaient sous la barre,
-      // qui prenait leurs clics et les masquait au défilement.
+    it("garde son `-z-10` hors de la barre large", async () => {
+      // Quand la même liste servait aux deux tailles, ce `-z-10` s'appliquait
+      // aussi dans la barre dès qu'elle y était un élément flex : les liens
+      // passaient sous la barre, qui prenait leurs clics. La barre a désormais
+      // sa propre liste, sans indice d'empilement.
       const { document } = await render(Header, at("/portfolio/"));
-      const classes = document.getElementById("nav-menu")?.getAttribute("class")?.split(/\s+/);
+      const classes = document.querySelector(`${lists.barre} ul`)?.getAttribute("class")?.split(/\s+/);
 
-      expect(classes).toContain("-z-10");
-      expect(classes).toContain("sm:z-auto");
+      expect(classes?.some((name) => name.includes("z-"))).toBe(false);
     });
 
     it("commande bien le panneau qu'il annonce", async () => {
@@ -197,12 +258,13 @@ describe("Header", () => {
 describe("Header en anglais", () => {
   it("traduit les liens et les garde dans la version anglaise", async () => {
     const { document } = await render(Header, at("/portfolio/en/"));
-    const links = [...document.querySelectorAll("[data-nav-link]")];
 
-    expect(links.map((node) => node.textContent?.trim())).toEqual(
-      navLinksEn.map((navLink) => navLink.label),
-    );
-    for (const node of links) expect(node.getAttribute("href")).toMatch(/^\/portfolio\/en\//);
+    for (const list of Object.values(lists)) {
+      expect(labels(document, list)).toEqual(navLinksEn.map((navLink) => navLink.label));
+    }
+    for (const node of document.querySelectorAll("[data-nav-link]")) {
+      expect(node.getAttribute("href")).toMatch(/^\/portfolio\/en\//);
+    }
     expect(document.querySelector("[data-home-link]")?.getAttribute("href")).toBe("/portfolio/en/");
   });
 

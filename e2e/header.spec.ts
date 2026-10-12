@@ -6,6 +6,7 @@ import {
   scrollToId,
   scrollToY,
   scrollY,
+  tabOrder,
   test,
 } from "./helpers";
 
@@ -112,4 +113,75 @@ test("le fil d'Ariane passe dans la barre une fois défilé sous elle, et y mèn
   // Le header a persisté : il porte maintenant le fil de la liste, caché en haut.
   await expect(header).not.toHaveAttribute("data-trail");
   await expect(trail).toHaveText("Projets");
+});
+
+test("le focus suit l'ordre visuel de la barre (RGAA 12.8)", async ({ page }) => {
+  // La liste remontée en tête par CSS faisait passer le focus du nom à « EN » et
+  // au thème, avant de revenir aux liens.
+  expect(await tabOrder(page, page.locator("[data-home-link]"), 7)).toEqual([
+    "À propos",
+    "Compétences",
+    "Parcours",
+    "Projets",
+    "Contact",
+    "EN",
+    "Thème clair",
+  ]);
+});
+
+test.describe("avec une police agrandie à 200 % (RGAA 10.4)", () => {
+  /** Les éléments affichés de la barre qui en chevauchent un autre. */
+  const overlaps = (page: import("@playwright/test").Page) =>
+    page.evaluate(() => {
+      const boxes = [
+        ...document.querySelectorAll(
+          "[data-home-link], [data-nav-link], [data-lang-switch], [data-theme-toggle], [data-nav-toggle]",
+        ),
+      ]
+        .map((element) => ({ name: element.textContent?.trim(), box: element.getBoundingClientRect() }))
+        .filter(({ box }) => box.width > 0 && box.height > 0);
+
+      return boxes.flatMap((a, i) =>
+        boxes
+          .slice(i + 1)
+          .filter(
+            (b) =>
+              a.box.left < b.box.right &&
+              b.box.left < a.box.right &&
+              a.box.top < b.box.bottom &&
+              b.box.top < a.box.bottom,
+          )
+          .map((b) => `${a.name} × ${b.name}`),
+      );
+    });
+
+  // La taille de police par défaut du navigateur, celle que règle le visiteur.
+  // Le zoom ne la change pas : il agrandit aussi la fenêtre en pixels CSS.
+  test.beforeEach(async ({ page }) => {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Page.setFontSizes", { fontSizes: { standard: 32, fixed: 26 } });
+  });
+
+  test("à 1280 px, la barre se replie au lieu de recouvrir le nom", async ({ page }) => {
+    // Avec un seuil à 40rem (1 280 px à cette taille), la barre restait large et
+    // le nom recouvrait « À propos » jusqu'à 1 350 px.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("");
+
+    await expect(page.locator("[data-nav-toggle]")).toBeVisible();
+    await expect(page.locator("[data-nav-bar]")).toBeHidden();
+    expect(await overlaps(page)).toEqual([]);
+  });
+
+  test("à 1920 px, la barre large tient sans chevauchement", async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto("");
+
+    await expect(page.locator("[data-nav-bar]")).toBeVisible();
+    expect(await overlaps(page)).toEqual([]);
+
+    await scrollToY(page, 800);
+    await expect(page.locator("header")).toHaveAttribute("data-scrolled");
+    expect(await overlaps(page)).toEqual([]);
+  });
 });
