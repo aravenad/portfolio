@@ -51,11 +51,11 @@ const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
               qu'elles ont sur grand écran, et la grille se centre sous le
               texte, qui lui court sur toute la largeur.
             */}
-            <div class="mx-auto hidden max-w-lg grid-cols-4 gap-3 sm:grid">
+            <ul class="mx-auto hidden max-w-lg grid-cols-4 gap-3 sm:grid">
               {skills.map((skill) => (
                 <SkillTile skill={skill} />
               ))}
-            </div>
+            </ul>
           </Fragment>
         ) : (
           <SkillList skills={skills} />

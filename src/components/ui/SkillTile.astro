@@ -15,7 +15,8 @@ const { skill } = Astro.props;
 const brand = brandStyle(skill);
 ---
 
-<div
+{/* Un élément de la liste des compétences (Skills.astro), comme SkillChip. */}
+<li
   title={skill.label}
   class="skill-tile surface-lit flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60 p-3 text-center transition hover:border-zinc-600 hover:from-zinc-800/80 hover:to-zinc-800/60"
   style={brand}
@@ -24,6 +25,7 @@ const brand = brandStyle(skill);
     skill.icon ? (
       <Icon
         name={skill.icon}
+        aria-hidden="true"
         class:list={[
           "skill-icon size-8 text-zinc-100 transition-colors sm:size-10",
           skill.lineArt && "skill-icon-line",
@@ -44,7 +46,7 @@ const brand = brandStyle(skill);
       </span>
     )
   }
-</div>
+</li>
 
 <style>
   /*

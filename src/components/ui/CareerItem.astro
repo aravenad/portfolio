@@ -46,7 +46,7 @@ const subtitle = title ? organization : undefined;
       logo ? (
         <img src={logo} alt="" width="32" height="32" class="size-full object-contain" />
       ) : icon ? (
-        <Icon name={icon} class="size-6 text-zinc-100" />
+        <Icon name={icon} aria-hidden="true" class="size-6 text-zinc-100" />
       ) : (
         <span class="font-mono text-[0.7rem] font-bold tracking-tight text-zinc-400">
           {initials}
@@ -60,7 +60,8 @@ const subtitle = title ? organization : undefined;
       Le titre et la pastille passent à la ligne d'un bloc : sur un écran étroit,
       la pastille glissée dans le texte se coupait en deux (« À » / « venir »).
     */}
-    <h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-zinc-100">
+    {/* h4 : l'entrée relève de l'intertitre « Expérience » ou « Formation » (h3). */}
+    <h4 class="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-zinc-100">
       {heading}
       {
         upcoming && (
@@ -69,7 +70,7 @@ const subtitle = title ? organization : undefined;
           </span>
         )
       }
-    </h3>
+    </h4>
 
     <p class="mt-1 text-sm text-zinc-400">
       {subtitle}{subtitle && location && " · "}

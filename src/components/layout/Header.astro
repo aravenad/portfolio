@@ -324,8 +324,11 @@ const setting = [
   /*
    * Sans fond, les liens reposent directement sur la matière. Mesuré sur ses
    * reflets les plus clairs (95e centile, de 1280 à 1920 px), le `zinc-400`
-   * habituel tombe à 2,5:1 — loin des 4,5:1 d'un texte. Le `zinc-200` en tient
-   * plus de 5. Le survol et le lien actif gardent leur propre couleur.
+   * habituel tombe à 2,5:1 — loin des 4,5:1 d'un texte. Le `zinc-200` tombait
+   * encore à 4,4:1 sur « Compétences » à 1280 px (audit RGAA, 12 octobre 2026) :
+   * le `zinc-100` remonte ce pire cas autour de 5:1. Le survol passe alors à
+   * l'encre maximale (`white`) pour rester perceptible ; le lien actif garde
+   * l'accent.
    *
    * Les boutons de langue et de thème suivent exactement les mêmes règles que
    * les liens : même couleur, même rythme, même survol.
@@ -353,7 +356,15 @@ const setting = [
         [aria-current],
         [data-active]
       ) {
-      color: var(--color-zinc-200);
+      color: var(--color-zinc-100);
+    }
+
+    header:not([data-scrolled])
+      :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):hover:not(
+        [aria-current],
+        [data-active]
+      ) {
+      color: var(--color-white);
     }
   }
 

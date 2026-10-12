@@ -309,7 +309,7 @@ describe("sélecteur de langue", () => {
     const link = document.querySelector("[data-lang-switch]");
 
     expect(link?.getAttribute("href")).toBe("/portfolio/");
-    expect(link?.getAttribute("aria-label")).toBe("Version française");
+    expect(link?.getAttribute("aria-label")).toBe("FR, version française");
   });
 });
 

@@ -22,9 +22,13 @@ const featuredProjects = await getFeaturedProjects(3, lang);
     description={t.projects.previewDescription}
   />
 
-  <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {featuredProjects.map((project) => <ProjectCard project={project} showTags={false} />)}
-  </div>
+  <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {featuredProjects.map((project) => (
+      <li>
+        <ProjectCard project={project} showTags={false} />
+      </li>
+    ))}
+  </ul>
 
   {
     projects.length > featuredProjects.length && (

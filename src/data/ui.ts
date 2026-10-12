@@ -28,13 +28,18 @@ const fr = {
   },
 
   header: {
+    skipLink: "Aller au contenu",
     navLabel: "Navigation principale",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
     /** Le bouton bascule le thème clair : il est « pressé » quand le clair est actif. */
     lightTheme: "Thème clair",
-    /** Lien vers l'autre langue : texte court, nom complet pour les lecteurs d'écran. */
-    otherLang: { short: "EN", label: "English version" },
+    /**
+     * Lien vers l'autre langue : texte court, nom complet pour les lecteurs
+     * d'écran. Le nom commence par le texte visible, pour qu'une commande
+     * vocale (« cliquer sur EN ») trouve le lien (RGAA 6.1).
+     */
+    otherLang: { short: "EN", label: "EN, English version" },
   },
 
   hero: {
@@ -237,11 +242,12 @@ const en = {
   },
 
   header: {
+    skipLink: "Skip to content",
     navLabel: "Main navigation",
     openMenu: "Open the menu",
     closeMenu: "Close the menu",
     lightTheme: "Light theme",
-    otherLang: { short: "FR", label: "Version française" },
+    otherLang: { short: "FR", label: "FR, version française" },
   },
 
   hero: {

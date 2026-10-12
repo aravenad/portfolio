@@ -11,9 +11,15 @@ interface Props {
   project: Project;
   /** Masqué sur l'aperçu de l'accueil, affiché sur la liste des projets. */
   showTags?: boolean;
+  /**
+   * Niveau du titre de la carte : h3 sous le h2 « Mes projets » de l'accueil,
+   * h2 directement sous le h1 de la page Projets (RGAA 9.1, sans saut).
+   */
+  headingLevel?: 2 | 3;
 }
 
-const { project, showTags = true } = Astro.props;
+const { project, showTags = true, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
 const { title, summary, tags, status, cover } = project.data;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
@@ -34,9 +40,9 @@ const t = useTranslations(lang);
   />
 
   <div class="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
-    <h3 class="font-medium text-zinc-100 transition group-hover:text-white">
+    <Heading class="font-medium text-zinc-100 transition group-hover:text-white">
       {title}
-    </h3>
+    </Heading>
 
     <p class="mt-1.5 line-clamp-3 text-sm leading-6 text-zinc-400 sm:mt-3 sm:line-clamp-none">
       {summary}
@@ -44,11 +50,13 @@ const t = useTranslations(lang);
 
     {
       showTags && tags.length > 0 && (
-        <div class="mt-4 hidden flex-wrap gap-2 sm:flex">
+        <ul class="mt-4 hidden flex-wrap gap-2 sm:flex">
           {tags.map((tag) => (
-            <Badge>{tag}</Badge>
+            <li>
+              <Badge>{tag}</Badge>
+            </li>
           ))}
-        </div>
+        </ul>
       )
     }
 

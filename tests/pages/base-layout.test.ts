@@ -28,6 +28,20 @@ describe("BaseLayout", () => {
     expect(meta(document, "viewport")).toContain("width=device-width");
   });
 
+  it("ouvre sur un lien d'évitement vers le contenu principal", async () => {
+    const { document } = await renderPage(BaseLayout, options());
+    const first = document.body.querySelector("a, button");
+
+    expect(first?.getAttribute("href")).toBe("#main");
+    expect(first?.textContent?.trim()).toBe("Aller au contenu");
+    expect(document.querySelector("main")?.id).toBe("main");
+  });
+
+  it("traduit le lien d'évitement sur les pages anglaises", async () => {
+    const { document } = await renderPage(BaseLayout, options("/portfolio/en/"));
+    expect(document.body.querySelector("a")?.textContent?.trim()).toBe("Skip to content");
+  });
+
   it("reprend la description du site quand la page n'en donne pas", async () => {
     const { document } = await renderPage(BaseLayout, options());
     expect(meta(document, "description")).toBe(site.description);

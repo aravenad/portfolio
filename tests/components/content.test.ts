@@ -137,13 +137,13 @@ describe("CareerItem", () => {
       props: { entry: { ...base, title: "Technicien informatique" } },
     });
 
-    expect(body.querySelector("h3")?.textContent?.trim()).toBe("Technicien informatique");
+    expect(body.querySelector("h4")?.textContent?.trim()).toBe("Technicien informatique");
     expect(body.textContent).toContain("Horizon Groupe");
   });
 
   it("promeut l'organisation en titre quand l'entrée n'a pas d'intitulé", async () => {
     const { body } = await render(CareerItem, { props: { entry: base } });
-    expect(body.querySelector("h3")?.textContent?.trim()).toBe("Horizon Groupe");
+    expect(body.querySelector("h4")?.textContent?.trim()).toBe("Horizon Groupe");
   });
 
   it("préfère le logo à l'icône et l'icône aux initiales", async () => {
@@ -244,6 +244,11 @@ describe("ProjectCard", () => {
 
     expect(body.querySelector("h3")?.textContent?.trim()).toBe("Mon projet");
     expect(body.textContent).toContain("Une phrase de résumé.");
+  });
+
+  it("prend le niveau de titre demandé", async () => {
+    const { body } = await render(ProjectCard, { props: { project: project(), headingLevel: 2 } });
+    expect(body.querySelector("h2")?.textContent?.trim()).toBe("Mon projet");
   });
 
   it("montre les étiquettes par défaut et les masque sur l'aperçu de l'accueil", async () => {

@@ -241,10 +241,17 @@ body::after {
  * (largeur du texte - largeur du motif), soit -1,5 fois la largeur du texte
  * pour une tuile de 250 %. Décaler d'une tuile pleine (2,5) demande donc
  * 2,5 / 1,5 = 1,6667 tour de cette unité.
+ *
+ * ⚠️ UN SEUL PASSAGE, PAS UNE BOUCLE INFINIE. Le RGAA (13.8) demande qu'un
+ * mouvement lancé seul dure 5 s au plus, ou qu'on puisse l'arrêter sur la page ;
+ * `prefers-reduced-motion` ne compte pas comme un tel moyen. Un passage dure
+ * 4 s, et le raccord sans couture fait que la position finale se confond avec
+ * celle du départ : le reflet s'arrête sans saut. Mis en pause hors écran
+ * (BaseLayout), chaque titre joue son passage quand on arrive sur lui.
  */
 @media (prefers-reduced-motion: no-preference) {
   .text-chrome {
-    animation: text-chrome-shine 4s linear infinite;
+    animation: text-chrome-shine 4s linear 1;
     background-image: linear-gradient(
       110deg,
       var(--color-white) 32%,

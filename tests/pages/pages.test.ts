@@ -95,7 +95,7 @@ describe("liste des projets", () => {
       request: request("/portfolio/projects"),
     });
 
-    expect(document.querySelectorAll("article h3, .grid h3").length).toBeGreaterThan(0);
+    expect(document.querySelectorAll("main ul.grid > li h2").length).toBeGreaterThan(0);
     expect(document.querySelector("[data-pagination]")).toBeTruthy();
     expect(document.querySelector('[data-page][aria-current="page"]')?.textContent?.trim())
       .toBe("1");

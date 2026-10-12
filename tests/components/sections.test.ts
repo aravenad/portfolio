@@ -192,7 +192,7 @@ describe("Career", () => {
     const { body } = await render(Career);
     const first = body.querySelector("ul > li")!;
 
-    expect(first.querySelector("h3")?.textContent).toContain("À venir");
+    expect(first.querySelector("h4")?.textContent).toContain("À venir");
     expect(first.querySelector('a[href="/portfolio/projects/stage-2027"]')?.textContent)
       .toContain("Voir la fiche");
   });
@@ -309,7 +309,13 @@ describe("ProjectsList", () => {
 
   it("affiche une carte par projet de la page", async () => {
     const { body } = await render(ProjectsList, { props: page });
-    expect(body.querySelectorAll("h3")).toHaveLength(6);
+    expect(body.querySelectorAll("ul > li h2")).toHaveLength(6);
+  });
+
+  // RGAA 9.1 : sous le h1 de la page, les cartes sont des h2, sans saut.
+  it("titre ses cartes en h2, juste sous le h1", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    expect(body.querySelectorAll("h3")).toHaveLength(0);
   });
 
   it("annonce la position dans la série", async () => {

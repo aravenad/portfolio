@@ -267,7 +267,7 @@ test.describe("accueil allégé", () => {
 
     test("la pastille « À venir » du parcours ne se coupe pas", async ({ page }) => {
       await page.goto("");
-      const badge = page.locator("#career h3 span", { hasText: "À venir" });
+      const badge = page.locator("#career h4 span", { hasText: "À venir" });
       await badge.scrollIntoViewIfNeeded();
 
       // Coupée sur deux lignes, une boîte en ligne compte un rectangle par ligne.
@@ -287,10 +287,10 @@ test.describe("accueil allégé", () => {
 
   test("les cartes de projets passent en ligne, vignette à gauche", async ({ page }) => {
     await page.goto("projects");
-    const card = page.locator("main a[href*='/projects/']").filter({ has: page.locator("h3") }).first();
+    const card = page.locator("main a[href*='/projects/']").filter({ has: page.locator("h2") }).first();
 
     const cover = (await card.locator(".project-cover").boundingBox())!;
-    const title = (await card.locator("h3").boundingBox())!;
+    const title = (await card.locator("h2").boundingBox())!;
     expect(cover.x + cover.width).toBeLessThanOrEqual(title.x);
     await expect(card.locator(".flex-wrap")).toBeHidden();
   });

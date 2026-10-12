@@ -99,4 +99,12 @@ describe("textes de l'interface", () => {
     expect(useTranslations("fr").header.otherLang.short).toBe("EN");
     expect(useTranslations("en").header.otherLang.short).toBe("FR");
   });
+
+  // RGAA 6.1 : le nom accessible contient l'intitulé visible, en tête.
+  it("fait commencer le nom du lien de langue par son texte visible", () => {
+    for (const lang of ["fr", "en"] as const) {
+      const { short, label } = useTranslations(lang).header.otherLang;
+      expect(label.startsWith(short), label).toBe(true);
+    }
+  });
 });
