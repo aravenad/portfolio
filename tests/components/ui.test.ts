@@ -281,6 +281,15 @@ describe("Footer", () => {
     expect(body.querySelector('#site-map a[href="/portfolio/legal"]')).toBeTruthy();
   });
 
+  it("mène à la déclaration d'accessibilité, juste après les mentions légales", async () => {
+    const { body } = await render(Footer);
+    const row = [...body.querySelectorAll("footer > div p a")].map((a) => a.textContent?.trim());
+
+    expect(row.slice(-2)).toEqual(["Mentions légales", "Accessibilité"]);
+    expect(body.querySelector('footer > div p a[href="/portfolio/accessibility"]')).toBeTruthy();
+    expect(body.querySelector('#site-map a[href="/portfolio/accessibility"]')).toBeTruthy();
+  });
+
   it("coupe le référent sur les liens sortants, et sur eux seuls", async () => {
     const { body } = await render(Footer);
 

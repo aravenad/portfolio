@@ -16,6 +16,8 @@ const ProjectsPageEn = (await import("../../src/pages/en/projects/page/[page].as
 const ProjectDetailEn = (await import("../../src/pages/en/projects/[slug].astro")).default;
 const Legal = (await import("../../src/pages/legal.astro")).default;
 const LegalEn = (await import("../../src/pages/en/legal.astro")).default;
+const Accessibility = (await import("../../src/pages/accessibility.astro")).default;
+const AccessibilityEn = (await import("../../src/pages/en/accessibility.astro")).default;
 
 /**
  * Une route générée. Le type est écrit à la main : un `import()` dynamique d'un
@@ -524,6 +526,58 @@ describe("mentions légales", () => {
     expect(document.querySelector('a[href*="privacy-statement"]')?.getAttribute("href"))
       .toContain("docs.github.com/en/");
     expect(document.body.textContent).toContain("Switzerland");
+  });
+});
+
+describe("déclaration d'accessibilité", () => {
+  it("donne l'état de conformité, les chiffres de l'audit et le lien du rapport", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+    const text = document.body.textContent ?? "";
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Accessibilité");
+    expect(text).toContain(`RGAA), version ${site.audit.rgaa}`);
+    expect(text).toContain(`${site.audit.conform} critères conformes`);
+    expect(text).toContain(`${site.audit.notApplicable} critères non applicables`);
+  });
+
+  it("ouvre le rapport Ara dans un nouvel onglet, et le dit", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+    const report = document.querySelector(`a[href="${site.audit.report}"]`);
+
+    expect(report?.getAttribute("target")).toBe("_blank");
+    expect(report?.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(report?.querySelector(".sr-only")?.textContent).toContain("(nouvel onglet)");
+    expect(report?.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("date l'audit en toutes lettres, avec la date machine", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+    const time = document.querySelector("time");
+
+    expect(time?.getAttribute("datetime")).toBe(site.audit.date);
+    expect(time?.textContent).toBe("12 octobre 2026");
+  });
+
+  it("dit à qui écrire quand un contenu reste inaccessible", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+    const section = document.querySelector('[aria-labelledby="a11y-contact"]');
+
+    expect(section?.querySelector(`a[href="mailto:${site.email}"]`)).toBeTruthy();
+  });
+
+  it("titre la page et la décrit pour les moteurs", async () => {
+    const { document } = await renderPage(Accessibility, { request: request("/portfolio/accessibility") });
+
+    expect(document.title).toBe(`Accessibilité | ${site.author}`);
+    expect(meta(document, "description")).toContain("RGAA");
+  });
+
+  it("existe en anglais, à la même adresse sous /en/", async () => {
+    const { document } = await renderPage(AccessibilityEn, { request: request("/portfolio/en/accessibility") });
+
+    expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Accessibility");
+    expect(document.querySelector("time")?.textContent).toBe("12 October 2026");
   });
 });
 

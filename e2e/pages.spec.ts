@@ -16,6 +16,8 @@ const routes = [
   "en/projects/developpement-application",
   "legal",
   "en/legal",
+  "accessibility",
+  "en/accessibility",
 ];
 
 for (const route of routes) {

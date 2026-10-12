@@ -208,7 +208,7 @@ const fr = {
       title: "Données personnelles",
       paragraphs: [
         "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
-        "Votre navigateur garde deux réglages, qui n'en sortent jamais : votre choix du thème clair (stockage local), pour le retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
+        "Votre navigateur garde quelques réglages, qui n'en sortent jamais : vos choix du thème et de l'animation des titres (stockage local), pour les retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
         "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre. Vous pouvez demander à tout moment leur suppression, à la même adresse, et adresser une réclamation à la CNIL.",
       ],
       hostLogs: "Comme tout hébergeur, GitHub enregistre l'adresse IP des visiteurs à des fins de sécurité. Voir sa",
@@ -217,6 +217,58 @@ const fr = {
     credits: {
       title: "Propriété intellectuelle",
       text: "Les textes et les illustrations du site sont la propriété de Damien Aravena Bravo. Les logos des technologies sont des marques de leurs propriétaires respectifs ; ils proviennent de Simple Icons (licence CC0) et, pour Java, de devicon (licence MIT).",
+    },
+  },
+
+  /**
+   * La déclaration d'accessibilité, sur le modèle officiel. Un particulier n'y
+   * est pas tenu (loi du 11 février 2005, art. 47) : elle est faite par choix.
+   * Les chiffres viennent de `site.audit`.
+   */
+  accessibility: {
+    title: "Accessibilité",
+    metaTitle: `Accessibilité | ${site.author}`,
+    metaDescription:
+      "Déclaration d'accessibilité du portfolio de Damien Aravena Bravo : conformité au RGAA, résultats de l'audit, réglages d'affichage et contact.",
+    intro:
+      "Ce site doit pouvoir se lire et se parcourir par tout le monde, au clavier comme à la souris, agrandi ou non. Éditeur particulier, Damien Aravena Bravo n'est pas tenu de publier une déclaration d'accessibilité ; il le fait quand même, sur le modèle officiel. Elle s'applique à tout le site damien-aravena.fr.",
+    status: {
+      title: "État de conformité",
+      text: (rgaa: string) =>
+        `Le site est totalement conforme au référentiel général d'amélioration de l'accessibilité (RGAA), version ${rgaa}.`,
+    },
+    results: {
+      title: "Résultats des tests",
+      text: "L'audit révèle que 100\u00a0% des critères applicables sont respectés :",
+      conform: (count: number) => `${count} critères conformes ;`,
+      nonConform: (count: number) => `${count} critère non conforme ;`,
+      notApplicable: (count: number) =>
+        `${count} critères non applicables, faute de contenu concerné (formulaires, tableaux, vidéos…).`,
+      report: "Lire le rapport d'audit complet sur Ara",
+      newTab: "(nouvel onglet)",
+    },
+    audit: {
+      title: "Établissement de cette déclaration",
+      date: "Cette déclaration a été établie le",
+      method:
+        "Il s'agit d'un auto-audit : l'éditeur a évalué son site lui-même, critère par critère, avec Ara, l'outil d'audit de la direction interministérielle du numérique (DINUM).",
+      pages:
+        "Pages auditées : l'accueil et chacune de ses sections, la liste des projets, les huit fiches projet et les mentions légales.",
+      technologies: "Technologies utilisées : HTML, CSS et JavaScript.",
+      environment:
+        "Vérifications faites dans Firefox 153 ESR sous Linux, au clavier et à la souris, en thème sombre et en thème clair, sur grand écran et en largeur de téléphone.",
+    },
+    display: {
+      title: "Réglages d'affichage",
+      settings:
+        "Le bouton en forme d'engrenage, en haut de chaque page, propose le thème clair et l'arrêt de l'animation des titres. Sur un écran étroit, ces réglages se trouvent en bas du menu.",
+      motion:
+        "Si votre système demande de réduire les animations, le site s'en passe : apparitions, défilements doux et reflet des titres compris.",
+    },
+    contact: {
+      title: "Retour d'information et contact",
+      text: "Si un contenu ou une fonctionnalité vous reste inaccessible, écrivez à",
+      after: "pour le signaler et l'obtenir sous une autre forme.",
     },
   },
   backToTop: "Revenir en haut de la page",
@@ -230,6 +282,7 @@ const fr = {
     contact: "Contact",
     cv: "CV (PDF)",
     legal: "Mentions légales",
+    accessibility: "Accessibilité",
   },
 };
 
@@ -420,7 +473,7 @@ const en = {
       title: "Personal data",
       paragraphs: [
         "This site sets no cookies, uses no analytics and loads no third-party service: fonts and images are served by the site itself.",
-        "Your browser keeps two settings, which never leave it: your choice of the light theme (local storage), so it is there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
+        "Your browser keeps a few settings, which never leave it: your choices of theme and title animation (local storage), so they are there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
         "Emails sent to the publisher are only used to reply to you. You can ask for their deletion at any time, at the same address, and lodge a complaint with the CNIL, the French data protection authority.",
       ],
       hostLogs: "Like any host, GitHub logs visitors' IP addresses for security purposes. See its",
@@ -429,6 +482,53 @@ const en = {
     credits: {
       title: "Intellectual property",
       text: "The texts and illustrations of this site belong to Damien Aravena Bravo. Technology logos are trademarks of their respective owners; they come from Simple Icons (CC0 license) and, for Java, from devicon (MIT license).",
+    },
+  },
+
+  accessibility: {
+    title: "Accessibility",
+    metaTitle: `Accessibility | ${site.author}`,
+    metaDescription:
+      "Accessibility statement for Damien Aravena Bravo's portfolio: RGAA compliance, audit results, display settings and contact.",
+    intro:
+      "Everyone should be able to read and browse this site, with a keyboard or a mouse, zoomed in or not. As a private publisher, Damien Aravena Bravo is not required to publish an accessibility statement; he does so anyway, following the official French template. It covers the whole damien-aravena.fr site.",
+    status: {
+      title: "Compliance status",
+      text: (rgaa: string) =>
+        `The site is fully compliant with the RGAA, the French general accessibility improvement framework (version ${rgaa}), which is based on WCAG 2.1.`,
+    },
+    results: {
+      title: "Test results",
+      text: "The audit shows that 100% of the applicable criteria are met:",
+      conform: (count: number) => `${count} criteria met;`,
+      nonConform: (count: number) => `${count} criteria not met;`,
+      notApplicable: (count: number) =>
+        `${count} criteria not applicable, as the site has no such content (forms, tables, videos…).`,
+      report: "Read the full audit report on Ara (in French)",
+      newTab: "(opens in a new tab)",
+    },
+    audit: {
+      title: "About this statement",
+      date: "This statement was made on",
+      method:
+        "It is a self-assessment: the publisher audited his own site, criterion by criterion, with Ara, the audit tool of DINUM, the French government's digital agency.",
+      pages:
+        "Audited pages: the home page and each of its sections, the project list, the eight project pages and the legal notice.",
+      technologies: "Technologies used: HTML, CSS and JavaScript.",
+      environment:
+        "Checked in Firefox 153 ESR on Linux, with keyboard and mouse, in dark and light themes, on a wide screen and at phone width.",
+    },
+    display: {
+      title: "Display settings",
+      settings:
+        "The gear button at the top of every page offers a light theme and a way to stop the title animation. On a narrow screen, these settings sit at the bottom of the menu.",
+      motion:
+        "If your system asks for reduced motion, the site does without it: reveal effects, smooth scrolling and the title shine included.",
+    },
+    contact: {
+      title: "Feedback and contact",
+      text: "If any content or feature remains out of reach for you, write to",
+      after: "to report it and get it in another form.",
     },
   },
   backToTop: "Back to top",
@@ -441,6 +541,7 @@ const en = {
     contact: "Contact",
     cv: "Résumé (PDF, French)",
     legal: "Legal notice",
+    accessibility: "Accessibility",
   },
 } satisfies Dictionary;
 

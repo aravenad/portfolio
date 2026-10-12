@@ -44,6 +44,19 @@ export const site = {
     city: "1227 Les Acacias (Genève)",
     url: "https://www.infomaniak.com",
   },
+  /**
+   * Le dernier audit RGAA, que reprend la page Accessibilité. Mené avec Ara
+   * (DINUM) ; le rapport public se met à jour avec l'audit. À revoir à chaque
+   * nouvel audit : date, chiffres et version du référentiel.
+   */
+  audit: {
+    date: "2026-10-12",
+    rgaa: "4.1.2",
+    conform: 46,
+    nonConform: 0,
+    notApplicable: 60,
+    report: "https://ara.numerique.gouv.fr/rapport/7rj5IIWOfIqYjOeacGvdu/",
+  },
 } as const;
 
 /**

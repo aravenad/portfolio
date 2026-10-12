@@ -47,6 +47,10 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
         </button>
         <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
         <a href={localizedUrl("/legal", lang)} class="transition hover:text-zinc-200">{t.footer.legal}</a>
+        <span aria-hidden="true" class="mx-2 text-zinc-700">·</span>
+        <a href={localizedUrl("/accessibility", lang)} class="transition hover:text-zinc-200">
+          {t.footer.accessibility}
+        </a>
       </span>
     </p>
 
@@ -130,6 +134,9 @@ const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : und
           </li>
           <li>
             <a href={localizedUrl("/legal", lang)} class={mapLink}>{t.footer.legal}</a>
+          </li>
+          <li>
+            <a href={localizedUrl("/accessibility", lang)} class={mapLink}>{t.footer.accessibility}</a>
           </li>
         </ul>
       </div>
