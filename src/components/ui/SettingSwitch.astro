@@ -1,0 +1,59 @@
+---
+/**
+ * Interrupteur d'un réglage d'affichage (thème, reflet des titres).
+ *
+ * Un bouton `aria-pressed` au libellé fixe : nommé par son texte visible, il
+ * s'annonce « Thème clair, bouton bascule, activé ». Le curseur dessiné à
+ * droite ne fait que redire cet état ; sa position le porte autant que sa
+ * couleur (RGAA 3.1). L'état est posé par le script du header, d'après
+ * `<html data-theme>` et `<html data-shine>`.
+ */
+interface Props {
+  /** L'attribut que le script du header cherche, `data-theme-toggle` par exemple. */
+  attribute: string;
+  label: string;
+}
+
+const { attribute, label } = Astro.props;
+---
+
+<button
+  type="button"
+  {...{ [attribute]: "" }}
+  aria-pressed="false"
+  class="group flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-left font-medium transition hover:bg-zinc-900 hover:text-zinc-100"
+>
+  {label}
+  <span
+    aria-hidden="true"
+    class="flex h-5 w-9 shrink-0 items-center rounded-full border border-zinc-500 p-0.5 transition group-aria-pressed:border-accent group-aria-pressed:bg-accent"
+  >
+    <span class="switch-knob size-3.5 rounded-full bg-zinc-400 group-aria-pressed:bg-zinc-950"></span>
+  </span>
+</button>
+
+<style>
+  /* Le curseur glisse à droite quand l'option est active. */
+  .switch-knob {
+    transition:
+      translate 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.15s;
+  }
+
+  [aria-pressed="true"] .switch-knob {
+    translate: 1rem 0;
+  }
+
+  /* Sans mouvement : saut net, le curseur se cale à droite sans glisser. */
+  @media (prefers-reduced-motion: reduce) {
+    .switch-knob {
+      translate: none;
+      transition: none;
+    }
+
+    [aria-pressed="true"] .switch-knob {
+      translate: none;
+      margin-inline-start: auto;
+    }
+  }
+</style>

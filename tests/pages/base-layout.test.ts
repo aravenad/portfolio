@@ -281,6 +281,18 @@ describe("BaseLayout, langues et thème", () => {
     expect(inline).toContain('let theme = "dark"');
     expect(inline).toContain('localStorage.getItem("theme")');
   });
+
+  it("pose le reflet des titres avant le premier rendu, selon le choix puis le système", async () => {
+    // Posé plus tard, le reflet démarrerait avant d'être coupé (RGAA 13.8).
+    const { document } = await renderPage(BaseLayout, options());
+    const inline = [...document.head.querySelectorAll("script:not([type=module])")]
+      .map((script) => script.textContent ?? "")
+      .find((text) => text.includes("dataset.shine"));
+
+    expect(inline, "script du reflet absent du <head>").toBeTruthy();
+    expect(inline).toContain('localStorage.getItem("shine")');
+    expect(inline).toContain("prefers-reduced-motion: reduce");
+  });
 });
 
 describe("données structurées", () => {

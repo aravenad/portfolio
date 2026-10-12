@@ -1,5 +1,6 @@
 ---
 import Container from "../ui/Container.astro";
+import SettingSwitch from "../ui/SettingSwitch.astro";
 import { navLinks, navLinksEn, site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { getLang, localized, localizedUrl, switchLangPath } from "../../lib/i18n";
@@ -15,20 +16,30 @@ const otherLang = lang === "fr" ? "en" : "fr";
 const ariaCurrent = (href: string) => ariaCurrentFor(localizedUrl(href, lang), currentPath);
 
 /**
- * Les petits boutons de la barre : menu, langue, thème. Sous 48rem, ils sont
+ * Les petits boutons de la barre : menu, langue, réglages. Sous 48rem, ils sont
  * seuls à côté du logo et marquent le survol d'un fond, comme le menu.
  */
 const control =
-  "flex size-10 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white";
+  "flex size-10 cursor-pointer items-center justify-center rounded-lg text-zinc-300 transition hover:bg-zinc-900 hover:text-white";
 
 /**
- * Langue et thème au-delà de 48rem : ils rejoignent les liens de navigation et
+ * Langue et réglages au-delà de 48rem : ils rejoignent les liens de navigation et
  * en prennent le survol (la couleur seule, sans fond) et le texte. Un pavé
  * plein, posé sur la matière du haut de page, s'y lisait comme un autocollant.
  */
 const setting = [
   control,
   "text-sm font-medium md:text-zinc-400 md:hover:bg-transparent md:hover:text-zinc-100",
+];
+
+/**
+ * Les interrupteurs d'affichage, rendus deux fois : dans le panneau de
+ * l'engrenage au-delà de 48rem, au pied du menu replié en deçà. Le script les
+ * câble ensemble, ils disent donc toujours le même état.
+ */
+const switches = [
+  { attribute: "data-theme-toggle", label: t.header.lightTheme },
+  { attribute: "data-shine-toggle", label: t.header.animateTitles },
 ];
 ---
 
@@ -93,19 +104,20 @@ const setting = [
     </div>
 
     {/*
-      Navigation, langue et thème, écartés ensemble vers le bord en haut de page.
+      Navigation, langue et réglages, écartés ensemble vers le bord en haut de page.
 
       Deux listes des mêmes liens, chacune à sa place dans l'ordre de tabulation
-      (RGAA 12.8) : celle de la barre large avant la langue et le thème, celle du
+      (RGAA 12.8) : celle de la barre large avant la langue et les réglages, celle du
       menu replié après son bouton. Une seule liste, remontée en tête de la barre
       par CSS (`order`), faisait passer le focus du nom à « EN » puis au thème,
       avant de revenir aux liens qu'on voyait pourtant en premier. Une seule des
       deux est affichée à la fois : l'autre, en `display: none`, sort aussi de
       l'arbre d'accessibilité, et un lecteur d'écran ne lit qu'une navigation.
 
-      Sous 48rem, les liens vivent dans le panneau déplié : restent visibles la
-      langue, le thème, puis le bouton du menu, au bord. En rem et non en px : la
-      barre large demande 43rem, et ce seuil suit la taille de police choisie par
+      Sous 48rem, les liens et les réglages vivent dans le panneau déplié :
+      restent visibles la langue, puis le bouton du menu, au bord. L'engrenage y
+      disparaît : à côté du menu, deux icônes de « plus d'options » se
+      faisaient concurrence. En rem et non en px : la barre large demande 43rem, et ce seuil suit la taille de police choisie par
       le visiteur (RGAA 10.4). L'ancien seuil, 40rem, était trop juste : le nom
       recouvrait « À propos » à 640 px, et jusqu'à 1 350 px avec une police à 200 %.
     */}
@@ -151,12 +163,12 @@ const setting = [
 
       <button
         type="button"
-        data-theme-toggle
-        aria-pressed="false"
-        aria-label={t.header.lightTheme}
-        class:list={setting}
+        popovertarget="settings-panel"
+        data-settings-toggle
+        aria-label={t.header.settings}
+        class:list={[setting, "max-md:hidden"]}
       >
-        {/* Le soleil en sombre (passer au clair), la lune en clair : voir le style. */}
+        {/* Icône « settings » de Lucide (licence ISC). */}
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -165,15 +177,48 @@ const setting = [
           stroke-linecap="round"
           stroke-linejoin="round"
           aria-hidden="true"
-          class="size-5"
+          class="settings-icon size-5"
         >
-          <g class="theme-icon-sun">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
-          </g>
-          <path class="theme-icon-moon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path>
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
         </svg>
       </button>
+
+      {/*
+        Panneau des réglages d'affichage : le thème, et le reflet des titres
+        chromés, qui tourne en boucle et doit donc pouvoir être arrêté et relancé
+        depuis la page (RGAA 13.8).
+
+        Un `popover` natif : l'engrenage l'ouvre sans script, Échap et un clic à
+        côté le ferment, et l'engrenage s'annonce déplié (`aria-expanded`). Placé
+        juste après l'engrenage dans le code, ses interrupteurs suivent celui-ci
+        dans l'ordre de tabulation (RGAA 12.8), avant le bouton du menu. Le
+        panneau vit dans la couche supérieure : le `transform` du groupe de
+        droite ne l'enferme pas, et le script le cale sous l'engrenage.
+
+        Les interrupteurs : voir SettingSwitch. Sous 48rem, l'engrenage est
+        masqué et les mêmes interrupteurs se retrouvent au pied du menu replié.
+      */}
+      <div
+        id="settings-panel"
+        popover
+        role="group"
+        aria-labelledby="settings-title"
+        class="settings-panel w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-800 bg-zinc-950/97 p-2 text-sm text-zinc-200 shadow-xl backdrop-blur-md"
+      >
+        <p id="settings-title" class="px-3 pt-1 pb-2 text-xs font-medium text-zinc-400">
+          {t.header.settingsTitle}
+        </p>
+        <ul class="flex flex-col gap-1">
+          {
+            switches.map((option) => (
+              <li>
+                <SettingSwitch attribute={option.attribute} label={option.label} />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
 
       <nav aria-label={t.header.navLabel} class="md:hidden">
         {/* Cinq liens ne tiennent pas à côté du logo sous 48rem. */}
@@ -213,26 +258,51 @@ const setting = [
           de l'accueil restait net et lisible derrière les liens. Le fond doit
           donc couvrir seul ; le flou n'est qu'un complément là où il s'applique.
         */}
-        <ul
+        <div
           id="nav-menu"
           class="fixed inset-x-0 top-0 -z-10 hidden flex-col gap-1 border-b border-zinc-900 bg-zinc-950/97 p-4 pt-20 text-sm backdrop-blur-md data-[open]:flex"
         >
-          {
-            links.map((link) => (
-              <li>
-                <a
-                  href={localizedUrl(link.href, lang)}
-                  data-nav-link
-                  data-sections={link.sections?.join(" ")}
-                  aria-current={ariaCurrent(link.href)}
-                  class="block rounded-lg px-3 py-2.5 font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent"
-                >
-                  <span>{link.label}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+          <ul class="flex flex-col gap-1">
+            {
+              links.map((link) => (
+                <li>
+                  <a
+                    href={localizedUrl(link.href, lang)}
+                    data-nav-link
+                    data-sections={link.sections?.join(" ")}
+                    aria-current={ariaCurrent(link.href)}
+                    class="block rounded-lg px-3 py-2.5 font-medium text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100 aria-[current]:text-accent data-[active]:text-accent"
+                  >
+                    <span>{link.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+
+          {/*
+            Les réglages de l'engrenage, masqué sous 48rem : après les liens,
+            sous un filet, comme le panneau large les met après la navigation.
+          */}
+          <div
+            role="group"
+            aria-labelledby="menu-settings-title"
+            class="mt-2 border-t border-zinc-900 pt-3 text-zinc-200"
+          >
+            <p id="menu-settings-title" class="px-3 pb-2 text-xs font-medium text-zinc-400">
+              {t.header.settingsTitle}
+            </p>
+            <ul class="flex flex-col gap-1">
+              {
+                switches.map((option) => (
+                  <li>
+                    <SettingSwitch attribute={option.attribute} label={option.label} />
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
       </nav>
     </div>
   </Container>
@@ -330,7 +400,7 @@ const setting = [
    * l'encre maximale (`white`) pour rester perceptible ; le lien actif garde
    * l'accent.
    *
-   * Les boutons de langue et de thème suivent exactement les mêmes règles que
+   * Le lien de langue et l'engrenage suivent exactement les mêmes règles que
    * les liens : même couleur, même rythme, même survol.
    *
    * La couleur suit le même rythme que le reste ; seul le survol reste vif.
@@ -340,18 +410,18 @@ const setting = [
    * et son `zinc-300` y tient déjà.
    */
   @media (width >= 48rem) {
-    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
+    :is([data-nav-link], [data-lang-switch], [data-settings-toggle]) {
       transition:
         color var(--bar-duration) var(--bar-ease),
         background-color 0.15s;
     }
 
-    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):hover {
+    :is([data-nav-link], [data-lang-switch], [data-settings-toggle]):hover {
       transition-duration: 0.15s;
     }
 
     header:not([data-scrolled])
-      :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):not(
+      :is([data-nav-link], [data-lang-switch], [data-settings-toggle]):not(
         :hover,
         [aria-current],
         [data-active]
@@ -360,7 +430,7 @@ const setting = [
     }
 
     header:not([data-scrolled])
-      :is([data-nav-link], [data-lang-switch], [data-theme-toggle]):hover:not(
+      :is([data-nav-link], [data-lang-switch], [data-settings-toggle]):hover:not(
         [aria-current],
         [data-active]
       ) {
@@ -496,7 +566,7 @@ const setting = [
   header[data-instant] .header-backdrop,
   header[data-instant] .header-start,
   header[data-instant] .header-end,
-  header[data-instant] :is([data-nav-link], [data-lang-switch], [data-theme-toggle]),
+  header[data-instant] :is([data-nav-link], [data-lang-switch], [data-settings-toggle]),
   header[data-instant] .header-trail :global(.trail-crumb),
   header[data-instant] [data-home-link] {
     transition: none;
@@ -506,23 +576,82 @@ const setting = [
     .header-backdrop,
     .header-start,
     .header-end,
-    :is([data-nav-link], [data-lang-switch], [data-theme-toggle]) {
+    :is([data-nav-link], [data-lang-switch], [data-settings-toggle]) {
       transition: none;
     }
   }
 
   /*
-   * Icône du bouton de thème : le soleil en sombre, pour passer au clair, et la
-   * lune en clair. Choisie en CSS d'après `data-theme`, déjà posé avant le
-   * premier rendu : aucune icône ne clignote au chargement.
+   * Panneau des réglages. Le style par défaut d'un `popover` le centre dans la
+   * fenêtre : il est remis ici dans l'angle, sous la barre, et le script l'aligne
+   * ensuite sur l'engrenage. `display: flex` est réservé à l'état ouvert, sinon
+   * il l'emporterait sur le `display: none` qui le cache.
    */
-  .theme-icon-moon,
-  :global(:root[data-theme="light"]) .theme-icon-sun {
-    display: none;
+  .settings-panel {
+    inset: 4.5rem 1rem auto auto;
+    margin: 0;
   }
 
-  :global(:root[data-theme="light"]) .theme-icon-moon {
-    display: inline;
+  .settings-panel:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /*
+   * Le panneau descend de 4 px en apparaissant, l'engrenage tourne d'un cran.
+   * Le départ de l'entrée vient de `@starting-style` ; `allow-discrete` laisse
+   * le panneau visible le temps de son fondu de sortie.
+   */
+  .settings-panel {
+    opacity: 0;
+    translate: 0 -4px;
+    transition:
+      opacity 0.15s ease-in,
+      translate 0.15s ease-in,
+      display 0.15s allow-discrete,
+      overlay 0.15s allow-discrete;
+  }
+
+  .settings-panel:popover-open {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 0.2s ease-out,
+      translate 0.2s cubic-bezier(0.34, 1.12, 0.64, 1),
+      display 0.2s allow-discrete,
+      overlay 0.2s allow-discrete;
+  }
+
+  @starting-style {
+    .settings-panel:popover-open {
+      opacity: 0;
+      translate: 0 -4px;
+    }
+  }
+
+  .settings-icon {
+    transition: rotate 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  header:has(.settings-panel:popover-open) .settings-icon {
+    rotate: 45deg;
+  }
+
+  /* Sans mouvement : fondu seul pour le panneau, saut net pour l'engrenage. */
+  @media (prefers-reduced-motion: reduce) {
+    .settings-panel,
+    .settings-panel:popover-open,
+    .settings-icon {
+      translate: none;
+    }
+
+    .settings-icon {
+      transition: none;
+    }
+
+    header:has(.settings-panel:popover-open) .settings-icon {
+      rotate: none;
+    }
   }
 
   /*
@@ -934,23 +1063,86 @@ const setting = [
   import { onEachPage } from "../../lib/enhance";
   import { switchLangPath, type Lang } from "../../lib/i18n";
   import { readingPosition, restoredScrollY, type ReadingPosition } from "../../lib/lang-switch";
+  import { wireShineToggle } from "../../lib/shine";
   import { wireThemeToggle, withViewTransition } from "../../lib/theme";
 
   const motionOk = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /**
-   * Bouton de thème : voir src/lib/theme.ts, où il est testé. Le changement se
-   * fait dans un fondu enchaîné de toute la page. Le thème lui-même est posé
-   * avant le premier rendu par le script en ligne de BaseLayout.
+   * Interrupteurs du panneau de réglages et du menu replié : voir src/lib/theme.ts et
+   * src/lib/shine.ts, où ils sont testés. Le changement de thème se fait dans
+   * un fondu enchaîné de toute la page. Les deux réglages sont posés avant le
+   * premier rendu par le script en ligne de BaseLayout.
    */
   onEachPage((signal) => {
-    const button = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+    const theme = [...document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")];
+    const shine = [...document.querySelectorAll<HTMLButtonElement>("[data-shine-toggle]")];
 
-    if (button) {
-      wireThemeToggle(button, document.documentElement, () => localStorage, signal, (update) =>
-        withViewTransition(document, motionOk(), update),
-      );
-    }
+    wireThemeToggle(theme, document.documentElement, () => localStorage, signal, (update) =>
+      withViewTransition(document, motionOk(), update),
+    );
+    wireShineToggle(shine, document.documentElement, () => localStorage, signal);
+  });
+
+  /**
+   * Cale le panneau sous l'engrenage, bord droit contre bord droit.
+   *
+   * L'engrenage bouge pendant que le panneau est ouvert : la barre se resserre
+   * au défilement (0,8 s de transition au-delà de 72rem), et la fenêtre peut
+   * changer de taille. Le panneau le suit donc image par image, tant qu'il est
+   * ouvert, et seulement alors.
+   */
+  onEachPage((signal) => {
+    const gear = document.querySelector<HTMLElement>("[data-settings-toggle]");
+    const panel = document.getElementById("settings-panel");
+
+    if (!gear || !panel) return;
+
+    let frame = 0;
+
+    /*
+     * L'état déplié est en principe implicite avec `popovertarget`, mais tous
+     * les navigateurs ne le transmettent pas aux lecteurs d'écran : il est donc
+     * posé à la main. Absent du rendu serveur, où il serait faux une fois le
+     * panneau ouvert sans script.
+     */
+    const expand = (open: boolean) => gear.setAttribute("aria-expanded", String(open));
+
+    const place = () => {
+      const rect = gear.getBoundingClientRect();
+      const right = document.documentElement.clientWidth - rect.right;
+
+      panel.style.top = `${rect.bottom + 8}px`;
+      panel.style.right = `${Math.max(right, 16)}px`;
+      frame = requestAnimationFrame(place);
+    };
+
+    const stop = () => cancelAnimationFrame(frame);
+
+    panel.addEventListener(
+      "beforetoggle",
+      (event) => {
+        const open = (event as ToggleEvent).newState === "open";
+
+        stop();
+        expand(open);
+        if (open) place();
+      },
+      { signal },
+    );
+
+    // Sous 48rem, l'engrenage disparaît : le panneau ne resterait pas accroché à rien.
+    window.matchMedia("(width >= 48rem)").addEventListener(
+      "change",
+      (event) => {
+        if (!event.matches && panel.matches(":popover-open")) panel.hidePopover();
+      },
+      { signal },
+    );
+
+    signal.addEventListener("abort", stop);
+    expand(panel.matches(":popover-open"));
+    if (panel.matches(":popover-open")) place();
   });
 
   /*

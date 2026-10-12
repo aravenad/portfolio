@@ -3,6 +3,7 @@ import {
   clickInPlace,
   expect,
   navLink,
+  openSettings,
   scrollToId,
   scrollToY,
   scrollY,
@@ -125,8 +126,56 @@ test("le focus suit l'ordre visuel de la barre (RGAA 12.8)", async ({ page }) =>
     "Projets",
     "Contact",
     "EN",
-    "Thème clair",
+    "Réglages d'affichage",
   ]);
+});
+
+test.describe("panneau de réglages", () => {
+  const gear = (page: import("@playwright/test").Page) => page.locator("[data-settings-toggle]");
+  const panel = (page: import("@playwright/test").Page) => page.locator("#settings-panel");
+
+  test("s'ouvre au clavier, garde le focus dans l'ordre et se ferme à Échap", async ({ page }) => {
+    await expect(gear(page)).toHaveAttribute("aria-expanded", "false");
+    await gear(page).focus();
+    await page.keyboard.press("Enter");
+    await expect(panel(page)).toBeVisible();
+    await expect(gear(page)).toHaveAttribute("aria-expanded", "true");
+
+    // Ses interrupteurs suivent l'engrenage (RGAA 12.8).
+    expect(await tabOrder(page, gear(page), 2)).toEqual(["Thème clair", "Animer les titres"]);
+
+    await page.keyboard.press("Escape");
+    await expect(panel(page)).toBeHidden();
+    await expect(gear(page)).toHaveAttribute("aria-expanded", "false");
+    await expect(gear(page)).toBeFocused();
+  });
+
+  test("se cale sous l'engrenage et le suit quand la barre se resserre", async ({ page }) => {
+    const gap = async () => {
+      const [g, p] = await Promise.all([gear(page).boundingBox(), panel(page).boundingBox()]);
+      return {
+        top: Math.round(p!.y - (g!.y + g!.height)),
+        right: Math.round(g!.x + g!.width - (p!.x + p!.width)),
+      };
+    };
+
+    await openSettings(page);
+    await expect.poll(gap).toEqual({ top: 8, right: 0 });
+
+    // La molette ne ferme pas le panneau : seul un clic à côté le fait.
+    await page.mouse.wheel(0, 600);
+    await expect(page.locator("header")).toHaveAttribute("data-scrolled", "");
+    await expect.poll(gap).toEqual({ top: 8, right: 0 });
+  });
+
+  test("reste ouvert quand on bascule un réglage, et se ferme d'un clic à côté", async ({ page }) => {
+    await openSettings(page);
+    await page.locator("#settings-panel [data-shine-toggle]").click();
+    await expect(panel(page)).toBeVisible();
+
+    await page.locator("main").click({ position: { x: 10, y: 400 } });
+    await expect(panel(page)).toBeHidden();
+  });
 });
 
 test.describe("avec une police agrandie à 200 % (RGAA 10.4)", () => {
@@ -135,7 +184,7 @@ test.describe("avec une police agrandie à 200 % (RGAA 10.4)", () => {
     page.evaluate(() => {
       const boxes = [
         ...document.querySelectorAll(
-          "[data-home-link], [data-nav-link], [data-lang-switch], [data-theme-toggle], [data-nav-toggle]",
+          "[data-home-link], [data-nav-link], [data-lang-switch], [data-settings-toggle], [data-nav-toggle]",
         ),
       ]
         .map((element) => ({ name: element.textContent?.trim(), box: element.getBoundingClientRect() }))

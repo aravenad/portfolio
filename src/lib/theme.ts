@@ -76,14 +76,17 @@ export type ThemeRoot = Pick<HTMLElement, "dataset">;
 export type ThemeButton = Pick<HTMLElement, "setAttribute" | "addEventListener">;
 
 /**
- * Câble le bouton de thème : son état pressé suit le thème courant, et un clic
- * bascule, applique et mémorise.
+ * Câble les boutons de thème : leur état pressé suit le thème courant, et un
+ * clic sur l'un d'eux bascule, applique et mémorise.
  *
- * Le bouton porte `aria-pressed` et un libellé fixe (« Thème clair ») : un
+ * Plusieurs boutons, un seul réglage : le panneau de l'engrenage et le menu
+ * replié ont chacun le leur, et tous deux doivent dire le même état.
+ *
+ * Chaque bouton porte `aria-pressed` et un libellé fixe (« Thème clair ») : un
  * lecteur d'écran annonce ainsi l'état, sans libellé qui change à chaque clic.
  */
 export function wireThemeToggle(
-  button: ThemeButton,
+  buttons: readonly ThemeButton[],
   root: ThemeRoot,
   getStore: () => ThemeStore,
   signal: AbortSignal,
@@ -94,18 +97,20 @@ export function wireThemeToggle(
 
   const apply = (theme: Theme) => {
     root.dataset.theme = theme;
-    button.setAttribute("aria-pressed", String(theme === "light"));
+    for (const button of buttons) button.setAttribute("aria-pressed", String(theme === "light"));
   };
 
   apply(current());
 
-  button.addEventListener(
-    "click",
-    () => {
-      const next = toggledTheme(current());
-      transition(() => apply(next));
-      saveTheme(getStore, next);
-    },
-    { signal },
-  );
+  for (const button of buttons) {
+    button.addEventListener(
+      "click",
+      () => {
+        const next = toggledTheme(current());
+        transition(() => apply(next));
+        saveTheme(getStore, next);
+      },
+      { signal },
+    );
+  }
 }

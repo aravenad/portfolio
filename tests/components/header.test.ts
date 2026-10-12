@@ -89,7 +89,7 @@ describe("Header", () => {
       const toggle = order.indexOf(document.querySelector("[data-nav-toggle]")!);
       const firstMenuLink = order.indexOf(document.querySelector(`${lists.menu} a`)!);
 
-      expect(order.indexOf(document.querySelector("[data-theme-toggle]")!)).toBeLessThan(toggle);
+      expect(order.indexOf(document.querySelector("[data-settings-toggle]")!)).toBeLessThan(toggle);
       expect(firstMenuLink).toBe(toggle + 1);
     });
 
@@ -313,15 +313,74 @@ describe("sélecteur de langue", () => {
   });
 });
 
-describe("bouton de thème", () => {
-  it("est un bouton à bascule, nommé dans la langue de la page", async () => {
-    const fr = (await render(Header, at("/portfolio/"))).document.querySelector("[data-theme-toggle]");
-    const en = (await render(Header, at("/portfolio/en/"))).document.querySelector("[data-theme-toggle]");
+describe("panneau de réglages", () => {
+  async function panel(path: string) {
+    const { document } = await render(Header, at(path));
+    const gear = document.querySelector("[data-settings-toggle]");
+    const target = document.getElementById(gear?.getAttribute("popovertarget") ?? "");
 
-    expect(fr?.tagName).toBe("BUTTON");
-    // Le sombre est le thème par défaut : le bouton du clair part relâché.
-    expect(fr?.getAttribute("aria-pressed")).toBe("false");
-    expect(fr?.getAttribute("aria-label")).toBe("Thème clair");
-    expect(en?.getAttribute("aria-label")).toBe("Light theme");
+    return { document, gear, target };
+  }
+
+  it("s'ouvre depuis un engrenage nommé dans la langue de la page", async () => {
+    const fr = await panel("/portfolio/");
+    const en = await panel("/portfolio/en/");
+
+    expect(fr.gear?.tagName).toBe("BUTTON");
+    expect(fr.gear?.getAttribute("aria-label")).toBe("Réglages d'affichage");
+    expect(en.gear?.getAttribute("aria-label")).toBe("Display settings");
+    // Un popover natif : Échap, le clic à côté et l'état déplié viennent du navigateur.
+    expect(fr.target?.hasAttribute("popover")).toBe(true);
+  });
+
+  it("est un groupe titré qui suit l'engrenage dans l'ordre de tabulation (RGAA 12.8)", async () => {
+    const { document, gear, target } = await panel("/portfolio/");
+    const order = focusOrder(document);
+    const title = document.getElementById(target?.getAttribute("aria-labelledby") ?? "");
+
+    expect(target?.getAttribute("role")).toBe("group");
+    expect(title?.textContent?.trim()).toBe("Affichage");
+    expect(order.indexOf(target!.querySelector("button")!)).toBe(order.indexOf(gear!) + 1);
+  });
+
+  it.each([
+    ["[data-theme-toggle]", "Thème clair", "Light theme"],
+    ["[data-shine-toggle]", "Animer les titres", "Animate titles"],
+  ])("contient l'interrupteur %s, nommé par son texte", async (selector, fr, en) => {
+    const french = (await panel("/portfolio/")).target?.querySelector(selector);
+    const english = (await panel("/portfolio/en/")).target?.querySelector(selector);
+
+    expect(french?.tagName).toBe("BUTTON");
+    expect(french?.hasAttribute("aria-pressed")).toBe(true);
+    expect(french?.hasAttribute("aria-label")).toBe(false);
+    expect(french?.textContent?.trim()).toBe(fr);
+    expect(english?.textContent?.trim()).toBe(en);
+  });
+
+  it("laisse sa place au menu replié sous 48rem", async () => {
+    // À côté du bouton du menu, l'engrenage faisait une seconde icône « plus d'options ».
+    const { gear } = await panel("/portfolio/");
+
+    expect(gear?.getAttribute("class")?.split(/\s+/)).toContain("max-md:hidden");
+  });
+
+  it("se retrouve au pied du menu replié, sous le même titre, après les liens", async () => {
+    const { document } = await panel("/portfolio/");
+    const menu = document.getElementById("nav-menu")!;
+    const group = menu.querySelector('[role="group"]');
+    const title = document.getElementById(group?.getAttribute("aria-labelledby") ?? "");
+    const order = focusOrder(document);
+    const lastLink = [...menu.querySelectorAll("a")].at(-1)!;
+
+    expect(title?.textContent?.trim()).toBe("Affichage");
+    expect(group?.querySelector("[data-theme-toggle]")?.textContent?.trim()).toBe("Thème clair");
+    expect(group?.querySelector("[data-shine-toggle]")?.textContent?.trim()).toBe("Animer les titres");
+    expect(order.indexOf(group!.querySelector("button")!)).toBe(order.indexOf(lastLink) + 1);
+  });
+
+  it("part avec le thème clair relâché : le sombre est le thème par défaut", async () => {
+    const { target } = await panel("/portfolio/");
+
+    expect(target?.querySelector("[data-theme-toggle]")?.getAttribute("aria-pressed")).toBe("false");
   });
 });

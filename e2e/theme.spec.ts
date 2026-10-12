@@ -1,12 +1,13 @@
-import { afterNavigation, expect, navLink, test } from "./helpers";
+import { afterNavigation, expect, navLink, openSettings, test } from "./helpers";
 
 /**
- * Le bouton de thème : sombre par défaut, clair au clic, et un choix qui tient
- * au rechargement comme à la navigation.
+ * L'interrupteur de thème, dans le panneau des réglages : sombre par défaut,
+ * clair au clic, et un choix qui tient au rechargement comme à la navigation.
  */
 
 const html = (page: import("@playwright/test").Page) => page.locator("html");
-const toggle = (page: import("@playwright/test").Page) => page.locator("[data-theme-toggle]");
+const toggle = (page: import("@playwright/test").Page) =>
+  page.locator("#settings-panel [data-theme-toggle]");
 const stored = (page: import("@playwright/test").Page) =>
   page.evaluate(() => localStorage.getItem("theme"));
 
@@ -21,6 +22,7 @@ test("le clair s'active, se mémorise et se retire", async ({ page }) => {
   await page.goto("");
   const darkBackground = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
+  await openSettings(page);
   await toggle(page).click();
   await expect(html(page)).toHaveAttribute("data-theme", "light");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
@@ -36,6 +38,7 @@ test("le clair s'active, se mémorise et se retire", async ({ page }) => {
 
 test("le thème choisi survit au rechargement et à la navigation", async ({ page }) => {
   await page.goto("");
+  await openSettings(page);
   await toggle(page).click();
   await expect(html(page)).toHaveAttribute("data-theme", "light");
 

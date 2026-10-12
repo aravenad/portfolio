@@ -61,16 +61,28 @@ test("le focus suit l'ordre visuel de la barre, puis entre dans le menu (RGAA 12
   page,
 }) => {
   const home = page.locator("[data-home-link]");
-  expect(await tabOrder(page, home, 3)).toEqual(["EN", "Thème clair", "Ouvrir le menu"]);
+  // Pas d'engrenage : ses réglages sont au pied du menu.
+  expect(await tabOrder(page, home, 2)).toEqual(["EN", "Ouvrir le menu"]);
+  await expect(page.locator("[data-settings-toggle]")).toBeHidden();
 
-  // Ouvert, le panneau suit directement son bouton.
+  // Ouvert, le panneau suit directement son bouton, liens puis réglages.
   await toggle(page).click();
   expect(await tabOrder(page, toggle(page), 2)).toEqual(["À propos", "Compétences"]);
+
+  const lastLink = menu(page).locator("a").last();
+  expect(await tabOrder(page, lastLink, 2)).toEqual(["Thème clair", "Animer les titres"]);
 });
 
-test("les réglages de langue et de thème restent accessibles", async ({ page }) => {
-  await page.locator("[data-theme-toggle]").click();
+test("les réglages de langue, de thème et du reflet restent accessibles", async ({ page }) => {
+  await toggle(page).click();
+  await menu(page).locator("[data-theme-toggle]").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  // Un interrupteur n'est pas un lien : le menu reste ouvert.
+  await expect(menu(page)).toBeVisible();
+
+  await menu(page).locator("[data-shine-toggle]").click();
+  await expect(page.locator("html")).toHaveAttribute("data-shine", "off");
+  await expect(menu(page).locator("[data-shine-toggle]")).toHaveAttribute("aria-pressed", "false");
 
   await page.locator("a[data-lang-switch]").click();
   await expect(page).toHaveURL(/\/en\/$/);

@@ -34,7 +34,7 @@ function wire(initial?: string) {
   const root = { dataset: initial ? { theme: initial } : {} } as { dataset: DOMStringMap };
   const store = fakeStore();
 
-  wireThemeToggle(button as never, root, () => store, new AbortController().signal);
+  wireThemeToggle([button] as never, root, () => store, new AbortController().signal);
 
   return { button, root, store };
 }
@@ -97,9 +97,22 @@ describe("wireThemeToggle", () => {
     const spy = vi.spyOn(button, "addEventListener");
     const { signal } = new AbortController();
 
-    wireThemeToggle(button as never, { dataset: {} } as never, () => fakeStore(), signal);
+    wireThemeToggle([button] as never, { dataset: {} } as never, () => fakeStore(), signal);
 
     expect(spy).toHaveBeenCalledWith("click", expect.any(Function), { signal });
+  });
+
+  it("garde le panneau et le menu replié d'accord", () => {
+    const panel = fakeButton();
+    const menu = fakeButton();
+    const root = { dataset: {} } as { dataset: DOMStringMap };
+
+    wireThemeToggle([panel, menu] as never, root, () => fakeStore(), new AbortController().signal);
+    menu.click();
+
+    expect(root.dataset.theme).toBe("light");
+    expect(panel.attributes.get("aria-pressed")).toBe("true");
+    expect(menu.attributes.get("aria-pressed")).toBe("true");
   });
 });
 
@@ -109,7 +122,7 @@ describe("wireThemeToggle, avec une transition", () => {
     const root = { dataset: {} } as { dataset: DOMStringMap };
     const seen: (string | undefined)[] = [];
 
-    wireThemeToggle(button as never, root, () => fakeStore(), new AbortController().signal, (update) => {
+    wireThemeToggle([button] as never, root, () => fakeStore(), new AbortController().signal, (update) => {
       seen.push(root.dataset.theme);
       update();
       seen.push(root.dataset.theme);

@@ -219,51 +219,43 @@ body::after {
 }
 
 /*
- * Reflet mobile. Transposition en CSS de ShineText (smoothui.dev) : un dégradé
- * bien plus large que le texte, dont la position horizontale est balayée en
- * boucle. Le composant d'origine est du React piloté par `motion`, ce qui
- * imposerait React et framer-motion pour animer un mot ; ici ce n'est qu'une
- * `background-position`, donc une animation CSS, sans une ligne de JS.
+ * Reflet mobile. Transposition en CSS du shimmer de shadcn (`shimmer` dans
+ * shadcn/tailwind.css) : un dégradé à UN SEUL reflet, symétrique (encre,
+ * demi-teinte, reflet à 50 %, demi-teinte, encre), bien plus large que le mot,
+ * dont la position est balayée de gauche à droite. Même angle que l'original
+ * (90° + 20°) et même demi-largeur (`3ch + 40px`).
  *
- * LA BOUCLE EST SANS COUTURE, et c'est la contrainte qui dicte tout le reste.
+ * Le motif n'est PAS répété (`no-repeat`), contrairement à la première version
+ * en tuiles, qui montrait deux bandes à la fois. Aux deux bouts du balayage, le
+ * reflet est entièrement hors du mot : on peut donc marquer un repos entre deux
+ * passages par un palier dans les keyframes (45 % à 100 %), sans figer de reflet
+ * sur la fin du mot. Un passage dure 1,8 s, suivi de 2,2 s de repos.
  *
- * Le composant d'origine sépare deux passages par un `repeatDelay`. Imité par
- * un palier dans les keyframes, ce délai ne fige pas un mot propre : le motif
- * se répétant (`background-repeat: repeat`), la position d'arrêt laissait une
- * tuile poser son reflet sur la fin du mot, immobile six dixièmes de seconde.
- *
- * La boucle décale donc le motif d'exactement une tuile, sans palier. Comme les
- * arrêts extrêmes du dégradé sont blancs, les bords de tuile coïncident et le
- * raccord est invisible. Le repos entre deux reflets n'est plus un arrêt : il
- * vient de la portion blanche du motif qui traverse le texte.
- *
- * D'où le -166.667 % : `background-position` en pourcentage se rapporte à
- * (largeur du texte - largeur du motif), soit -1,5 fois la largeur du texte
- * pour une tuile de 250 %. Décaler d'une tuile pleine (2,5) demande donc
- * 2,5 / 1,5 = 1,6667 tour de cette unité.
- *
- * ⚠️ UN SEUL PASSAGE, PAS UNE BOUCLE INFINIE. Le RGAA (13.8) demande qu'un
- * mouvement lancé seul dure 5 s au plus, ou qu'on puisse l'arrêter sur la page ;
- * `prefers-reduced-motion` ne compte pas comme un tel moyen. Un passage dure
- * 4 s, et le raccord sans couture fait que la position finale se confond avec
- * celle du départ : le reflet s'arrête sans saut. Mis en pause hors écran
- * (BaseLayout), chaque titre joue son passage quand on arrive sur lui.
+ * ⚠️ EN BOUCLE, DONC UN INTERRUPTEUR. Le RGAA (13.8) accepte un mouvement de
+ * plus de 5 s si le visiteur peut l'arrêter et le relancer sur la page :
+ * « Animer les titres », dans le panneau de réglages du header, pose
+ * `<html data-shine="off">` (src/lib/shine.ts). Sans choix mémorisé, le reflet
+ * suit `prefers-reduced-motion` (script en ligne de BaseLayout). Sans
+ * JavaScript, aucun drapeau n'est posé : le titre garde le chrome fixe.
  */
-@media (prefers-reduced-motion: no-preference) {
-  .text-chrome {
-    animation: text-chrome-shine 4s linear 1;
-    background-image: linear-gradient(
-      110deg,
-      var(--color-white) 32%,
-      var(--color-zinc-400) 44%,
-      var(--color-white) 50%,
-      var(--color-zinc-300) 57%,
-      var(--color-white) 68%
-    );
-    /* Explicite, et non hérité du défaut : la boucle en dépend. */
-    background-repeat: repeat;
-    background-size: 250% 100%;
-  }
+:root[data-shine="on"] .text-chrome {
+  --shine-spread: calc(3ch + 40px);
+  /* Le reflet assombrit l'encre blanche ; en clair, il éclaircit le graphite. */
+  --shine-peak: var(--color-zinc-400);
+  --shine-half: color-mix(in oklch, var(--shine-peak), var(--color-white) 50%);
+
+  animation: text-chrome-shine 4s linear infinite;
+  background-image: linear-gradient(
+    110deg,
+    var(--color-white) calc(50% - var(--shine-spread)),
+    var(--shine-half) calc(50% - var(--shine-spread) * 0.5),
+    var(--shine-peak) 50%,
+    var(--shine-half) calc(50% + var(--shine-spread) * 0.5),
+    var(--color-white) calc(50% + var(--shine-spread))
+  );
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: calc(200% + var(--shine-spread) * 2) 100%;
 }
 
 /*
@@ -271,8 +263,11 @@ body::after {
  * passaient de 18 % à 40 % de luminance : un écart qui se voit sur un blanc,
  * pas sur une encre sombre. Le reflet monte donc jusqu'à `zinc-600` (57 %), ce
  * qui reste lisible sur le gris perle pour des corps de cette taille.
+ *
+ * Chrome fixe seulement : de même poids que la règle du reflet et placée après
+ * elle, cette règle écraserait sinon son dégradé animé.
  */
-:root[data-theme="light"] .text-chrome {
+:root[data-theme="light"]:not([data-shine="on"]) .text-chrome {
   background-image: linear-gradient(
     172deg,
     var(--color-white) 0%,
@@ -283,26 +278,19 @@ body::after {
   );
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  :root[data-theme="light"] .text-chrome {
-    background-image: linear-gradient(
-      110deg,
-      var(--color-white) 32%,
-      var(--color-zinc-600) 44%,
-      var(--color-white) 50%,
-      var(--color-zinc-500) 57%,
-      var(--color-white) 68%
-    );
-  }
+:root[data-theme="light"][data-shine="on"] .text-chrome {
+  --shine-peak: var(--color-zinc-600);
 }
 
+/* Du reflet hors du mot à gauche au reflet hors du mot à droite, puis repos. */
 @keyframes text-chrome-shine {
-  from {
-    background-position: 0 0;
+  0% {
+    background-position: 100% 0;
   }
 
-  to {
-    background-position: -166.667% 0;
+  45%,
+  100% {
+    background-position: 0 0;
   }
 }
 

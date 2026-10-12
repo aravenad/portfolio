@@ -140,3 +140,12 @@ export async function tabOrder(page: Page, from: Locator, count: number): Promis
 
   return names;
 }
+
+/**
+ * Ouvre le panneau des réglages d'affichage (thème, reflet des titres) et
+ * attend qu'il soit affiché.
+ */
+export async function openSettings(page: Page): Promise<void> {
+  await page.locator("[data-settings-toggle]").click();
+  await expect(page.locator("#settings-panel")).toBeVisible();
+}

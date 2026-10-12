@@ -1,4 +1,4 @@
-import { afterNavigation, clickInPlace, expect, scrollToId, test, topOf } from "./helpers";
+import { afterNavigation, clickInPlace, expect, openSettings, scrollToId, test, topOf } from "./helpers";
 
 /**
  * Le lien de langue : il mène à la même page dans l'autre langue et garde la
@@ -67,10 +67,14 @@ test("la position de lecture est gardée d'une langue à l'autre, aller et retou
 
 test("le thème est gardé en changeant de langue", async ({ page }) => {
   await page.goto("");
-  await page.locator("[data-theme-toggle]").click();
+  await openSettings(page);
+  await page.locator("#settings-panel [data-theme-toggle]").click();
 
   await afterNavigation(page, () => langLink(page).click());
 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(page.locator("[data-theme-toggle]")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#settings-panel [data-theme-toggle]")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });

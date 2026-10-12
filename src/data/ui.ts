@@ -32,8 +32,14 @@ const fr = {
     navLabel: "Navigation principale",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
-    /** Le bouton bascule le thème clair : il est « pressé » quand le clair est actif. */
+    /**
+     * L'engrenage ouvre le panneau des réglages d'affichage. Ses interrupteurs
+     * gardent un libellé fixe et sont « pressés » quand l'option est active.
+     */
+    settings: "Réglages d'affichage",
+    settingsTitle: "Affichage",
     lightTheme: "Thème clair",
+    animateTitles: "Animer les titres",
     /**
      * Lien vers l'autre langue : texte court, nom complet pour les lecteurs
      * d'écran. Le nom commence par le texte visible, pour qu'une commande
@@ -246,7 +252,10 @@ const en = {
     navLabel: "Main navigation",
     openMenu: "Open the menu",
     closeMenu: "Close the menu",
+    settings: "Display settings",
+    settingsTitle: "Display",
     lightTheme: "Light theme",
+    animateTitles: "Animate titles",
     otherLang: { short: "FR", label: "FR, version française" },
   },
 
