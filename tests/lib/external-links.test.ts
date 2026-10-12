@@ -25,18 +25,21 @@ describe("satteriExternalLinks", () => {
   /** Un contexte Sätteri réduit à ce que le plugin appelle. */
   function visit(
     href: string,
-    { label = "note de cadrage", file = "file:///site/src/content/projects/fiche.md" } = {},
+    {
+      label = "note de cadrage",
+      file = "file:///site/src/content/projects/fiche.md",
+      children = [{ type: "text", value: label }] as unknown[],
+    } = {},
   ) {
     const attributes: Record<string, unknown> = {};
     const appended: unknown[] = [];
     const replaced: unknown[] = [];
     const ctx = {
-      fileURL: new URL(file),
+      fileURL: file ? new URL(file) : undefined,
       setProperty: (_node: unknown, key: string, value: unknown) => (attributes[key] = value),
       appendChild: (_node: unknown, child: unknown) => appended.push(child),
       replaceNode: (_node: unknown, nodes: unknown[]) => replaced.push(...nodes),
     };
-    const children = [{ type: "text", value: label }];
     visitor.visit({ type: "element", tagName: "a", properties: { href }, children }, ctx);
 
     return { attributes, appended, replaced, text: JSON.stringify([replaced, appended]) };
@@ -76,6 +79,29 @@ describe("satteriExternalLinks", () => {
 
   it("garde entier un lien d'un seul mot", () => {
     expect(visit("https://exemple.fr", { label: "GitHub" }).replaced).toHaveLength(1);
+  });
+
+  it("pose la flèche après le lien quand il ne finit pas par un mot", () => {
+    const code = { type: "element", tagName: "code", properties: {}, children: [] };
+    const cases = [
+      { children: [{ type: "text", value: "le dépôt " }, code] },
+      { label: "le dépôt " },
+      { children: [] },
+    ];
+
+    for (const options of cases) {
+      const { appended, replaced } = visit("https://exemple.fr", options) as {
+        appended: { tagName: string }[];
+        replaced: unknown[];
+      };
+      expect(replaced).toEqual([]);
+      expect(appended.map((child) => child.tagName)).toEqual(["svg", "span"]);
+    }
+  });
+
+  it("parle français quand le chemin de la fiche est inconnu", () => {
+    // Une chaîne vide, car `undefined` rendrait la main au chemin par défaut.
+    expect(visit("https://exemple.fr", { file: "" }).text).toContain(" (nouvel onglet)");
   });
 
   it("laisse les liens internes tels quels", () => {
