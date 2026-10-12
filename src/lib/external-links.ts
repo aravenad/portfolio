@@ -54,7 +54,7 @@ export const satteriExternalLinks: HastPluginDefinition = {
 
       const last = node.children.at(-1);
       const [, head = "", word = ""] =
-        last?.type === "text" ? (/^(.*?)(\S*)$/s.exec(last.value) ?? []) : [];
+        last?.type === "text" ? /^(.*?)(\S*)$/s.exec(last.value)! : [];
 
       if (last && word) {
         const replacement: ElementContent[] = [
