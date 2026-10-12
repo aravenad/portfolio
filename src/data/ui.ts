@@ -256,7 +256,7 @@ const fr = {
         "Pages auditées : l'accueil et chacune de ses sections, la liste des projets, les huit fiches projet, les mentions légales, cette déclaration et le plan du site.",
       technologies: "Technologies utilisées : HTML, CSS et JavaScript.",
       environment:
-        "Vérifications faites dans Firefox 153 ESR sous Linux, au clavier et à la souris, en thème sombre et en thème clair, sur grand écran et en largeur de téléphone.",
+        "Vérifications faites dans Firefox 153 ESR sous Linux, au clavier, à la souris et avec le lecteur d'écran Orca, en thème sombre et en thème clair, sur grand écran et en largeur de téléphone.",
     },
     display: {
       title: "Réglages d'affichage",
@@ -527,7 +527,7 @@ const en = {
         "Audited pages: the home page and each of its sections, the project list, the eight project pages, the legal notice, this statement and the site map.",
       technologies: "Technologies used: HTML, CSS and JavaScript.",
       environment:
-        "Checked in Firefox 153 ESR on Linux, with keyboard and mouse, in dark and light themes, on a wide screen and at phone width.",
+        "Checked in Firefox 153 ESR on Linux, with keyboard, mouse and the Orca screen reader, in dark and light themes, on a wide screen and at phone width.",
     },
     display: {
       title: "Display settings",
