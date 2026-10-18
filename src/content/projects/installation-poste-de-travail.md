@@ -5,7 +5,7 @@ tags: ["Linux", "Debian", "Système"]
 status: "termine"
 team: "Seul"
 year: 2024
-order: 8
+order: 9
 cover: terminal
 ---
 

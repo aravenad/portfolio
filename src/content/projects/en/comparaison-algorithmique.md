@@ -5,7 +5,7 @@ tags: ["Java", "Algorithms", "Optimization", "Machine learning", "Unit testing"]
 status: "termine"
 team: "In pairs"
 year: 2024
-order: 3
+order: 4
 cover: algo
 featured: true
 links:

@@ -5,7 +5,7 @@ tags: ["Linux", "Apache", "PostgreSQL", "PHP"]
 status: "termine"
 team: "Seul"
 year: 2025
-order: 7
+order: 8
 cover: network
 ---
 

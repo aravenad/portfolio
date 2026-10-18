@@ -307,3 +307,17 @@ test.describe("accueil allégé", () => {
     await expect(card.locator(".flex-wrap")).toBeHidden();
   });
 });
+
+test("la démo jouable tient dans la largeur et se lance au toucher", async ({ page }) => {
+  await page.goto("projects/arrow-block");
+  const demo = page.locator("[data-demo]");
+  await demo.getByRole("link", { name: "Jouer à la démo" }).tap();
+  await expect(demo).toHaveAttribute("data-state", "ready");
+  await expect(page.frameLocator("[data-demo] iframe").locator("canvas")).toBeVisible();
+
+  const stage = (await demo.locator("[data-demo-stage]").boundingBox())!;
+  const width = page.viewportSize()!.width;
+  expect(stage.x).toBeGreaterThanOrEqual(0);
+  expect(stage.x + stage.width).toBeLessThanOrEqual(width);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+});

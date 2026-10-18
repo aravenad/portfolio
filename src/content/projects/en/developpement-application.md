@@ -5,7 +5,7 @@ tags: ["Java", "JavaFX", "UML", "Unit testing", "Project management"]
 status: "termine"
 team: "Team of 6"
 year: 2024
-order: 2
+order: 3
 cover: uml
 featured: true
 links:

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arrow Block · démo</title>
+<link rel="stylesheet" href="embed.css?v=2d18de5f8c">
+</head>
+<body>
+<div id="decor"></div>
+<div id="shell">
+<div hidden>
+<section class="screen" id="home"><h1 id="hTitle"></h1><button id="gems"></button><button id="bHomeOpts"></button>
+<div id="tab_play"><div id="hero"></div><button id="bContinue"></button><button id="daily"></button><div id="worlds"></div></div>
+<div id="tab_mis"></div><div id="tab_shop"></div><div id="tabbar"></div></section>
+<section class="screen" id="world"><button id="bBack"></button><span id="wSub"></span><h2 id="wName"></h2><div id="wPieces"></div><section id="pzcard"></section><div id="map"></div></section>
+</div>
+<section class="screen" id="game" hidden>
+<div class="gwrap">
+<header class="hud">
+<button type="button" class="iconbtn" id="bOpts" aria-label="Pause et options" data-la="pause_options"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+<div class="lvl"><span class="label" id="wlabel">L’Atelier</span><span class="lvl-n" id="lvl">1</span></div>
+<div class="side">
+<button type="button" class="pc" id="pc" hidden></button>
+<div class="hearts" id="hearts" role="img" aria-label="Vies" data-la="lives"></div>
+</div>
+</header>
+<div class="meter" id="meter"><span class="mi" id="mIcon"></span><div class="tbar"><i id="tfill"></i></div><span class="tval" id="tval">0</span></div>
+<div id="stage"><canvas id="c" role="img" aria-label="Plateau de jeu en 3D" data-la="board3d"></canvas></div>
+<nav class="tools" aria-label="Bonus">
+<div class="tool-wrap">
+<button type="button" class="tool" id="bHint" aria-label="Indice" data-la="hint">
+<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>
+<span class="n" id="nHint">2</span>
+</button>
+</div>
+<div class="tool-wrap">
+<button type="button" class="tool" id="bRescue" aria-label="Second souffle" data-la="rescue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l3.6 3.6M14.8 14.8l3.6 3.6M18.4 5.6l-3.6 3.6M9.2 14.8l-3.6 3.6"/></svg>
+<span class="n" id="nRescue">2</span>
+</button>
+</div>
+</nav>
+</div>
+</section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div id="veil" aria-hidden="true"></div>
+<div id="coach" hidden></div>
+<div id="ov" hidden></div>
+<script src="embed.js?v=d227b48ece"></script>
+</body>
+</html>
