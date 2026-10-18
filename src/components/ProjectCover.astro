@@ -29,6 +29,7 @@ const framing: Record<Cover, string> = {
   network: "--cover-x: 58%; --cover-y: 18%",
   terminal: "--cover-x: 34%; --cover-y: 86%",
   calendar: "--cover-x: 62%; --cover-y: 78%",
+  cube: "--cover-x: 40%; --cover-y: 44%",
 };
 ---
 
@@ -208,6 +209,27 @@ const framing: Record<Cover, string> = {
                 />
               );
             })}
+          </>
+        )}
+
+        {cover === "cube" && (
+          <>
+            {/* Un cube de 3 × 3 × 3 en perspective isométrique, dont un petit cube est sorti en suivant sa flèche. */}
+            <path d="M146 22l57 33-57 33-57-33z" class="fill-zinc-950/70" />
+            <path d="M89 55l57 33v66l-57-33z" class="fill-zinc-950/70" />
+            <path d="M203 55l-57 33v66l57-33z" class="fill-zinc-950/70" />
+            <path
+              d="M165 33l-57 33M127 33l57 33M108 66v66M89 99l57 33M184 66v66M203 99l-57 33M184 44l-57 33M108 44l57 33M127 77v66M89 77l57 33M165 77v66M203 77l-57 33"
+              class="opacity-60"
+            />
+            <path d="M184 88l-19 11v22l19-11z" class="fill-zinc-950" />
+            <path d="M177.3 106.2l22.8 13.1" stroke-dasharray="2 5" class="text-accent" stroke="currentColor" />
+            <path
+              d="M212.5 104.5l19 11-19 11-19-11zM193.5 115.5l19 11v22l-19-11zM231.5 115.5l-19 11v22l19-11z"
+              class="fill-zinc-950 text-accent"
+              stroke="currentColor"
+            />
+            <path d="M206.8 112.2l11.4 6.6M218.2 113.3v5.5h-9.5" class="text-accent" stroke="currentColor" />
           </>
         )}
       </svg>
