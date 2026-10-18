@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,6 +31,7 @@ const schema = (collections.projects as { schema: { safeParse: (input: unknown) 
  */
 const DIRECTORY = fileURLToPath(new URL("../../src/content/projects", import.meta.url));
 const DIRECTORY_EN = join(DIRECTORY, "en");
+const PUBLIC = fileURLToPath(new URL("../../public", import.meta.url));
 
 /** Chaque fiche d'un dossier, avec son en-tête YAML déjà décodé. */
 const read = (directory: string) => readdirSync(directory)
@@ -96,6 +97,17 @@ describe("fiches de projet", () => {
       expect(body).not.toMatch(/^# /m);
     });
 
+    it("pointe vers une démo construite, s'il en annonce une", () => {
+      // La démo est recopiée depuis le dépôt du jeu : une fiche ne doit pas
+      // promettre un dossier vide.
+      const demo = data.demo as { src: string } | undefined;
+      if (!demo) return;
+
+      for (const file of ["index.html", "poster.webp"]) {
+        expect(existsSync(join(PUBLIC, demo.src, file)), `${demo.src}${file}`).toBe(true);
+      }
+    });
+
     it("donne une année plausible", () => {
       if (data.year === undefined) return;
       expect(data.year).toBeGreaterThanOrEqual(2015);
@@ -153,6 +165,13 @@ describe("fiches de projet en anglais", () => {
       for (const key of ["order", "status", "year", "featured", "cover", "competences"]) {
         expect(data[key], key).toEqual(original[key]);
       }
+    });
+
+    it("garde la démo de la version française", () => {
+      const original = fiches.find((fiche) => fiche.slug === slug)!.data;
+      const src = (fiche: Record<string, unknown>) => (fiche.demo as { src: string } | undefined)?.src;
+
+      expect(src(data)).toBe(src(original));
     });
 
     it("garde autant d'étiquettes que la version française", () => {

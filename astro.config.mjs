@@ -46,6 +46,13 @@ export default defineConfig({
     }),
   },
 
+  // Le même en-tête que GitHub Pages, sur toutes ses réponses. La démo
+  // jouable tourne dans une iframe en bac à sable, d'origine « null » : sans
+  // lui, `astro dev` et `astro preview` lui refuseraient ses polices.
+  server: {
+    headers: { 'Access-Control-Allow-Origin': '*' },
+  },
+
   vite: {
     plugins: [tailwindcss()]
   }

@@ -277,6 +277,39 @@ describe("fiche d'un projet", () => {
     expect(without.document.querySelector(nav)).toBeNull();
   });
 
+  it("montre la démo sous l'en-tête, en image d'attente et lien « Jouer »", async () => {
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-1"),
+      props: await propsFor("projet-1"),
+    });
+    const demo = document.querySelector("article figure[data-demo]");
+    const play = demo?.querySelector("a[data-demo-play]");
+
+    // Juste après l'en-tête, avant le texte de la fiche.
+    expect(document.querySelector("article header")?.nextElementSibling).toBe(demo);
+    expect(demo?.getAttribute("aria-label")).toBe("Démo jouable");
+    expect(demo?.getAttribute("data-demo-src")).toBe("/portfolio/demos/projet-1/");
+    // Espace insécable devant le deux-points (`withFrenchSpacing`).
+    expect(demo?.getAttribute("data-demo-title")).toMatch(/^Projet 1\s: démo jouable$/);
+    expect(demo?.querySelector("img")?.getAttribute("src")).toBe("/portfolio/demos/projet-1/poster.webp");
+    expect(demo?.querySelector("img")?.getAttribute("alt")).toBe("");
+    // Sans script, le lien ouvre la démo en pleine page : rien n'est chargé avant le clic.
+    expect(play?.getAttribute("href")).toBe("/portfolio/demos/projet-1/?lang=fr");
+    expect(play?.textContent?.trim()).toBe("Jouer à la démo");
+    expect(demo?.querySelector("iframe")).toBeNull();
+    expect(demo?.querySelector("figcaption")?.textContent).toBe("But du jeu et commandes.");
+    expect(demo?.querySelector('[role="status"]')).toBeTruthy();
+  });
+
+  it("ne montre pas de démo à une fiche qui n'en a pas", async () => {
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-2"),
+      props: await propsFor("projet-2"),
+    });
+
+    expect(document.querySelector("[data-demo]")).toBeNull();
+  });
+
   it("ne montre aucune rubrique du PPP tant qu'elle est vide", async () => {
     const props = await propsFor("projet-1");
     const { document } = await renderPage(ProjectDetail, {
@@ -461,6 +494,25 @@ describe("version anglaise", () => {
       expect(link.getAttribute("href")).toMatch(/^\/portfolio\/en\/projects\//);
     }
     expect(document.querySelector("article header")?.textContent).toContain("Completed");
+  });
+
+  it("ouvre la démo en anglais", async () => {
+    const page = await import("../../src/pages/en/projects/[slug].astro");
+    const paths: Route<"slug">[] = await page.getStaticPaths({ paginate: (() => []) as never });
+    const { props } = paths.find((route) => route.params.slug === "projet-1")!;
+
+    const { document } = await renderPage(ProjectDetailEn, {
+      request: request("/portfolio/en/projects/projet-1"),
+      props,
+    });
+    const demo = document.querySelector("[data-demo]");
+
+    expect(demo?.getAttribute("aria-label")).toBe("Playable demo");
+    expect(demo?.getAttribute("data-demo-lang")).toBe("en");
+    expect(demo?.querySelector("[data-demo-play]")?.getAttribute("href")).toBe(
+      "/portfolio/demos/projet-1/?lang=en",
+    );
+    expect(demo?.querySelector("[data-demo-play]")?.textContent?.trim()).toBe("Play the demo");
   });
 });
 

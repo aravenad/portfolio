@@ -129,6 +129,13 @@ const fr = {
       repo: "Voir le code",
       newTab: "(nouvel onglet)",
     },
+    demo: {
+      label: "Démo jouable",
+      play: "Jouer à la démo",
+      loading: "Chargement de la démo…",
+      frameTitle: (title: string) => `${title} : démo jouable`,
+      solved: "Niveau réussi en {time} s.",
+    },
     sections: {
       role: { slug: "mon-role", title: "Mon rôle" },
       competences: { slug: "competences-mobilisees", title: "Compétences mobilisées" },
@@ -403,6 +410,13 @@ const en = {
       site: "Visit the site",
       repo: "View the code",
       newTab: "(opens in a new tab)",
+    },
+    demo: {
+      label: "Playable demo",
+      play: "Play the demo",
+      loading: "Loading the demo…",
+      frameTitle: (title: string) => `${title}: playable demo`,
+      solved: "Level cleared in {time} s.",
     },
     sections: {
       role: { slug: "my-role", title: "My role" },

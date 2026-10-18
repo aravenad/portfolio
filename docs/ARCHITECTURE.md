@@ -35,7 +35,7 @@ justifie : ce document n'en donne que la carte.
 | `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination, CV public, données structurées | Sans DOM, couverte à 100 % |
 | `src/styles/global.css` | Thème Tailwind, calques du fond, utilitaires, rendu Markdown | Seule feuille de style globale |
 | `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS ou le code importent |
-| `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) | Nom stable : c'est lui qui fait l'URL |
+| `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) ; `demos/` : les démos jouables, construites dans le dépôt de chaque projet | Nom stable : c'est lui qui fait l'URL. Ne jamais retoucher `demos/` à la main |
 | `tests/` | Vitest, rangé comme `src/` | Voir §5 |
 | `e2e/` | Playwright : le site construit, dans Chromium | Voir §5 |
 | `tools/` | Sources des images générées | Jamais compilé ni servi |
@@ -69,6 +69,8 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
 - **Une fiche suit la grille du PPP** : le corps Markdown (contexte, objectifs,
   réalisation, résultats), puis `role`, `competences` et `learned`, rendus par
   `ProjectDetail.astro` seulement s'ils sont renseignés.
+- **Une fiche peut avoir une démo jouable** (`demo`, voir plus bas), montrée
+  sous l'en-tête de la fiche par `ProjectDemo.astro`.
 - **Le site vit à la racine de son domaine** (`damien-aravena.fr`, sans
   `base`). Tout lien interne passe quand même par `localizedUrl(chemin, langue)`
   (`src/lib/i18n.ts`), qui ajoute la base s'il y en a une et, en anglais, `/en`.
@@ -130,6 +132,30 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
+| Démo jouable chargée au clic, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
+
+**Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
+`/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une
+image d'attente (`poster.webp`) et un lien « Jouer à la démo ». Rien de la démo
+n'est chargé avant le clic : il crée une iframe en bac à sable
+(`sandbox="allow-scripts"`, sans `allow-same-origin`), qui reçoit la langue et
+le thème dans l'URL. Sans JavaScript, ou au clic du milieu, le lien ouvre la
+démo seule. La démo ne parle à la page que par `postMessage`, version `v: 1` ;
+la page ne lit que les messages de sa propre iframe :
+
+| Message | Champs | Effet |
+| :--- | :--- | :--- |
+| `ab:ready` | `level` | La démo remplace l'image et reçoit le focus (au plus tard 8 s après le clic) |
+| `ab:size` | `height` | Hauteur conseillée, bornée entre 360 et 800 px |
+| `ab:solved` | `level`, `time`, `errors` | Annoncé aux lecteurs d'écran (`role="status"`) |
+
+Une iframe sans `allow-same-origin` a l'origine `null` : ses polices ne se
+chargent qu'avec `Access-Control-Allow-Origin`. GitHub Pages l'envoie
+(`*`) sur toutes ses réponses ; `server.headers` dans `astro.config.mjs` fait
+de même pour `astro dev` et `astro preview`, sinon les tests de bout en bout
+échouent sur les erreurs de la console. Les fichiers de `public/demos/` viennent
+du dépôt du projet : pour Arrow Block, `npm run embed -- <chemin du portfolio>`
+dans le dépôt du jeu les reconstruit et les recopie.
 
 **Apparition au défilement.** Un script bloquant dans le `<head>` pose
 `data-reveal-armed` avant le premier affichage ; le CSS ne masque les blocs
