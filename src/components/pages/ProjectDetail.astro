@@ -6,6 +6,7 @@ import Badge from "../ui/Badge.astro";
 import Breadcrumb from "../ui/Breadcrumb.astro";
 import Button from "../ui/Button.astro";
 import Container from "../ui/Container.astro";
+import ProjectDemo from "../ProjectDemo.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
@@ -25,7 +26,7 @@ interface Props {
  * (`getProjectPaths`).
  */
 const { project, previous, next } = Astro.props;
-const { title, summary, tags, status, team, year, links, role, competences, learned } =
+const { title, summary, tags, status, team, year, links, demo, role, competences, learned } =
   project.data;
 const { Content, headings } = await render(project);
 const lang = getLang(Astro.url.pathname);
@@ -133,6 +134,12 @@ const meta = [team, year?.toString()].filter(Boolean);
           )
         }
       </header>
+
+      {/*
+        La démo vient juste après l'en-tête, avant le texte : on joue d'abord,
+        on lit ensuite comment c'est fait.
+      */}
+      {demo && <ProjectDemo title={title} src={demo.src} caption={demo.caption} />}
 
       {/*
         Le sommaire occupe la marge droite à partir de `lg`, et passe au-dessus

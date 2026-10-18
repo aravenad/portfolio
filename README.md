@@ -119,8 +119,11 @@ status: "termine" # termine | en-cours | a-venir
 team: "En binôme"
 year: 2026
 order: 8 # ordre d'affichage
-cover: uml # motif de la carte : uml | algo | web | erd | chart | network | terminal | calendar
+cover: uml # motif de la carte : uml | algo | web | erd | chart | network | terminal | calendar | cube
 featured: true # mis en avant sur l'accueil
+demo: # facultatif : démo jouable, construite dans public/demos/<nom>/
+  src: "/demos/mon-projet/"
+  caption: "But et commandes, sous la démo."
 role: # ce que j'ai fait moi-même dans l'équipe
   - "Conception du diagramme de classes"
 competences: [realiser, collaborer] # compétences du BUT mobilisées

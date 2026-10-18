@@ -1,0 +1,127 @@
+---
+import { solidButton } from "./ui/button-styles";
+import { useTranslations } from "../data/ui";
+import { demoUrl } from "../lib/demo";
+import { getLang } from "../lib/i18n";
+import { url } from "../lib/url";
+
+interface Props {
+  /** Le titre du projet, repris dans celui de l'iframe. */
+  title: string;
+  /** Le dossier de la démo dans `public/`, avec `index.html` et `poster.webp`. */
+  src: string;
+  /** Le but du jeu et les commandes, sous la démo. */
+  caption: string;
+}
+
+/*
+ * La démo jouable d'une fiche projet. Rien n'est chargé tant que le visiteur
+ * ne l'a pas demandé : une image d'attente, carrée, et un lien « Jouer ». Sans
+ * script, le lien ouvre la démo en pleine page ; avec, elle prend la place de
+ * l'image (src/lib/demo.ts).
+ *
+ * La scène fait la hauteur que la démo conseille pour sa largeur (`ab:size`) :
+ * la même formule en CSS, sur la largeur du bloc (`cqw`), évite que la page
+ * ne saute à l'arrivée du premier message.
+ */
+const { title, src, caption } = Astro.props;
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const folder = url(src);
+---
+
+<figure
+  data-demo
+  data-demo-src={folder}
+  data-demo-lang={lang}
+  data-demo-title={t.projects.demo.frameTitle(title)}
+  data-demo-loading={t.projects.demo.loading}
+  data-demo-solved={t.projects.demo.solved}
+  aria-label={t.projects.demo.label}
+  class="group mt-10 max-w-3xl @container sm:mt-14"
+>
+  <div
+    data-demo-stage
+    class="demo-stage relative h-[clamp(460px,120cqw,680px)] overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
+  >
+    <img
+      src={`${folder}poster.webp`}
+      alt=""
+      width="640"
+      height="640"
+      decoding="async"
+      class="absolute inset-0 size-full object-cover transition-opacity duration-500 group-data-[state=ready]:opacity-0"
+    />
+    <a
+      href={demoUrl(folder, lang)}
+      data-demo-play
+      class="absolute inset-0 flex items-center justify-center group-data-[state=ready]:hidden"
+    >
+      <span
+        class:list={[
+          "inline-flex items-center gap-2.5 rounded-lg px-5 py-3 font-medium transition",
+          solidButton,
+          "group-data-[state=loading]:opacity-70",
+        ]}
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-4 fill-current">
+          <path d="M4 2.5v11a.5.5 0 0 0 .76.43l9-5.5a.5.5 0 0 0 0-.86l-9-5.5A.5.5 0 0 0 4 2.5z" />
+        </svg>
+        {t.projects.demo.play}
+      </span>
+    </a>
+  </div>
+
+  <figcaption class="mt-4 text-sm leading-6 text-zinc-400">{caption}</figcaption>
+
+  {/* Annonce le chargement, puis chaque niveau réussi, aux lecteurs d'écran. */}
+  <p data-demo-status role="status" class="sr-only"></p>
+</figure>
+
+<style>
+  /* L'iframe est créée par le script : hors de portée des classes du composant. */
+  .demo-stage :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    opacity: 0;
+    transition: opacity 500ms;
+  }
+
+  [data-state="ready"] .demo-stage :global(iframe) {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .demo-stage :global(iframe) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { onEachPage } from "../lib/enhance";
+  import { wireDemo } from "../lib/demo";
+
+  /** Tout le câblage est dans src/lib/demo.ts, où il est testé. */
+  onEachPage((signal) => {
+    for (const root of document.querySelectorAll<HTMLElement>("[data-demo]")) {
+      const play = root.querySelector<HTMLElement>("[data-demo-play]");
+      const stage = root.querySelector<HTMLElement>("[data-demo-stage]");
+      const status = root.querySelector<HTMLElement>("[data-demo-status]");
+      if (!play || !stage || !status) continue;
+
+      const data = root.dataset;
+      wireDemo({ root, play, stage, status }, window, signal, {
+        src: data.demoSrc ?? "",
+        lang: data.demoLang ?? "fr",
+        theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
+        title: data.demoTitle ?? "",
+        loading: data.demoLoading ?? "",
+        solved: data.demoSolved ?? "",
+      });
+    }
+  });
+</script>

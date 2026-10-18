@@ -14,6 +14,7 @@ export interface FixtureProject {
     featured: boolean;
     cover?: Cover;
     links: { site?: string; repo?: string };
+    demo?: { src: string; caption: string };
     role: string[];
     competences: Competence[];
     learned: string[];
@@ -43,6 +44,8 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
         : index === 3
           ? { repo: "https://github.com/exemple/projet-4" }
           : {},
+    // Seul le premier a une démo : les autres ne doivent rien en montrer.
+    demo: index === 0 ? { src: "/demos/projet-1/", caption: "But du jeu et commandes." } : undefined,
     // Seul le troisième remplit les rubriques du PPP : les autres prouvent
     // qu'une fiche incomplète n'en montre rien.
     role: index === 2 ? ["Conception de la base", "Tests unitaires"] : [],

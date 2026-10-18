@@ -48,6 +48,18 @@ const schema = z.object({
       repo: z.url().optional(),
     })
     .default({}),
+  /**
+   * Démo jouable, sous l'en-tête de la fiche (ProjectDemo.astro). `src` est son
+   * dossier dans public/, qui contient la page de la démo (`index.html`) et son
+   * image d'attente (`poster.webp`) ; `caption`, affiché dessous, dit le but et
+   * les commandes, pour que la fiche reste complète sans la démo.
+   */
+  demo: z
+    .object({
+      src: z.string().regex(/^\/demos\/[a-z0-9-]+\/$/),
+      caption: text(),
+    })
+    .optional(),
   /*
    * Les rubriques attendues par la grille du PPP, en plus du corps Markdown.
    * Chacune n'apparaît sur la fiche, et dans son sommaire, qu'une fois
