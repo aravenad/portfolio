@@ -72,6 +72,13 @@ export const NIVEAUX: Niveaux = { noir: 0.18, blanc: 0.85, gamma: 1.15, neutre: 
  */
 export const NIVEAUX_MATIERE: Niveaux = { noir: 0.04, blanc: 0.6, gamma: 1.15, neutre: 0.02 };
 
+/**
+ * Les niveaux d'un bouton : la matière, éclaircie. Sur quarante cellules de
+ * large, les niveaux de la matière laissaient la moitié d'un bouton vide dès
+ * que son cadrage tombait dans une ombre.
+ */
+export const NIVEAUX_BOUTON: Niveaux = { noir: 0.01, blanc: 0.4, gamma: 1, neutre: 0.02 };
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /** Valeur tonale d'une luminance après niveaux et gamma : 0 la nuit, 1 le givre. */
@@ -173,6 +180,80 @@ export function trame(
   return sortie;
 }
 
+/**
+ * Un logo vu par la trame : l'encre de chaque cellule (0 à 1), et la part de
+ * cette encre qui revient à la seconde couleur d'un logo bicolore.
+ */
+export interface Empreinte {
+  colonnes: number;
+  lignes: number;
+  encre: Float32Array;
+  accent: Float32Array;
+}
+
+/**
+ * Lit un logo rendu à un pixel par cellule sur fond transparent, sa couleur
+ * principale en rouge pur et sa seconde en vert pur : l'alpha donne l'encre,
+ * le vert la part de seconde couleur.
+ */
+export function empreinte(rgba: ArrayLike<number>, colonnes: number, lignes: number): Empreinte {
+  const taille = colonnes * lignes;
+  const encre = new Float32Array(taille);
+  const accent = new Float32Array(taille);
+
+  for (let i = 0; i < taille; i++) {
+    const r = rgba[i * 4];
+    const g = rgba[i * 4 + 1];
+    encre[i] = rgba[i * 4 + 3] / 255;
+    accent[i] = r + g > 0 ? g / (r + g) : 0;
+  }
+
+  return { colonnes, lignes, encre, accent };
+}
+
+/** Les niveaux d'un logo : son encre pleine atteint le givre, sans gamma. */
+export const NIVEAUX_LOGO: Niveaux = { noir: 0.04, blanc: 0.8, gamma: 1, neutre: 0 };
+
+/**
+ * Rang, dans l'atlas d'un logo, de la couleur de sa marque : juste après les
+ * teintes de la palette. Sa seconde couleur suit.
+ */
+export const MARQUE = TEINTES.length;
+
+/**
+ * Trame un logo dans `sortie` (voir `code`). L'encre est modelée comme du
+ * métal, plus claire en haut à gauche, et le reflet n'éclaire qu'elle : autour
+ * du logo, la tuile reste vide. Au repos, le logo prend les teintes de la
+ * palette ; avec `marque`, les couleurs de sa marque (`MARQUE` et la suivante),
+ * l'encre ne réglant plus que la densité des glyphes.
+ */
+export function trameLogo(
+  source: Empreinte,
+  sortie: Uint8Array,
+  temps: number | null = null,
+  marque = false,
+): Uint8Array {
+  const { colonnes, lignes, encre, accent } = source;
+  const marches = RAMPE.length - 1;
+
+  for (let y = 0; y < lignes; y++) {
+    for (let x = 0; x < colonnes; x++) {
+      const i = y * colonnes + x;
+      const modele = 1 - 0.18 * (x / colonnes + y / lignes);
+      const eclat = temps === null ? 0 : 1.5 * lumiere(x, y, colonnes, lignes, temps);
+      const t = ton(encre[i] * (modele + eclat), NIVEAUX_LOGO);
+      const seuil = (BAYER4[y & 3][x & 3] + 0.5) / 16;
+      const glyphe = clamp(Math.floor(t * marches + seuil), 0, marches);
+      const tb = clamp(t + (seuil - 0.5) * 0.16, 0, 1);
+      const teinte = marque ? MARQUE + (accent[i] > 0.5 ? 1 : 0) : bande(tb);
+
+      sortie[i] = code(teinte, glyphe);
+    }
+  }
+
+  return sortie;
+}
+
 /** Ce que l'atlas et la peinture utilisent d'un contexte 2D. */
 export interface Pinceau {
   font: string;
@@ -202,7 +283,8 @@ export const POLICE = '"IBM Plex Mono", ui-monospace, monospace';
  * ligne par teinte, des tuiles de `cellule` pixels. Peindre une image revient
  * ensuite à copier des tuiles.
  *
- * `couleurs` suit l'ordre de `TEINTES`.
+ * `couleurs` suit l'ordre de `TEINTES`, suivi des couleurs d'une marque pour
+ * un logo (voir `MARQUE`).
  */
 export function atlas(pinceau: Pinceau, cellule: number, couleurs: readonly string[]): void {
   pinceau.font = `500 ${Math.round(cellule * 1.15)}px ${POLICE}`;
@@ -273,7 +355,11 @@ export interface Cadre {
   sh: number;
 }
 
-/** Largeur de la matière du fond (src/assets/chrome-original-hq.webp). */
+/**
+ * Largeur de la matière pleine taille (src/assets/chrome-original-hq.webp) :
+ * les cadrages sont calculés dans ses pixels, puis ramenés à la source que lit
+ * vraiment la trame (`aLaSource`).
+ */
 export const MATIERE_LARGEUR = 1920;
 /** Hauteur de la matière du fond. */
 export const MATIERE_HAUTEUR = 3770;
@@ -311,6 +397,16 @@ export function cadrageCouverture(largeur: number, hauteur: number, x: number, y
     sw: largeur * echelle,
     sh: hauteur * echelle,
   };
+}
+
+/**
+ * Ramène un cadre, calculé sur la matière pleine taille, à une source large de
+ * `largeur` pixels. La trame ne lit qu'un pixel par cellule : elle se contente
+ * d'une copie réduite (src/assets/chrome-glyph.webp).
+ */
+export function aLaSource(cadre: Cadre, largeur: number): Cadre {
+  const k = largeur / MATIERE_LARGEUR;
+  return { sx: cadre.sx * k, sy: cadre.sy * k, sw: cadre.sw * k, sh: cadre.sh * k };
 }
 
 /** Lit un pourcentage CSS (« 22% ») en fraction, `repli` s'il est illisible. */

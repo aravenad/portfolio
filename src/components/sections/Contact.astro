@@ -1,12 +1,13 @@
 ---
-import { Icon } from "astro-icon/components";
 import Button from "../ui/Button.astro";
+import GlyphLogo from "../ui/GlyphLogo.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
 import { outlineButton } from "../ui/button-styles";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { publicCv } from "../../lib/cv";
+import { brandStyle } from "../../lib/skills";
 import { getLang } from "../../lib/i18n";
 
 const t = useTranslations(getLang(Astro.url.pathname));
@@ -19,10 +20,25 @@ const cv = publicCv();
  * passent en icônes, que tout le monde reconnaît : quatre boutons à libellé
  * alourdissaient la ligne. Leur nom reste dans `aria-label`, et dans `title`
  * pour qui survole.
+ *
+ * Comme les tuiles de compétences, leur logo est tramé en glyphes et prend la
+ * couleur de sa marque au survol. En sombre, le bleu du mode sombre de LinkedIn
+ * et le blanc de GitHub : en glyphes, le bleu officiel éteignait le « in ». En
+ * clair, leurs couleurs officielles (comme GitHub dans data/skills.ts).
  */
 const profiles = [
-  { href: site.linkedin, label: t.contact.linkedin, icon: "simple-icons:linkedin" },
-  { href: site.github, label: t.contact.github, icon: "simple-icons:github" },
+  {
+    href: site.linkedin,
+    label: t.contact.linkedin,
+    icon: "simple-icons:linkedin",
+    brand: brandStyle({ label: "LinkedIn", color: "#70B5F9", colorLight: "#0A66C2" }),
+  },
+  {
+    href: site.github,
+    label: t.contact.github,
+    icon: "simple-icons:github",
+    brand: brandStyle({ label: "GitHub", color: "#FFFFFF", colorLight: "#181717" }),
+  },
 ];
 ---
 
@@ -56,12 +72,14 @@ const profiles = [
             rel="noreferrer"
             aria-label={profile.label}
             title={profile.label}
+            style={profile.brand}
+            data-glyph-hote
             class:list={[
               "inline-flex size-12 items-center justify-center rounded-lg text-zinc-300 transition hover:text-zinc-100",
               outlineButton,
             ]}
           >
-            <Icon name={profile.icon} aria-hidden="true" class="size-5" />
+            <GlyphLogo name={profile.icon} box="size-10" class="size-5" />
           </a>
         ))
       }

@@ -132,8 +132,8 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
-| Trame de glyphes du fond, de ses échos et des couvertures | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro` | `lib/glyph.ts` |
 | Démo jouable chargée au clic, arrêtable, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
+| Trame de glyphes du fond, de ses échos, des couvertures, des logos et du survol des boutons | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro`, `ui/GlyphLogo.astro`, `ui/Button.astro` | `lib/glyph.ts` |
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une
@@ -173,21 +173,36 @@ les 3 secondes, le drapeau est retiré et tout redevient visible. Sous
 **Style.** Tailwind v4, sans fichier de configuration : le thème est dans le
 bloc `@theme` de `global.css`. Le fond de page est fait de deux calques sur
 `body` : la matière métallique (`::before`, photo `chrome-original-hq.webp`
-fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`). Le
+fondue par le masque `chrome-fade.webp` étiré sur `--matiere-hauteur`, 96rem,
+et effacée sous les liens de la barre de navigation) et un grain fin (`::after`). Le
 titre de l'accueil entre mot par mot, du flou au net (`.blur-word`), en CSS
 seul ; le reste du gabarit monte en fondu (`.page-enter`).
 
 **Trame de glyphes.** `ui/GlyphField.astro` recompose la matière en glyphes
 ASCII (rampe ` ·:+×xX#`, tramage de Bayer 4×4, IBM Plex Mono) sur un canvas
-persistant d'une page à l'autre ; la photo de `body::before` ne s'efface
-qu'une fois la trame peinte (`html[data-glyph-ready]`), et reste sans script.
+persistant d'une page à l'autre. Elle lit une copie réduite de la matière
+(`chrome-glyph.webp`, 480 px, 51 Ko, préchargée) : la photo pleine taille de
+`body::before` n'est dessinée, donc téléchargée, que sans script (`html` sans
+`data-glyph`).
 Le même moteur trame les couvertures de projet (animées au survol de la carte)
 ainsi que ses échos plus bas dans la page (`ui/GlyphEchoes.astro`) : une tache
 tous les 66rem, d'un bord puis de l'autre (sur un écran de plus de 64rem),
-et le halo du pied de page.
+entière dans la fenêtre et éteinte avant le bord, et le halo du pied de page.
+Il trame aussi des logos (`ui/GlyphLogo.astro`) : ceux des tuiles de
+compétences et les profils LinkedIn et GitHub du contact. La source est leur
+propre SVG, rendu à un pixel par cellule de 4 px (16 × 16 en tuile, 10 × 10 au
+contact). Ils sont dans la palette au repos, et au survol de leur hôte
+(`[data-glyph-hote]`) ils prennent les couleurs de marque `--skill-color*`
+(`lib/skills.ts`). Le SVG reste dans la page, effacé ; les puces mobiles
+gardent leurs icônes vectorielles.
+Enfin, chaque `ui/Button.astro` cache un fragment de la matière (cellules de
+5 px, niveaux `NIVEAUX_BOUTON` plus clairs, cadrage différent d'un bouton à
+l'autre) qui apparaît au survol ou au focus, s'éclaircit sous le libellé et
+est balayé d'un reflet en 1,5 s. Sur le bouton plein, il passe en `difference`
+(blanc, thème sombre) ou en `multiply` (graphite, thème clair).
 Une seule boucle à 12 images/s, qui ne repeint que les cellules changées et
 s'arrête hors écran. Les teintes sont les variables `--glyph-*` de
-`global.css`, une palette par thème. L'interrupteur « Animer le fond » du
+`global.css`, en OKLCH comme le reste, une palette par thème. L'interrupteur « Animer le fond » du
 panneau de réglages pose `<html data-glyph="off">` (clé `glyph`) : chaque
 surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 `prefers-reduced-motion`.
@@ -210,7 +225,8 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
   `data-theme="light"`, `global.css` redonne à chaque nuance une valeur claire
   (`zinc-950`, le fond, devient un gris perle ; `zinc-100`, les titres, un
   graphite). Chaque composant garde ainsi la même hiérarchie dans les deux
-  thèmes, sans une ligne de code en plus. Pas de blanc ni de noir purs : le
+  thèmes, sans une ligne de code en plus. Pas de blanc ni de noir purs, dans
+  aucun des deux thèmes : `white` et `black` prennent la teinte des gris, et le
   contraste reste net sans fatiguer l'œil.
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
   clair) et l'accent argent devient un bleu acier. Les logos des compétences

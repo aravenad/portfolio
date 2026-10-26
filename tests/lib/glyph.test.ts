@@ -3,23 +3,27 @@ import { describe, expect, it } from "vitest";
 import {
   BALAYAGE,
   GLYPH_KEY,
+  MARQUE,
   MATIERE_LARGEUR,
   NIVEAUX,
   NIVEAUX_MATIERE,
   RAMPE,
   TEINTES,
+  aLaSource,
   atlas,
   bande,
   cadrageCouverture,
   cadrageFond,
   champ,
   code,
+  empreinte,
   fraction,
   grille,
   lumiere,
   peindre,
   ton,
   trame,
+  trameLogo,
   wireGlyphToggle,
 } from "../../src/lib/glyph";
 
@@ -178,6 +182,41 @@ describe("trame", () => {
   });
 });
 
+describe("empreinte", () => {
+  it("lit l'encre dans l'alpha et l'accent dans la part de vert", () => {
+    const logo = empreinte([255, 0, 0, 255, 0, 255, 0, 128, 0, 0, 0, 0], 3, 1);
+
+    expect([...logo.encre]).toEqual([1, 128 / 255, 0].map(Math.fround));
+    expect([...logo.accent]).toEqual([0, 1, 0]);
+  });
+});
+
+describe("trameLogo", () => {
+  /** Un logo de 4 × 4, plein d'encre, en couleur principale (0) ou d'accent (1). */
+  const plein = (accent: number) =>
+    empreinte(new Uint8ClampedArray(64).map((_, i) => [255 * (1 - accent), 255 * accent, 0, 255][i % 4]), 4, 4);
+
+  it("laisse vide ce qui n'a pas d'encre", () => {
+    const sortie = trameLogo(empreinte(new Uint8ClampedArray(64), 4, 4), new Uint8Array(16), BALAYAGE / 2, true);
+
+    expect([...sortie].every((valeur) => valeur === 0)).toBe(true);
+  });
+
+  it("reste dans la palette au repos", () => {
+    const sortie = trameLogo(plein(0), new Uint8Array(16));
+
+    expect(sortie.every((valeur) => valeur > 0 && valeur < MARQUE * RAMPE.length)).toBe(true);
+  });
+
+  it("prend les couleurs de la marque au survol, accent compris", () => {
+    const teintes = (accent: number) =>
+      new Set([...trameLogo(plein(accent), new Uint8Array(16), null, true)].map((v) => Math.floor(v / RAMPE.length)));
+
+    expect(teintes(0)).toEqual(new Set([MARQUE]));
+    expect(teintes(1)).toEqual(new Set([MARQUE + 1]));
+  });
+});
+
 describe("atlas", () => {
   it("rend chaque glyphe non vide dans chaque teinte, centré dans sa tuile", () => {
     const pinceau = fakePinceau();
@@ -241,6 +280,17 @@ describe("cadrageCouverture", () => {
     expect(gauche.sw).toBeCloseTo(MATIERE_LARGEUR / 3.6);
     expect(droite.sx + droite.sw).toBeCloseTo(MATIERE_LARGEUR);
     expect(droite.sy + droite.sh).toBeCloseTo(3770);
+  });
+});
+
+describe("aLaSource", () => {
+  it("ramène un cadre de la matière pleine taille à la copie réduite", () => {
+    const plein = cadrageCouverture(360, 200, 1, 1);
+    const reduit = aLaSource(plein, 480);
+
+    expect(reduit.sx + reduit.sw).toBeCloseTo(480);
+    expect(reduit.sy + reduit.sh).toBeCloseTo((3770 * 480) / MATIERE_LARGEUR);
+    expect(aLaSource(plein, MATIERE_LARGEUR)).toEqual(plein);
   });
 });
 

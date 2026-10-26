@@ -13,8 +13,13 @@ import { ClientRouter } from "astro:transitions";
  *
  * Régénérer depuis la source (tools/metal-study/, hors dépôt) :
  * sharp(src).webp({ quality: 80, effort: 6 }).toFile("src/assets/chrome-original-hq.webp")
+ *
+ * Elle ne sert plus qu'aux visiteurs sans script. Les autres voient la trame
+ * de glyphes, qui lit une copie réduite à 480 px de large (51 Ko au lieu de
+ * 427) : un pixel par cellule lui suffit. Régénérer depuis la photo :
+ * sharp(hq).resize({ width: 480 }).webp({ quality: 70, effort: 6 }).toFile("src/assets/chrome-glyph.webp")
  */
-import chromeField from "../assets/chrome-original-hq.webp";
+import chromeGlyph from "../assets/chrome-glyph.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
 import GlyphEchoes from "../components/ui/GlyphEchoes.astro";
@@ -127,12 +132,14 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
 
     {/*
-      La matière du fond est déclarée en `background-image` dans global.css : le
-      navigateur ne la découvre donc qu'une fois la feuille de style reçue et
-      analysée. Mesuré sur le build, en 4G lente : découverte à 377 ms contre
-      172 ms pour le CSS — le fond apparaissait visiblement après le texte.
+      La matière du fond n'était découverte qu'une fois la feuille de style
+      reçue et analysée. Mesuré sur le build, en 4G lente : découverte à 377 ms
+      contre 172 ms pour le CSS — le fond apparaissait visiblement après le
+      texte. La trame ne la lit qu'une fois son script chargé, plus tard encore.
 
-      Ce préchargement la rend visible dès le HTML, en parallèle du CSS.
+      Ce préchargement la rend visible dès le HTML, en parallèle du CSS. C'est
+      la copie réduite que lit la trame : la photo pleine taille ne sert que
+      sans script, où l'on peut attendre le CSS.
       L'import en frontmatter est indispensable : c'est lui qui donne l'URL
       empreintée par Vite, qu'un chemin écrit à la main ne peut pas deviner.
     */}
@@ -140,7 +147,7 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       rel="preload"
       as="image"
       type="image/webp"
-      href={chromeField.src}
+      href={chromeGlyph.src}
       fetchpriority="high"
     />
 
@@ -215,8 +222,8 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       d'être coupé chez qui l'a désactivé. L'animation de la trame du fond
       aussi (`data-glyph`, src/lib/glyph.ts).
 
-      `data-glyph-ready`, posé une fois la trame peinte, retire la photo du
-      fond qu'elle remplace : il doit, lui aussi, survivre à l'échange.
+      `data-glyph` sert aussi à global.css pour écarter la photo du fond, qui
+      ne sert qu'aux visiteurs sans script.
     */}
     <script is:inline>
       (() => {
@@ -241,7 +248,6 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
           next.dataset.theme = root.dataset.theme;
           next.dataset.shine = root.dataset.shine;
           next.dataset.glyph = root.dataset.glyph;
-          if (root.hasAttribute("data-glyph-ready")) next.setAttribute("data-glyph-ready", "");
         });
       })();
     </script>

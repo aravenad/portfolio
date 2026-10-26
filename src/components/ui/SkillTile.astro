@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon/components";
+import GlyphLogo from "./GlyphLogo.astro";
 import { brandStyle } from "../../lib/skills";
 import type { Skill } from "../../types";
 
@@ -18,14 +18,15 @@ const brand = brandStyle(skill);
 {/* Un élément de la liste des compétences (Skills.astro), comme SkillChip. */}
 <li
   title={skill.label}
+  data-glyph-hote
   class="skill-tile surface-lit flex aspect-square flex-col items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-800/50 to-zinc-900/60 p-3 text-center transition hover:border-zinc-600 hover:from-zinc-800/80 hover:to-zinc-800/60"
   style={brand}
 >
   {
     skill.icon ? (
-      <Icon
+      <GlyphLogo
         name={skill.icon}
-        aria-hidden="true"
+        box="size-16"
         class:list={[
           "skill-icon size-8 text-zinc-100 transition-colors sm:size-10",
           skill.lineArt && "skill-icon-line",
@@ -50,7 +51,8 @@ const brand = brandStyle(skill);
 
 <style>
   /*
-   * Le logo reprend la couleur de sa marque au survol de la tuile.
+   * Le logo reprend la couleur de sa marque au survol de la tuile. La trame
+   * fait de même, avec les mêmes variables.
    *
    * `color` porte la couleur principale, que le tracé prend par `currentColor`.
    * `--logo-accent` porte la seconde, pour les logos bicolores — elle n'est

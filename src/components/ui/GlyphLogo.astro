@@ -1,0 +1,36 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  /** Le nom astro-icon du logo. */
+  name: string;
+  /** Les classes du SVG, tel qu'il s'affiche sans script. */
+  class?: string;
+  /** La taille du canvas, plus grand que le SVG : voir plus bas. */
+  box: string;
+}
+
+const { name, class: iconClass, box } = Astro.props;
+---
+
+{/*
+  Un logo tramé en glyphes par le moteur de GlyphField.astro, à partir de son
+  propre SVG. Il s'anime au survol de l'élément `[data-glyph-hote]` qui le
+  contient, et en prend les couleurs de marque (`--skill-color*`, voir
+  lib/skills.ts).
+*/}
+<span class:list={["glyph-logo relative flex shrink-0 items-center justify-center", box]}>
+  <Icon name={name} aria-hidden="true" class={iconClass} />
+  <canvas data-glyph-logo aria-hidden="true" class="absolute inset-0"></canvas>
+</span>
+
+<style>
+  /*
+   * Avec script, le SVG s'efface, mais reste là pour être lu. Le canvas est
+   * plus grand que lui : à 4 px la cellule, il faut 10 à 16 cellules de côté
+   * pour qu'un logo se reconnaisse encore (40 px au contact, 64 px en tuile).
+   */
+  :global(:root[data-glyph]) .glyph-logo > svg {
+    opacity: 0;
+  }
+</style>

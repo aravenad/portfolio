@@ -10,26 +10,35 @@
  * - ses échos plus bas dans la page et dans le halo du pied de page
  *   (`[data-glyph-echo]`, GlyphEchoes.astro) font de même ;
  * - chaque couverture de carte (`[data-glyph-cover]`, ProjectCover.astro) est
- *   figée, et s'anime le temps du survol ou du focus de sa carte.
+ *   figée, et s'anime le temps du survol ou du focus de sa carte ;
+ * - chaque logo (`[data-glyph-logo]`, GlyphLogo.astro : compétences, profils
+ *   du contact) aussi, au survol de son hôte `[data-glyph-hote]`, dont il prend
+ *   les couleurs de marque. Sa source n'est pas la matière mais son propre SVG,
+ *   rendu à un pixel par cellule ;
+ * - chaque bouton (`[data-glyph-bouton]`, Button.astro) cache un fragment de
+ *   la matière, qui n'apparaît qu'au survol ou au focus, balayé d'un reflet
+ *   deux fois plus vif que celui des couvertures.
  *
  * Tout s'arrête avec l'interrupteur « Animer le fond » (`<html data-glyph>`) :
  * chaque surface repasse alors sur une image figée. Une surface hors de
  * l'écran, ou un onglet caché, ne coûte rien.
  *
- * Sans script, rien ne change : global.css garde la photo du fond et des
- * couvertures tant que la trame n'a pas peint (`data-glyph-ready`).
+ * La trame lit une copie réduite de la matière (chrome-glyph.webp, 480 px de
+ * large, une cinquantaine de Ko) : un pixel par cellule lui suffit. La photo
+ * pleine taille n'est chargée que sans script, où global.css la garde en fond
+ * et sur les couvertures.
  *
  * `transition:persist` garde le calque, et sa trame, d'une page à l'autre :
  * le reflet poursuit sa course au lieu de repartir à chaque navigation.
  */
-import chromeField from "../../assets/chrome-original-hq.webp";
+import chromeGlyph from "../../assets/chrome-glyph.webp";
 ---
 
 <div
   class="glyph-field"
   aria-hidden="true"
   data-glyph-field
-  data-glyph-src={chromeField.src}
+  data-glyph-src={chromeGlyph.src}
   transition:persist="glyph-field"
 >
   <canvas></canvas>
@@ -40,19 +49,23 @@ import chromeField from "../../assets/chrome-original-hq.webp";
   import {
     BALAYAGE,
     type Cadre,
+    NIVEAUX_BOUTON,
     NIVEAUX_MATIERE,
     type Niveaux,
     POLICE,
     RAMPE,
     TEINTES,
+    aLaSource,
     atlas,
     cadrageCouverture,
     cadrageFond,
     champ,
+    empreinte,
     fraction,
     grille,
     peindre,
     trame,
+    trameLogo,
   } from "../../lib/glyph";
 
   const root = document.documentElement;
@@ -65,15 +78,19 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     /** Taille d'une cellule, en pixels CSS. */
     cellule: number;
     /** La source, et la part de la source pour une surface de `largeur × hauteur`. */
-    source: () => Promise<CanvasImageSource | null>;
+    source: () => Promise<HTMLImageElement | null>;
     cadre: (largeur: number, hauteur: number) => Cadre;
     niveaux: Niveaux;
     /** S'anime-t-elle en ce moment, réglage mis à part ? */
     anime: () => boolean;
     /** Son horloge, en secondes. */
     temps: (maintenant: number) => number;
-    /** Appelé une fois la première image peinte. */
-    prete?: () => void;
+    /** Un logo : sa source est lue entière, et il a les couleurs de sa marque. */
+    logo?: {
+      couleurs: () => string[];
+      /** Est-il dans ses couleurs en ce moment ? */
+      marque: () => boolean;
+    };
     visible: boolean;
     etat?: {
       colonnes: number;
@@ -81,10 +98,11 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       pixels: number;
       contexte: CanvasRenderingContext2D;
       tuiles: HTMLCanvasElement;
-      champ: ReturnType<typeof champ>;
+      champ: ReturnType<typeof champ> | ReturnType<typeof empreinte>;
       codes: Uint8Array;
       avant: Uint8Array;
       fige: boolean;
+      marque: boolean;
     };
   }
 
@@ -111,11 +129,12 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     return TEINTES.map((teinte) => style.getPropertyValue(`--glyph-${teinte}`).trim() || "#888");
   }
 
-  function tuiles(pixels: number) {
+  function tuiles(pixels: number, toile: Toile) {
+    const teintes = [...couleurs(), ...(toile.logo?.couleurs() ?? [])];
     const canvas = document.createElement("canvas");
     canvas.width = RAMPE.length * pixels;
-    canvas.height = TEINTES.length * pixels;
-    atlas(canvas.getContext("2d")!, pixels, couleurs());
+    canvas.height = teintes.length * pixels;
+    atlas(canvas.getContext("2d")!, pixels, teintes);
     return canvas;
   }
 
@@ -136,8 +155,14 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     lecture.height = lignes;
     const lecteur = lecture.getContext("2d", { willReadFrequently: true })!;
     lecteur.imageSmoothingQuality = "high";
-    const { sx, sy, sw, sh } = toile.cadre(colonnes * toile.cellule, lignes * toile.cellule);
-    lecteur.drawImage(source, sx, sy, sw, sh, 0, 0, colonnes, lignes);
+    if (toile.logo) {
+      lecteur.drawImage(source, 0, 0, colonnes, lignes);
+    } else {
+      const cadre = toile.cadre(colonnes * toile.cellule, lignes * toile.cellule);
+      const { sx, sy, sw, sh } = aLaSource(cadre, source.naturalWidth);
+      lecteur.drawImage(source, sx, sy, sw, sh, 0, 0, colonnes, lignes);
+    }
+    const donnees = lecteur.getImageData(0, 0, colonnes, lignes).data;
 
     const canvas = toile.canvas;
     canvas.width = colonnes * pixels;
@@ -150,15 +175,15 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       lignes,
       pixels,
       contexte: canvas.getContext("2d")!,
-      tuiles: tuiles(pixels),
-      champ: champ(lecteur.getImageData(0, 0, colonnes, lignes).data, colonnes, lignes),
+      tuiles: tuiles(pixels, toile),
+      champ: toile.logo ? empreinte(donnees, colonnes, lignes) : champ(donnees, colonnes, lignes),
       codes: new Uint8Array(colonnes * lignes),
       avant: new Uint8Array(colonnes * lignes).fill(255),
       fige: false,
+      marque: false,
     };
 
     peindreToile(toile, performance.now());
-    toile.prete?.();
   }
 
   function peindreToile(toile: Toile, maintenant: number) {
@@ -166,12 +191,17 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     if (!etat) return;
 
     const anime = animationVoulue() && toile.anime();
+    // Un logo change de couleurs au survol, même quand rien ne s'anime.
+    const marque = toile.logo?.marque() ?? false;
     // Figée, une surface n'est peinte qu'une fois.
-    if (!anime && etat.fige) return;
+    if (!anime && etat.fige && marque === etat.marque) return;
 
-    trame(etat.champ, etat.codes, anime ? toile.temps(maintenant) : null, toile.niveaux);
+    const temps = anime ? toile.temps(maintenant) : null;
+    if ("encre" in etat.champ) trameLogo(etat.champ, etat.codes, temps, marque);
+    else trame(etat.champ, etat.codes, temps, toile.niveaux);
     peindre(etat.contexte, etat.tuiles, etat.codes, etat.avant, etat.colonnes, etat.pixels);
     etat.fige = !anime;
+    etat.marque = marque;
   }
 
   /** Repeint tout, de zéro : nouvelles couleurs ou nouvel état du réglage. */
@@ -180,7 +210,7 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       const etat = toile.etat;
       if (!etat) continue;
       if (nouvellesCouleurs) {
-        etat.tuiles = tuiles(etat.pixels);
+        etat.tuiles = tuiles(etat.pixels, toile);
         etat.avant.fill(255);
       }
       etat.fige = false;
@@ -237,8 +267,47 @@ import chromeField from "../../assets/chrome-original-hq.webp";
         cadrageFond(largeur, hauteur, parseFloat(getComputedStyle(root).fontSize) || 16),
       anime: () => true,
       temps: (maintenant) => (maintenant - debut) / 1000,
-      prete: () => root.setAttribute("data-glyph-ready", ""),
       visible: true,
+    };
+  }
+
+  /*
+   * Survolée, une surface lance un reflet plus vif que celui du fond (trois
+   * fois par défaut). Quittée, elle le laisse finir sa traversée avant de se
+   * figer : un reflet coupé net au milieu se verrait comme un saut.
+   */
+  function refletAuSurvol(cible: HTMLElement, signal: AbortSignal, acceleration = 3) {
+    let depart: number | undefined;
+    let sortie = false;
+    let survolee = false;
+    const temps = (maintenant: number) => ((maintenant - (depart ?? maintenant)) / 1000) * acceleration;
+
+    const entrer = () => {
+      depart ??= performance.now();
+      sortie = false;
+      survolee = true;
+    };
+    const sortir = () => {
+      sortie = true;
+      survolee = false;
+    };
+
+    for (const type of ["pointerenter", "focusin"]) cible.addEventListener(type, entrer, { signal });
+    for (const type of ["pointerleave", "focusout"]) cible.addEventListener(type, sortir, { signal });
+
+    return {
+      anime: () => {
+        if (depart === undefined) return false;
+        // Le reflet est sorti de la surface : elle peut se figer.
+        if (sortie && (temps(performance.now()) % BALAYAGE) / BALAYAGE > 0.95) {
+          depart = undefined;
+          sortie = false;
+          return false;
+        }
+        return true;
+      },
+      temps,
+      survolee: () => survolee,
     };
   }
 
@@ -248,27 +317,7 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     const style = getComputedStyle(couverture);
     const x = fraction(style.getPropertyValue("--cover-x"));
     const y = fraction(style.getPropertyValue("--cover-y"));
-
-    /*
-     * Survolée, la couverture lance un reflet trois fois plus vif que celui du
-     * fond. Quittée, elle le laisse finir sa traversée avant de se figer : un
-     * reflet coupé net au milieu se verrait comme un saut.
-     */
-    const ACCELERATION = 3;
-    let depart: number | undefined;
-    let sortie = false;
-    const temps = (maintenant: number) => ((maintenant - (depart ?? maintenant)) / 1000) * ACCELERATION;
-
-    const entrer = () => {
-      depart ??= performance.now();
-      sortie = false;
-    };
-    const sortir = () => {
-      sortie = true;
-    };
-
-    for (const type of ["pointerenter", "focusin"]) carte.addEventListener(type, entrer, { signal });
-    for (const type of ["pointerleave", "focusout"]) carte.addEventListener(type, sortir, { signal });
+    const { anime, temps } = refletAuSurvol(carte, signal);
 
     return {
       canvas,
@@ -276,18 +325,105 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       niveaux: NIVEAUX_MATIERE,
       source: () => chargerMatiere(src),
       cadre: (largeur, hauteur) => cadrageCouverture(largeur, hauteur, x, y),
-      anime: () => {
-        if (depart === undefined) return false;
-        // Le reflet est sorti de la carte : la couverture peut se figer.
-        if (sortie && (temps(performance.now()) % BALAYAGE) / BALAYAGE > 0.95) {
-          depart = undefined;
-          sortie = false;
-          return false;
-        }
-        return true;
-      },
+      anime,
       temps,
-      prete: () => couverture.setAttribute("data-glyph-ready", ""),
+      visible: true,
+    };
+  }
+
+  /*
+   * Un bouton : la matière, comme une couverture, mais en cellules plus fines
+   * et cadrée d'un bouton à l'autre sur un autre pli. Son reflet traverse en
+   * une seconde et demie : un survol de bouton est bref.
+   */
+  function surfaceDeBouton(canvas: HTMLCanvasElement, src: string, rang: number, signal: AbortSignal): Toile {
+    const { anime, temps } = refletAuSurvol(canvas.parentElement!, signal, 6);
+    const x = (0.2 + rang * 0.37) % 1;
+    const y = (0.15 + rang * 0.61) % 1;
+
+    return {
+      canvas,
+      cellule: 5,
+      niveaux: NIVEAUX_BOUTON,
+      source: () => chargerMatiere(src),
+      cadre: (largeur, hauteur) => cadrageCouverture(largeur, hauteur, x, y),
+      anime,
+      temps,
+      visible: true,
+    };
+  }
+
+  /**
+   * Le SVG d'un logo, autonome, prêt à être chargé comme image : les symboles
+   * qu'il appelle par `<use>` y sont recopiés, sa couleur principale passe en
+   * rouge pur et sa seconde (`--logo-accent`) en vert pur, que lit `empreinte`.
+   */
+  function dessinDuLogo(svg: SVGSVGElement): string {
+    const copie = svg.cloneNode(true) as SVGSVGElement;
+    for (const use of copie.querySelectorAll("use")) {
+      const id = use.getAttribute("href")?.slice(1) ?? "";
+      const symbole = document.getElementById(id);
+      if (symbole && !copie.querySelector(`[id="${id}"]`)) copie.prepend(symbole.cloneNode(true));
+    }
+    copie.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    copie.setAttribute("width", "240");
+    copie.setAttribute("height", "240");
+    /*
+     * Le filet des logos au trait (.skill-icon-line), que le SVG seul n'a pas.
+     * Plus épais que sur le SVG (0,35) : à 16 cellules de côté, une cellule
+     * couvre 1,5 unité du viewBox, et un trait fin ne laissait que des glyphes
+     * épars dans les teintes sombres.
+     */
+    const filet = svg.classList.contains("skill-icon-line")
+      ? "stroke: currentColor; stroke-width: 0.8; stroke-linejoin: round;"
+      : "";
+    copie.setAttribute("style", `color: #f00; --logo-accent: #0f0; ${filet}`);
+    return new XMLSerializer().serializeToString(copie);
+  }
+
+  function chargerLogo(svg: SVGSVGElement): Promise<HTMLImageElement | null> {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(null);
+      image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(dessinDuLogo(svg))}`;
+    });
+  }
+
+  function surfaceDeLogo(canvas: HTMLCanvasElement, signal: AbortSignal): Toile | undefined {
+    const hote = canvas.closest<HTMLElement>("[data-glyph-hote]");
+    const svg = canvas.parentElement?.querySelector<SVGSVGElement>("svg");
+    if (!hote || !svg) return;
+
+    let logo: Promise<HTMLImageElement | null> | undefined;
+    const { anime, temps, survolee } = refletAuSurvol(hote, signal);
+
+    /*
+     * Les couleurs de la marque, comme les règles de survol de SkillTile : la
+     * couleur claire en thème clair si la marque en a une, la principale pour
+     * la partie secondaire d'un logo qui n'en a pas. Sans couleur (SQL), le
+     * logo garde la palette.
+     */
+    const couleursDeMarque = () => {
+      const style = getComputedStyle(hote);
+      const lire = (nom: string) => style.getPropertyValue(nom).trim();
+      const principale =
+        (root.dataset.theme === "light" && lire("--skill-color-light")) || lire("--skill-color");
+      return principale ? [principale, lire("--skill-color-2") || principale] : [];
+    };
+
+    return {
+      canvas,
+      cellule: 4,
+      niveaux: NIVEAUX_MATIERE,
+      source: () => (logo ??= chargerLogo(svg)),
+      cadre: () => ({ sx: 0, sy: 0, sw: 0, sh: 0 }),
+      anime,
+      temps,
+      logo: {
+        couleurs: couleursDeMarque,
+        marque: () => survolee() && couleursDeMarque().length > 0,
+      },
       visible: true,
     };
   }
@@ -333,6 +469,12 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       ),
       ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-echo]")].map((canvas, rang) =>
         surfaceDEcho(canvas, src, rang),
+      ),
+      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-logo]")].flatMap(
+        (canvas) => surfaceDeLogo(canvas, signal) ?? [],
+      ),
+      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-bouton]")].map((canvas, rang) =>
+        surfaceDeBouton(canvas, src, rang, signal),
       ),
     ];
 

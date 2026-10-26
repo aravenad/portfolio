@@ -26,6 +26,9 @@
 @theme {
   --color-accent: oklch(90% 0.032 250);
   --color-zinc-500: oklch(61% 0.016 286);
+  /* Ni blanc ni noir purs : les deux extrêmes prennent la teinte des gris. */
+  --color-white: oklch(98.5% 0.002 286);
+  --color-black: oklch(16% 0.005 286);
   --font-sans: "Noto Sans Variable", "Noto Sans", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
@@ -63,15 +66,16 @@
   /*
    * La palette de la trame de glyphes (src/lib/glyph.ts), de la nuit au givre,
    * et la cendre des demi-teintes neutres. Le moteur la lit au moment de
-   * peindre : un changement de thème repeint la trame dans l'autre.
+   * peindre : un changement de thème repeint la trame dans l'autre. Une seule
+   * teinte (261 à 264) de la nuit au givre, comme le zinc garde la sienne.
    */
-  --glyph-nuit: #141619;
-  --glyph-abysse: #0b337a;
-  --glyph-cobalt: #2c63c7;
-  --glyph-azur: #618cd6;
-  --glyph-ciel: #87a9ea;
-  --glyph-givre: #e0e9f2;
-  --glyph-cendre: #8c9196;
+  --glyph-nuit: oklch(19.9% 0.007 258);
+  --glyph-abysse: oklch(34.3% 0.129 261);
+  --glyph-cobalt: oklch(52.1% 0.167 261);
+  --glyph-azur: oklch(64.1% 0.122 261);
+  --glyph-ciel: oklch(73.5% 0.102 263);
+  --glyph-givre: oklch(93% 0.016 248);
+  --glyph-cendre: oklch(65.4% 0.009 248);
 }
 
 :root[data-theme="light"] {
@@ -97,13 +101,13 @@
    * les plus pleins, deviennent les plus foncés. L'encre est plus soutenue
    * qu'en sombre : sur le papier clair, des bleus pâles ne se voyaient plus.
    */
-  --glyph-nuit: #c9ced8;
-  --glyph-abysse: #9fb0d0;
-  --glyph-cobalt: #6a85bd;
-  --glyph-azur: #3f61a6;
-  --glyph-ciel: #284887;
-  --glyph-givre: #132750;
-  --glyph-cendre: #555b64;
+  --glyph-nuit: oklch(85.1% 0.015 264);
+  --glyph-abysse: oklch(75.5% 0.05 263);
+  --glyph-cobalt: oklch(61.9% 0.091 264);
+  --glyph-azur: oklch(50.1% 0.117 263);
+  --glyph-ciel: oklch(41.3% 0.112 262);
+  --glyph-givre: oklch(28.2% 0.08 263);
+  --glyph-cendre: oklch(46.9% 0.016 258);
 }
 
 /*
@@ -134,10 +138,29 @@ body {
 }
 
 /*
- * Source originale 1920 × 3770, encodée en WebP avec perte (voir BaseLayout,
- * où elle est préchargée). Le décalage proportionnel
- * à sa largeur choisit le même départ de motif (y ≈ 1670 dans la source) à
- * chaque taille d'écran, sans déformer les plis.
+ * En haut de page, la barre de navigation n'a pas encore de fond flouté : la
+ * matière s'efface sous ses liens, puis revient avant le hero. Sans ce fondu, un
+ * glyphe sous « Projets » tombait à 1,6:1 contre l'encre du lien, en clair.
+ * La barre fait 4rem : ses liens finissent vers 2,75rem.
+ */
+/*
+ * La hauteur du calque de la matière, et de son masque de fondu étiré d'autant.
+ * À 64rem, le fondu était à moitié éteint dès 12rem et nul passé 28rem : la
+ * matière s'arrêtait bien au-dessus du hero, alors que la photo reste aussi
+ * claire plus bas. À 96rem, elle est à moitié éteinte vers 18rem et rejoint le
+ * fond vers 45rem.
+ */
+:root {
+  --sous-la-barre: linear-gradient(to bottom, transparent 3rem, black 7rem);
+  --matiere-hauteur: 96rem;
+}
+
+/*
+ * La photo, pour qui n'a pas de script : avec un script, la trame de glyphes
+ * (plus bas) la remplace. Source originale 1920 × 3770, encodée en WebP avec
+ * perte (voir BaseLayout). Le décalage proportionnel à sa largeur choisit le
+ * même départ de motif (y ≈ 1670 dans la source) à chaque taille d'écran, sans
+ * déformer les plis.
  *
  * `screen` rend le noir de l'image neutre : il ne peut plus créer une nappe
  * plus noire que le fond zinc. Un masque à décroissance gaussienne, légèrement
@@ -157,7 +180,7 @@ body::before {
   content: "";
   position: absolute;
   inset: 0 0 auto;
-  height: 64rem;
+  height: var(--matiere-hauteur);
   z-index: -1;
   pointer-events: none;
   background-image: url("../assets/chrome-original-hq.webp");
@@ -166,10 +189,13 @@ body::before {
   background-size: var(--chrome-width) auto;
   mix-blend-mode: screen;
   opacity: 0.18;
-  mask-image: url("../assets/chrome-fade.webp");
+  mask-image: url("../assets/chrome-fade.webp"), var(--sous-la-barre);
   mask-mode: alpha;
   mask-repeat: no-repeat;
-  mask-size: 100% 64rem;
+  mask-size:
+    100% var(--matiere-hauteur),
+    100% 100%;
+  mask-composite: intersect;
 }
 
 /* Sur l'accueil, l'espace au-dessus du hero laisse mieux voir la matière.
@@ -196,18 +222,19 @@ body[data-home="true"]::before {
 }
 
 /* Une fenêtre basse fait remonter le texte dans les reflets du haut :
- * avancer le fondu, sans flouter la matière ni déplacer le contenu.
+ * avancer le fondu, sans flouter la matière ni déplacer le contenu. Vaut aussi
+ * pour la trame, qui lit la même hauteur.
  */
 @media (min-width: 40rem) and (max-height: 44rem) {
-  body[data-home="true"]::before {
-    mask-size: 100% 52rem;
+  body[data-home="true"] {
+    --matiere-hauteur: 78rem;
   }
 }
 
 /*
  * La même matière, tramée en glyphes (ui/GlyphField.astro) : même boîte, même
- * masque. La photo de `body::before` reste dessous tant que la trame n'a pas
- * peint, et pour qui n'a pas de script ; elle s'efface ensuite.
+ * masque. Elle remplace la photo de `body::before`, qui ne sert plus qu'à qui
+ * n'a pas de script.
  *
  * Les glyphes sont composés normalement, sans `screen` : leur couleur est déjà
  * celle de la palette, et la grille dessine assez de vide entre eux pour que le
@@ -216,15 +243,18 @@ body[data-home="true"]::before {
 .glyph-field {
   position: absolute;
   inset: 0 0 auto;
-  height: 64rem;
+  height: var(--matiere-hauteur);
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
   opacity: 0.3;
-  mask-image: url("../assets/chrome-fade.webp");
+  mask-image: url("../assets/chrome-fade.webp"), var(--sous-la-barre);
   mask-mode: alpha;
   mask-repeat: no-repeat;
-  mask-size: 100% 64rem;
+  mask-size:
+    100% var(--matiere-hauteur),
+    100% 100%;
+  mask-composite: intersect;
 }
 
 .glyph-field canvas,
@@ -244,12 +274,6 @@ body[data-home="true"] .glyph-field {
 
 :root[data-theme="light"] body[data-home="true"] .glyph-field {
   opacity: 0.9;
-}
-
-@media (min-width: 40rem) and (max-height: 44rem) {
-  body[data-home="true"] .glyph-field {
-    mask-size: 100% 52rem;
-  }
 }
 
 /*
@@ -273,22 +297,28 @@ body[data-home="true"] .glyph-field {
   mask-image: linear-gradient(to bottom, black calc(100% - 14rem), transparent);
 }
 
+/*
+ * Chaque tache tient entière dans la fenêtre, collée à son bord : son masque
+ * s'éteint avant le bord, où un débord la tranchait net. Elle rétrécit avec
+ * la marge à côté de la colonne de texte (72rem), pour que son cœur reste
+ * près de cette marge plutôt que sous le texte.
+ */
 .glyph-echo {
   position: absolute;
   top: var(--echo-top);
-  width: 46rem;
-  height: 34rem;
+  width: clamp(24rem, 100vw - 56rem, 46rem);
+  aspect-ratio: 46 / 34;
   overflow: hidden;
   opacity: 0.45;
   mask-image: radial-gradient(closest-side, black 25%, transparent);
 }
 
 .glyph-echo[data-side="left"] {
-  left: -16rem;
+  left: 0;
 }
 
 .glyph-echo[data-side="right"] {
-  right: -16rem;
+  right: 0;
 }
 
 /* Le halo du pied de page : mêmes centre et taille que son dégradé sur `body`. */
@@ -317,7 +347,12 @@ body[data-home="true"] .glyph-field {
   opacity: 1;
 }
 
-:root[data-glyph-ready] body::before {
+/*
+ * Avec un script (le script en ligne de BaseLayout pose toujours `data-glyph`),
+ * la photo n'est jamais dessinée, donc jamais téléchargée : la trame lit sa
+ * propre copie réduite. Elle ne sert qu'à qui n'a pas de script.
+ */
+:root[data-glyph] body::before {
   display: none;
 }
 
@@ -579,8 +614,8 @@ body::after {
   opacity: 0.4;
 }
 
-/* La trame remplace la photo dès qu'elle a peint, avec le même fondu. */
-.project-cover[data-glyph-ready]::before {
+/* Avec un script, la trame remplace la photo, avec le même fondu. */
+:root[data-glyph] .project-cover::before {
   display: none;
 }
 
@@ -594,6 +629,46 @@ body::after {
 
 .group:hover .glyph-cover {
   opacity: 1;
+}
+
+/*
+ * La trame d'un bouton (Button.astro) : invisible au repos, elle monte sous le
+ * libellé au survol ou au focus. Elle s'éclaircit vers le centre, sous le
+ * libellé, qui garde ainsi son contraste.
+ */
+.glyph-bouton {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  mask-image: radial-gradient(farthest-side, rgb(0 0 0 / 35%) 30%, black 100%);
+  transition: opacity 0.3s;
+}
+
+/*
+ * Le bouton plein est blanc en sombre : la palette, claire, s'y perdrait, et
+ * la différence l'y inverse. En clair, il est graphite, et la palette inversée
+ * presque blanche : posée telle quelle, elle le délavait sous son libellé
+ * clair. Multipliée, elle le grave d'un ton plus sombre, comme la matière sur
+ * la page claire.
+ */
+.glyph-bouton-plein {
+  mix-blend-mode: difference;
+}
+
+:root[data-theme="light"] .glyph-bouton-plein {
+  mix-blend-mode: multiply;
+}
+
+:focus-visible > .glyph-bouton {
+  opacity: 0.5;
+}
+
+@media (hover: hover) {
+  :hover > .glyph-bouton {
+    opacity: 0.5;
+  }
 }
 
 /*

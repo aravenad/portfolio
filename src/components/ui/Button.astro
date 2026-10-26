@@ -15,8 +15,9 @@ const {
   ...rest
 } = Astro.props;
 
+/* `isolate` et `overflow-hidden` : la trame passe sous le libellé, dans l'arrondi. */
 const base =
-  "inline-flex items-center justify-center rounded-lg px-5 py-3 font-medium transition";
+  "relative isolate inline-flex items-center justify-center overflow-hidden rounded-lg px-5 py-3 font-medium transition";
 
 /* Styles et survols partagés avec la pagination : voir button-styles.ts. */
 const variants = {
@@ -25,15 +26,23 @@ const variants = {
 };
 
 const classes = [base, variants[variant], className];
+const trame = ["glyph-bouton", variant === "primary" && "glyph-bouton-plein"];
 ---
 
+{/*
+  Au survol ou au focus, un fragment de la matière tramée en glyphes apparaît
+  sous le libellé (GlyphField.astro, `.glyph-bouton` dans global.css). Sans
+  script, le canvas reste vide.
+*/}
 {
   href ? (
     <a href={href} class:list={classes} {...rest}>
+      <canvas data-glyph-bouton aria-hidden="true" class:list={trame}></canvas>
       <slot />
     </a>
   ) : (
     <button class:list={classes} {...rest}>
+      <canvas data-glyph-bouton aria-hidden="true" class:list={trame}></canvas>
       <slot />
     </button>
   )
