@@ -16,7 +16,7 @@ role:
   - "Pilotage du développement avec une IA (Claude Opus 5.5) : consignes, choix techniques, relecture et validation de chaque étape."
   - "Développement de la version web, de son générateur de niveaux et de son solveur."
   - "Emballage Android avec Capacitor, puis réécriture complète en Flutter."
-  - "Tests, mesures de performance sur téléphone et préparation de la publication sur Google Play."
+  - "Tests et mesures de performance sur téléphone."
 competences: ["realiser", "optimiser", "conduire"]
 learned:
   - "Travailler avec une IA de code : cadrer sa tâche, vérifier ce qu’elle produit, garder la main sur les décisions."
@@ -24,7 +24,6 @@ learned:
   - "Traduire un programme d’un langage à l’autre sans changer son résultat, vérifié par des références communes."
   - "Mesurer la fluidité d’une application sur un vrai téléphone plutôt que de la supposer."
   - "Garder une seule source pour les niveaux et les textes, et générer le reste à partir d’elle."
-  - "Préparer une application à la publication : signature, confidentialité, fiche du store en onze langues."
 ---
 
 ## Contexte
@@ -54,7 +53,7 @@ J'ai mené ce projet avec une intelligence artificielle : Claude Opus 5.5,
 d'Anthropic, réglé sur un effort de raisonnement élevé, d'abord en conversation
 puis dans Claude Code, un agent qui lit le dépôt, écrit le code et lance les
 tests. C'était un choix délibéré : voir jusqu'où va cette technologie sur un
-vrai projet, de la première règle du jeu à la publication, et apprendre à
+vrai projet, de la première règle du jeu à une application sur téléphone, et apprendre à
 l'utiliser maintenant plutôt que de la découvrir plus tard en entreprise.
 
 Les rôles étaient partagés. L'IA a écrit l'essentiel du code et proposé des
@@ -127,7 +126,6 @@ par seconde, l'affichage d'une image prenant environ 2 ms sur les 8 disponibles.
 Le jeu est traduit en 11 langues, et sa logique est couverte par des tests en
 JavaScript, en Dart et sur le téléphone lui-même.
 
-Il reste à le publier sur Google Play, après une phase de test fermé. Ce projet
-m'a surtout appris à mesurer avant d'optimiser, à vérifier une réécriture par
+Ce projet m'a surtout appris à mesurer avant d'optimiser, à vérifier une réécriture par
 des références plutôt qu'à l'œil, et à travailler avec une IA sans lui confier
 mon jugement.

@@ -16,7 +16,7 @@ role:
   - "Leading development with an AI (Claude Opus 5.5): instructions, technical choices, review and sign-off of every step."
   - "Development of the web version, its level generator and its solver."
   - "Android packaging with Capacitor, then a full rewrite in Flutter."
-  - "Testing, performance measurements on a phone and preparing the Google Play release."
+  - "Testing and performance measurements on a phone."
 competences: ["realiser", "optimiser", "conduire"]
 learned:
   - "Working with a coding AI: framing its task, checking what it produces, keeping control of the decisions."
@@ -24,7 +24,6 @@ learned:
   - "Porting a program from one language to another without changing its output, checked against shared references."
   - "Measuring an app’s smoothness on a real phone instead of assuming it."
   - "Keeping a single source for levels and texts, and generating everything else from it."
-  - "Getting an app ready for release: signing, privacy, a store listing in eleven languages."
 ---
 
 ## Context
@@ -53,7 +52,7 @@ I led this project with an artificial intelligence: Claude Opus 5.5, by
 Anthropic, set to a high reasoning effort, first in conversation and then in
 Claude Code, an agent that reads the repository, writes the code and runs the
 tests. It was a deliberate choice: to see how far this technology goes on a
-real project, from the first game rule to the release, and to learn to use it
+real project, from the first game rule to an app on a phone, and to learn to use it
 now rather than discover it later at work.
 
 The roles were split. The AI wrote most of the code and suggested technical
@@ -122,7 +121,6 @@ second, with each frame taking about 2 ms to draw out of the 8 available. The
 game is translated into 11 languages, and its logic is covered by tests in
 JavaScript, in Dart and on the phone itself.
 
-What is left is the Google Play release, after a closed testing phase. Above
-all, this project taught me to measure before optimizing, to check a rewrite
+Above all, this project taught me to measure before optimizing, to check a rewrite
 against references rather than by eye, and to work with an AI without handing
 it my judgment.
