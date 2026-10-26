@@ -5,9 +5,9 @@ tags: ["Java", "Algorithms", "Optimization", "Machine learning", "Unit testing"]
 status: "termine"
 team: "In pairs"
 year: 2024
-order: 4
+order: 5
 cover: algo
-featured: true
+featured: false
 links:
   repo: "https://github.com/aravenad/comparaison-algorithmique"
 role:

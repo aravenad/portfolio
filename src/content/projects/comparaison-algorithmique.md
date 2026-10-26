@@ -5,9 +5,9 @@ tags: ["Java", "Algorithmique", "Optimisation", "Apprentissage automatique", "Te
 status: "termine"
 team: "En binôme"
 year: 2024
-order: 4
+order: 5
 cover: algo
-featured: true
+featured: false
 links:
   repo: "https://github.com/aravenad/comparaison-algorithmique"
 role:
