@@ -1,4 +1,7 @@
 // @ts-check
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { defineConfig } from 'astro/config';
 
 import icon from 'astro-icon';
@@ -54,6 +57,47 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss(), publicDirectoryIndex()]
   }
 });
+
+/**
+ * Sert `public/` sous `astro dev` comme GitHub Pages et `astro preview` :
+ *
+ * - l'`index.html` d'un dossier sous l'adresse du dossier (`/demos/arrow-block/`
+ *   tombait sur une 404) ;
+ * - ses fichiers à l'iframe en bac à sable de la démo, d'origine « null » :
+ *   Astro refuse en dev toute requête d'une autre origine (en-tête
+ *   `Sec-Fetch-Site`), ce qui privait la démo de son script et de sa feuille de
+ *   style. Un fichier de `public/` part tel quel, sans rien du code source : on
+ *   retire l'en-tête pour lui seul.
+ *
+ * @returns {import('vite').Plugin}
+ */
+function publicDirectoryIndex() {
+  return {
+    name: 'public-directory-index',
+    apply: 'serve',
+    configureServer(server) {
+      /** @param {string} path */
+      const inPublic = (path) => existsSync(join(server.config.publicDir, decodeURIComponent(path)));
+
+      // Après les intergiciels d'Astro, et placé devant eux.
+      return () => {
+        server.middlewares.stack.unshift({
+          route: '',
+          handle(req, _res, next) {
+            const [path, query] = (req.url ?? '').split(/(?=\?)/);
+            if (path.endsWith('/') && inPublic(join(path, 'index.html'))) {
+              req.url = `${path}index.html${query ?? ''}`;
+            }
+            if (!path.endsWith('/') && inPublic(path)) {
+              delete req.headers['sec-fetch-site'];
+            }
+            next();
+          },
+        });
+      };
+    },
+  };
+}
