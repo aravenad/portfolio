@@ -14,9 +14,9 @@ import {
 } from "../../src/lib/demo";
 
 describe("demoUrl", () => {
-  it("passe la langue, et le thème quand il est connu", () => {
-    expect(demoUrl("/demos/jeu/", "fr")).toBe("/demos/jeu/?lang=fr");
-    expect(demoUrl("/demos/jeu/", "en", "light")).toBe("/demos/jeu/?lang=en&theme=light");
+  it("passe la langue, le son, et le thème quand il est connu", () => {
+    expect(demoUrl("/demos/jeu/", "fr")).toBe("/demos/jeu/?lang=fr&sound=1");
+    expect(demoUrl("/demos/jeu/", "en", "light")).toBe("/demos/jeu/?lang=en&sound=1&theme=light");
   });
 });
 
@@ -71,6 +71,7 @@ describe("wireDemo", () => {
     theme: "light",
     title: "Jeu : démo jouable",
     loading: "Chargement…",
+    stopped: "Démo arrêtée.",
     solved: "Réussi en {time} s.",
   };
 
@@ -78,11 +79,12 @@ describe("wireDemo", () => {
   function setup() {
     const { document, Event: DomEvent } = parseHTML(`<!doctype html><html><body>
       <figure data-demo><div data-demo-stage><a data-demo-play href="/demos/jeu/?lang=fr">Jouer</a></div>
-      <p data-demo-status></p></figure></body></html>`);
+      <p data-demo-status></p><button data-demo-stop hidden>Arrêter</button></figure></body></html>`);
     const root = document.querySelector("[data-demo]") as HTMLElement;
     const parts = {
       root,
       play: root.querySelector("[data-demo-play]") as HTMLElement,
+      stop: root.querySelector("[data-demo-stop]") as HTMLElement,
       stage: root.querySelector("[data-demo-stage]") as HTMLElement,
       status: root.querySelector("[data-demo-status]") as HTMLElement,
     };
@@ -96,6 +98,7 @@ describe("wireDemo", () => {
       parts.play.dispatchEvent(event);
       return event;
     };
+    const end = () => parts.stop.dispatchEvent(new DomEvent("click"));
     const frame = () => parts.stage.querySelector("iframe") as HTMLIFrameElement | null;
     // linkedom ne crée pas de fenêtre pour une iframe : on lui en donne une.
     const source = {};
@@ -111,7 +114,7 @@ describe("wireDemo", () => {
       return iframe;
     };
 
-    return { ...parts, controller, click, frame, post, open };
+    return { ...parts, controller, click, end, frame, post, open };
   }
 
   beforeEach(() => {
@@ -128,11 +131,49 @@ describe("wireDemo", () => {
     const iframe = demo.frame();
 
     expect(event.defaultPrevented).toBe(true);
-    expect(iframe?.getAttribute("src")).toBe("/portfolio/demos/jeu/?lang=fr&theme=light");
+    expect(iframe?.getAttribute("src")).toBe("/portfolio/demos/jeu/?lang=fr&sound=1&theme=light");
     expect(iframe?.getAttribute("sandbox")).toBe("allow-scripts");
     expect(iframe?.getAttribute("title")).toBe(options.title);
     expect(demo.root.dataset.state).toBe("loading");
     expect(demo.status.textContent).toBe(options.loading);
+    expect(demo.stop.hidden).toBe(false);
+  });
+
+  it("cache le bouton « Arrêter » tant que la démo ne tourne pas", () => {
+    expect(setup().stop.hidden).toBe(true);
+  });
+
+  it("arrête la démo : retire l'iframe, remet l'image et rend le focus au lien", () => {
+    const demo = setup();
+    demo.open();
+    demo.post({ v: 1, type: "ab:ready" });
+    demo.post({ v: 1, type: "ab:size", height: 612 });
+    demo.play.focus = vi.fn();
+    demo.end();
+
+    expect(demo.frame()).toBeNull();
+    expect(demo.root.dataset.state).toBeUndefined();
+    expect(demo.stage.style.height).toBe("");
+    expect(demo.stop.hidden).toBe(true);
+    expect(demo.status.textContent).toBe(options.stopped);
+    expect(demo.play.focus).toHaveBeenCalled();
+
+    // La démo arrêtée ne parle plus, et le lien la relance.
+    demo.post({ v: 1, type: "ab:ready" });
+    expect(demo.root.dataset.state).toBeUndefined();
+    demo.click();
+    expect(demo.stage.querySelectorAll("iframe")).toHaveLength(1);
+    expect(demo.root.dataset.state).toBe("loading");
+  });
+
+  it("arrête aussi le délai d'attente d'une démo encore en chargement", () => {
+    const demo = setup();
+    demo.open();
+    demo.play.focus = vi.fn();
+    demo.end();
+    vi.advanceTimersByTime(DEMO_READY_TIMEOUT);
+
+    expect(demo.root.dataset.state).toBeUndefined();
   });
 
   it("laisse le lien faire son travail avec une touche ou un autre bouton", () => {

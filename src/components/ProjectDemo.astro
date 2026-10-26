@@ -1,4 +1,5 @@
 ---
+import Button from "./ui/Button.astro";
 import { solidButton } from "./ui/button-styles";
 import { useTranslations } from "../data/ui";
 import { demoUrl } from "../lib/demo";
@@ -20,6 +21,9 @@ interface Props {
  * script, le lien ouvre la démo en pleine page ; avec, elle prend la place de
  * l'image (src/lib/demo.ts).
  *
+ * Une fois lancée, un bouton « Arrêter » la retire et remet l'image. Il flotte
+ * à droite de la légende : la scène ne bouge pas quand il apparaît.
+ *
  * La scène fait la hauteur que la démo conseille pour sa largeur (`ab:size`) :
  * la même formule en CSS, sur la largeur du bloc (`cqw`), évite que la page
  * ne saute à l'arrivée du premier message.
@@ -36,9 +40,10 @@ const folder = url(src);
   data-demo-lang={lang}
   data-demo-title={t.projects.demo.frameTitle(title)}
   data-demo-loading={t.projects.demo.loading}
+  data-demo-stopped={t.projects.demo.stopped}
   data-demo-solved={t.projects.demo.solved}
   aria-label={t.projects.demo.label}
-  class="group mt-10 max-w-3xl @container sm:mt-14"
+  class="group mt-10 flow-root max-w-3xl @container sm:mt-14"
 >
   <div
     data-demo-stage
@@ -72,10 +77,23 @@ const folder = url(src);
     </a>
   </div>
 
-  <figcaption class="mt-4 text-sm leading-6 text-zinc-400">{caption}</figcaption>
-
-  {/* Annonce le chargement, puis chaque niveau réussi, aux lecteurs d'écran. */}
+  {/* Annonce le chargement, chaque niveau réussi et l'arrêt aux lecteurs d'écran. */}
   <p data-demo-status role="status" class="sr-only"></p>
+
+  <Button
+    type="button"
+    variant="secondary"
+    data-demo-stop
+    hidden
+    class="mt-4 gap-2.5 sm:float-right sm:ml-6"
+  >
+    <svg viewBox="0 0 16 16" aria-hidden="true" class="size-3.5 fill-current">
+      <rect x="2" y="2" width="12" height="12" rx="1.5" />
+    </svg>
+    {t.projects.demo.stop}
+  </Button>
+
+  <figcaption class="mt-4 text-sm leading-6 text-zinc-400">{caption}</figcaption>
 </figure>
 
 <style>
@@ -109,17 +127,19 @@ const folder = url(src);
   onEachPage((signal) => {
     for (const root of document.querySelectorAll<HTMLElement>("[data-demo]")) {
       const play = root.querySelector<HTMLElement>("[data-demo-play]");
+      const stop = root.querySelector<HTMLElement>("[data-demo-stop]");
       const stage = root.querySelector<HTMLElement>("[data-demo-stage]");
       const status = root.querySelector<HTMLElement>("[data-demo-status]");
-      if (!play || !stage || !status) continue;
+      if (!play || !stop || !stage || !status) continue;
 
       const data = root.dataset;
-      wireDemo({ root, play, stage, status }, window, signal, {
+      wireDemo({ root, play, stop, stage, status }, window, signal, {
         src: data.demoSrc ?? "",
         lang: data.demoLang ?? "fr",
         theme: document.documentElement.dataset.theme === "light" ? "light" : "dark",
         title: data.demoTitle ?? "",
         loading: data.demoLoading ?? "",
+        stopped: data.demoStopped ?? "",
         solved: data.demoSolved ?? "",
       });
     }

@@ -294,7 +294,7 @@ describe("fiche d'un projet", () => {
     expect(demo?.querySelector("img")?.getAttribute("src")).toBe("/portfolio/demos/projet-1/poster.webp");
     expect(demo?.querySelector("img")?.getAttribute("alt")).toBe("");
     // Sans script, le lien ouvre la démo en pleine page : rien n'est chargé avant le clic.
-    expect(play?.getAttribute("href")).toBe("/portfolio/demos/projet-1/?lang=fr");
+    expect(play?.getAttribute("href")).toBe("/portfolio/demos/projet-1/?lang=fr&sound=1");
     expect(play?.textContent?.trim()).toBe("Jouer à la démo");
     expect(demo?.querySelector("iframe")).toBeNull();
     expect(demo?.querySelector("figcaption")?.textContent).toBe("But du jeu et commandes.");
@@ -510,7 +510,7 @@ describe("version anglaise", () => {
     expect(demo?.getAttribute("aria-label")).toBe("Playable demo");
     expect(demo?.getAttribute("data-demo-lang")).toBe("en");
     expect(demo?.querySelector("[data-demo-play]")?.getAttribute("href")).toBe(
-      "/portfolio/demos/projet-1/?lang=en",
+      "/portfolio/demos/projet-1/?lang=en&sound=1",
     );
     expect(demo?.querySelector("[data-demo-play]")?.textContent?.trim()).toBe("Play the demo");
   });

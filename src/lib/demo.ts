@@ -2,10 +2,10 @@
  * La démo jouable d'une fiche projet (ProjectDemo.astro) : l'adresse de son
  * iframe et la lecture des messages qu'elle envoie.
  *
- * Le contrat vient du dépôt du jeu (Arrow Block) : la page passe la langue et
- * le thème dans l'URL, la démo répond par `postMessage`. Chaque message porte
- * `v: 1`, pour que le format puisse évoluer sans casser une page déjà publiée :
- * un message d'une autre version est ignoré.
+ * Le contrat vient du dépôt du jeu (Arrow Block) : la page passe la langue, le
+ * thème et le son dans l'URL, la démo répond par `postMessage`. Chaque message
+ * porte `v: 1`, pour que le format puisse évoluer sans casser une page déjà
+ * publiée : un message d'une autre version est ignoré.
  */
 import type { Theme } from "./theme";
 
@@ -21,9 +21,13 @@ export type DemoMessage =
 export const DEMO_MIN_HEIGHT = 360;
 export const DEMO_MAX_HEIGHT = 800;
 
-/** Adresse de la démo, dans la langue et le thème de la page. */
+/**
+ * Adresse de la démo, dans la langue et le thème de la page, son activé. Sans
+ * `sound=1`, la démo affiche ses volumes à 0 %, mais son moteur audio, réglé
+ * avant, joue quand même à 50 et 80 % : le menu Pause mentait.
+ */
 export function demoUrl(src: string, lang: string, theme?: Theme): string {
-  const params = new URLSearchParams({ lang });
+  const params = new URLSearchParams({ lang, sound: "1" });
   if (theme) params.set("theme", theme);
 
   return `${src}?${params}`;
@@ -66,11 +70,13 @@ export function solvedText(template: string, time: number, lang: string): string
   return template.replace("{time}", seconds);
 }
 
-/** Ce que la démo utilise de la page : le bloc, le lien « Jouer », la scène et la zone annoncée. */
+/** Ce que la démo utilise de la page : le bloc, les boutons, la scène et la zone annoncée. */
 export interface DemoParts {
   /** Porte l'état dans `data-state` : absent, puis `loading`, puis `ready`. */
   root: HTMLElement;
   play: HTMLElement;
+  /** Arrête la démo ; caché (`hidden`) tant qu'elle ne tourne pas. */
+  stop: HTMLElement;
   stage: HTMLElement;
   status: HTMLElement;
 }
@@ -83,6 +89,8 @@ export interface DemoOptions {
   /** Titre de l'iframe, pour les lecteurs d'écran. */
   title: string;
   loading: string;
+  /** Annoncé quand la démo s'arrête. */
+  stopped: string;
   /** Modèle de l'annonce d'un niveau réussi, voir `solvedText`. */
   solved: string;
 }
@@ -101,7 +109,8 @@ export const DEMO_READY_TIMEOUT = 8000;
  * ici, un clic simple la charge à la place de l'image d'attente, dans une
  * iframe en bac à sable (scripts seulement : ni stockage, ni formulaire, ni
  * navigation de la page). Un clic avec Ctrl, Maj ou la molette garde le
- * comportement du lien.
+ * comportement du lien. Le bouton « Arrêter » retire l'iframe, et avec elle le
+ * jeu et son son : l'image d'attente revient, et le lien reprend le focus.
  *
  * ⚠️ Tous les écouteurs portent le `signal` d'`onEachPage`, et le délai
  * d'attente est annulé avec lui.
@@ -112,7 +121,7 @@ export function wireDemo(
   signal: AbortSignal,
   options: DemoOptions,
 ): void {
-  const { root, play, stage, status } = parts;
+  const { root, play, stop, stage, status } = parts;
   let frame: HTMLIFrameElement | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -134,7 +143,21 @@ export function wireDemo(
     root.dataset.state = "loading";
     status.textContent = options.loading;
     stage.append(frame);
+    stop.hidden = false;
     timer = setTimeout(reveal, DEMO_READY_TIMEOUT);
+  };
+
+  const end = () => {
+    if (!frame) return;
+    clearTimeout(timer);
+    frame.remove();
+    frame = undefined;
+    delete root.dataset.state;
+    stage.style.height = "";
+    stop.hidden = true;
+    status.textContent = options.stopped;
+    // Le bouton vient de disparaître : le focus revient au lien qui relance la démo.
+    play.focus();
   };
 
   play.addEventListener(
@@ -148,6 +171,8 @@ export function wireDemo(
     },
     { signal },
   );
+
+  stop.addEventListener("click", end, { signal });
 
   win.addEventListener(
     "message",

@@ -133,6 +133,8 @@ const fr = {
     demo: {
       label: "Démo jouable",
       play: "Jouer à la démo",
+      stop: "Arrêter la démo",
+      stopped: "Démo arrêtée.",
       loading: "Chargement de la démo…",
       frameTitle: (title: string) => `${title} : démo jouable`,
       solved: "Niveau réussi en {time} s.",
@@ -216,7 +218,7 @@ const fr = {
       title: "Données personnelles",
       paragraphs: [
         "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
-        "Votre navigateur garde quelques réglages, qui n'en sortent jamais : vos choix du thème et de l'animation des titres (stockage local), pour les retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
+        "Votre navigateur garde quelques réglages, qui n'en sortent jamais : vos choix du thème, de l'animation des titres et de celle du fond, ainsi que votre progression et vos réglages dans la démo d'Arrow Block si vous y jouez (stockage local), pour les retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
         "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre. Vous pouvez demander à tout moment leur suppression, à la même adresse, et adresser une réclamation à la CNIL.",
       ],
       hostLogs: "Comme tout hébergeur, GitHub enregistre l'adresse IP des visiteurs à des fins de sécurité. Voir sa",
@@ -416,6 +418,8 @@ const en = {
     demo: {
       label: "Playable demo",
       play: "Play the demo",
+      stop: "Stop the demo",
+      stopped: "Demo stopped.",
       loading: "Loading the demo…",
       frameTitle: (title: string) => `${title}: playable demo`,
       solved: "Level cleared in {time} s.",
@@ -500,7 +504,7 @@ const en = {
       title: "Personal data",
       paragraphs: [
         "This site sets no cookies, uses no analytics and loads no third-party service: fonts and images are served by the site itself.",
-        "Your browser keeps a few settings, which never leave it: your choices of theme and title animation (local storage), so they are there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
+        "Your browser keeps a few settings, which never leave it: your choices of theme, title animation and background animation, plus your progress and settings in the Arrow Block demo if you play it (local storage), so they are there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
         "Emails sent to the publisher are only used to reply to you. You can ask for their deletion at any time, at the same address, and lodge a complaint with the CNIL, the French data protection authority.",
       ],
       hostLogs: "Like any host, GitHub logs visitors' IP addresses for security purposes. See its",

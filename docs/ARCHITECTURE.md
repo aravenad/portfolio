@@ -132,15 +132,18 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
-| Démo jouable chargée au clic, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
 | Trame de glyphes du fond, de ses échos et des couvertures | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro` | `lib/glyph.ts` |
+| Démo jouable chargée au clic, arrêtable, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une
 image d'attente (`poster.webp`) et un lien « Jouer à la démo ». Rien de la démo
 n'est chargé avant le clic : il crée une iframe en bac à sable
-(`sandbox="allow-scripts"`, sans `allow-same-origin`), qui reçoit la langue et
-le thème dans l'URL. Sans JavaScript, ou au clic du milieu, le lien ouvre la
+(`sandbox="allow-scripts"`, sans `allow-same-origin`), qui reçoit la langue,
+le thème et `sound=1` dans l'URL (sans lui, le menu Pause affiche 0 % alors que
+le son joue). Un bouton « Arrêter la démo », à droite de la légende, retire
+l'iframe (et son son) et remet l'image ; le lien « Jouer » reprend le focus.
+Sans JavaScript, ou au clic du milieu, le lien ouvre la
 démo seule. La démo ne parle à la page que par `postMessage`, version `v: 1` ;
 la page ne lit que les messages de sa propre iframe :
 

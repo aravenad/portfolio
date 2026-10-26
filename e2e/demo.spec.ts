@@ -22,12 +22,31 @@ test("ne charge la démo qu'au clic, puis lui donne la place et le clavier", asy
 
   const iframe = demo(page).locator("iframe");
   await expect(iframe).toHaveAttribute("sandbox", "allow-scripts");
-  await expect(iframe).toHaveAttribute("src", "/demos/arrow-block/?lang=fr&theme=dark");
+  await expect(iframe).toHaveAttribute("src", "/demos/arrow-block/?lang=fr&sound=1&theme=dark");
   await expect(frame(page).locator("canvas")).toBeVisible();
   // Le clavier est dans le jeu : Échap y ouvre la pause.
   await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe("IFRAME");
   await page.keyboard.press("Escape");
   await expect(frame(page).locator("#oResume")).toBeFocused();
+});
+
+test("arrête la démo et la relance", async ({ page }) => {
+  await page.goto("projects/arrow-block");
+  const stop = demo(page).getByRole("button", { name: "Arrêter la démo" });
+  await expect(stop).toBeHidden();
+
+  await demo(page).getByRole("link", { name: "Jouer à la démo" }).click();
+  await expect(demo(page)).toHaveAttribute("data-state", "ready");
+  await stop.click();
+
+  await expect(demo(page).locator("iframe")).toHaveCount(0);
+  await expect(stop).toBeHidden();
+  await expect(demo(page).getByRole("status")).toHaveText("Démo arrêtée.");
+  const play = demo(page).getByRole("link", { name: "Jouer à la démo" });
+  await expect(play).toBeFocused();
+
+  await play.click();
+  await expect(demo(page)).toHaveAttribute("data-state", "ready");
 });
 
 test("suit la hauteur que la démo conseille", async ({ page }) => {
