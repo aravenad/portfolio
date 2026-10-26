@@ -133,6 +133,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 | Démo jouable chargée au clic, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
+| Trame de glyphes du fond, des couvertures et de l'image d'attente des démos | `ui/GlyphField.astro` | `lib/glyph.ts` |
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une
@@ -170,6 +171,19 @@ fondue par le masque `chrome-fade.webp`) et un grain fin (`::after`). Le
 titre de l'accueil entre mot par mot, du flou au net (`.blur-word`), en CSS
 seul ; le reste du gabarit monte en fondu (`.page-enter`).
 
+**Trame de glyphes.** `ui/GlyphField.astro` recompose la matière en glyphes
+ASCII (rampe ` ·:+×xX#`, tramage de Bayer 4×4, IBM Plex Mono) sur un canvas
+persistant d'une page à l'autre ; la photo de `body::before` ne s'efface
+qu'une fois la trame peinte (`html[data-glyph-ready]`), et reste sans script.
+Le même moteur trame les couvertures de projet (animées au survol de la carte)
+et l'image d'attente des démos (lue en négatif, animée jusqu'au lancement).
+Une seule boucle à 12 images/s, qui ne repeint que les cellules changées et
+s'arrête hors écran. Les teintes sont les variables `--glyph-*` de
+`global.css`, une palette par thème. L'interrupteur « Animer le fond » du
+panneau de réglages pose `<html data-glyph="off">` (clé `glyph`) : chaque
+surface se fige. Comme « Animer les titres », il est coupé par défaut sous
+`prefers-reduced-motion`.
+
 ### Thèmes
 
 - **Le sombre est le thème par défaut** : c'est la palette de Tailwind, sans
@@ -201,7 +215,7 @@ seul ; le reste du gabarit monte en fondu (`.page-enter`).
 ## 5. Tests
 
 ```sh
-npm test          # 653 tests, quelques secondes
+npm test          # 766 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 57 tests de bout en bout, une quarantaine de secondes
 ```

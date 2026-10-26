@@ -12,7 +12,7 @@ const { cover, class: className } = Astro.props;
  * La couverture d'une carte projet. Pas de capture d'écran : les projets sont
  * anciens, et une capture aurait juré avec le reste du site. À la place, la
  * matière métallique du haut de page (`.project-cover` dans global.css), cadrée
- * différemment pour chaque motif, sous un dessin au trait qui dit de quoi parle
+ * différemment pour chaque motif et tramée en glyphes (ui/GlyphField.astro), sous un dessin au trait qui dit de quoi parle
  * le projet : un diagramme de classes, un schéma de base, une fenêtre de
  * navigateur…
  *
@@ -38,6 +38,8 @@ const framing: Record<Cover, string> = {
   class:list={["project-cover relative overflow-hidden border-zinc-800", className]}
   style={cover ? framing[cover] : undefined}
 >
+  {/* La matière tramée en glyphes, peinte par GlyphField.astro. */}
+  <canvas data-glyph-cover class="glyph-cover"></canvas>
   {
     cover && (
       <svg

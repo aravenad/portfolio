@@ -1,0 +1,351 @@
+---
+/*
+ * La matière du fond, recomposée en glyphes (src/lib/glyph.ts), et le moteur
+ * qui trame aussi les couvertures de projet et l'image d'attente des démos.
+ *
+ * Trois surfaces, une même boucle à 12 images par seconde :
+ *
+ * - le fond, en haut de chaque page, anime en continu un reflet qui traverse
+ *   la matière ;
+ * - chaque couverture de carte (`[data-glyph-cover]`, ProjectCover.astro) est
+ *   figée, et s'anime le temps du survol ou du focus de sa carte ;
+ * - l'image d'attente d'une démo (`[data-glyph-poster]`, ProjectDemo.astro)
+ *   s'anime en continu jusqu'au lancement du jeu.
+ *
+ * Tout s'arrête avec l'interrupteur « Animer le fond » (`<html data-glyph>`) :
+ * chaque surface repasse alors sur une image figée. Une surface hors de
+ * l'écran, ou un onglet caché, ne coûte rien.
+ *
+ * Sans script, rien ne change : global.css garde la photo du fond et des
+ * couvertures tant que la trame n'a pas peint (`data-glyph-ready`).
+ *
+ * `transition:persist` garde le calque, et sa trame, d'une page à l'autre :
+ * le reflet poursuit sa course au lieu de repartir à chaque navigation.
+ */
+import chromeField from "../../assets/chrome-original-hq.webp";
+---
+
+<div
+  class="glyph-field"
+  aria-hidden="true"
+  data-glyph-field
+  data-glyph-src={chromeField.src}
+  transition:persist="glyph-field"
+>
+  <canvas></canvas>
+</div>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+  import {
+    BALAYAGE,
+    type Cadre,
+    NIVEAUX_AFFICHE,
+    NIVEAUX_MATIERE,
+    type Niveaux,
+    POLICE,
+    RAMPE,
+    TEINTES,
+    atlas,
+    cadrageCouverture,
+    cadrageCouvrant,
+    cadrageFond,
+    champ,
+    fraction,
+    grille,
+    peindre,
+    trame,
+  } from "../../lib/glyph";
+
+  const root = document.documentElement;
+  const FPS = 12;
+  const debut = performance.now();
+
+  /** Une surface tramée : son canvas, sa grille et ce qu'elle a déjà peint. */
+  interface Toile {
+    canvas: HTMLCanvasElement;
+    /** Taille d'une cellule, en pixels CSS. */
+    cellule: number;
+    /** La source, et la part de la source pour une surface de `largeur × hauteur`. */
+    source: () => Promise<CanvasImageSource | null>;
+    cadre: (largeur: number, hauteur: number) => Cadre;
+    niveaux: Niveaux;
+    /** S'anime-t-elle en ce moment, réglage mis à part ? */
+    anime: () => boolean;
+    /** Son horloge, en secondes. */
+    temps: (maintenant: number) => number;
+    /** Appelé une fois la première image peinte. */
+    prete?: () => void;
+    visible: boolean;
+    etat?: {
+      colonnes: number;
+      lignes: number;
+      pixels: number;
+      contexte: CanvasRenderingContext2D;
+      tuiles: HTMLCanvasElement;
+      champ: ReturnType<typeof champ>;
+      codes: Uint8Array;
+      avant: Uint8Array;
+      fige: boolean;
+    };
+  }
+
+  /** La matière du fond, chargée une fois pour toutes les surfaces. */
+  let matiere: Promise<HTMLImageElement | null> | undefined;
+  function chargerMatiere(src: string) {
+    matiere ??= new Promise((resolve) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.onload = () => resolve(image);
+      image.onerror = () => resolve(null);
+      image.src = src;
+    });
+    return matiere;
+  }
+
+  /** La police de la trame : sans elle, l'atlas serait rendu dans une police de repli. */
+  const police = document.fonts?.load(`500 16px ${POLICE}`).catch(() => []) ?? Promise.resolve([]);
+
+  const animationVoulue = () => root.dataset.glyph === "on";
+
+  function couleurs() {
+    const style = getComputedStyle(root);
+    return TEINTES.map((teinte) => style.getPropertyValue(`--glyph-${teinte}`).trim() || "#888");
+  }
+
+  function tuiles(pixels: number) {
+    const canvas = document.createElement("canvas");
+    canvas.width = RAMPE.length * pixels;
+    canvas.height = TEINTES.length * pixels;
+    atlas(canvas.getContext("2d")!, pixels, couleurs());
+    return canvas;
+  }
+
+  /** (Re)construit la grille d'une surface à sa taille actuelle, puis la peint. */
+  async function preparer(toile: Toile) {
+    const [source] = await Promise.all([toile.source(), police]);
+    const boite = toile.canvas.parentElement!;
+    const { width, height } = boite.getBoundingClientRect();
+    if (!source || width === 0 || height === 0) return;
+
+    const ratio = window.devicePixelRatio || 1;
+    const pixels = Math.max(1, Math.round(toile.cellule * ratio));
+    const { colonnes, lignes } = grille(width, height, toile.cellule);
+
+    // Lecture de la source : un pixel par cellule.
+    const lecture = document.createElement("canvas");
+    lecture.width = colonnes;
+    lecture.height = lignes;
+    const lecteur = lecture.getContext("2d", { willReadFrequently: true })!;
+    lecteur.imageSmoothingQuality = "high";
+    const { sx, sy, sw, sh } = toile.cadre(colonnes * toile.cellule, lignes * toile.cellule);
+    lecteur.drawImage(source, sx, sy, sw, sh, 0, 0, colonnes, lignes);
+
+    const canvas = toile.canvas;
+    canvas.width = colonnes * pixels;
+    canvas.height = lignes * pixels;
+    canvas.style.width = `${(colonnes * pixels) / ratio}px`;
+    canvas.style.height = `${(lignes * pixels) / ratio}px`;
+
+    toile.etat = {
+      colonnes,
+      lignes,
+      pixels,
+      contexte: canvas.getContext("2d")!,
+      tuiles: tuiles(pixels),
+      champ: champ(lecteur.getImageData(0, 0, colonnes, lignes).data, colonnes, lignes),
+      codes: new Uint8Array(colonnes * lignes),
+      avant: new Uint8Array(colonnes * lignes).fill(255),
+      fige: false,
+    };
+
+    peindreToile(toile, performance.now());
+    toile.prete?.();
+  }
+
+  function peindreToile(toile: Toile, maintenant: number) {
+    const etat = toile.etat;
+    if (!etat) return;
+
+    const anime = animationVoulue() && toile.anime();
+    // Figée, une surface n'est peinte qu'une fois.
+    if (!anime && etat.fige) return;
+
+    trame(etat.champ, etat.codes, anime ? toile.temps(maintenant) : null, toile.niveaux);
+    peindre(etat.contexte, etat.tuiles, etat.codes, etat.avant, etat.colonnes, etat.pixels);
+    etat.fige = !anime;
+  }
+
+  /** Repeint tout, de zéro : nouvelles couleurs ou nouvel état du réglage. */
+  function repeindre(nouvellesCouleurs: boolean) {
+    for (const toile of toiles) {
+      const etat = toile.etat;
+      if (!etat) continue;
+      if (nouvellesCouleurs) {
+        etat.tuiles = tuiles(etat.pixels);
+        etat.avant.fill(255);
+      }
+      etat.fige = false;
+      peindreToile(toile, performance.now());
+    }
+  }
+
+  let toiles: Toile[] = [];
+  let fond: Toile | undefined;
+  let boucle = 0;
+  let derniere = 0;
+
+  function image(maintenant: number) {
+    boucle = requestAnimationFrame(image);
+    if (document.hidden || maintenant - derniere < 1000 / FPS) return;
+    derniere = maintenant;
+
+    for (const toile of toiles) if (toile.visible) peindreToile(toile, maintenant);
+  }
+
+  /** Suit la taille et la visibilité d'une surface. */
+  function observer(toile: Toile, signal?: AbortSignal) {
+    const boite = toile.canvas.parentElement!;
+    let largeur = 0;
+    let hauteur = 0;
+
+    const taille = new ResizeObserver(([entree]) => {
+      const { width, height } = entree.contentRect;
+      if (Math.abs(width - largeur) < toile.cellule && Math.abs(height - hauteur) < toile.cellule) return;
+      largeur = width;
+      hauteur = height;
+      void preparer(toile);
+    });
+    const vue = new IntersectionObserver(([entree]) => {
+      toile.visible = entree.isIntersecting;
+    });
+
+    taille.observe(boite);
+    vue.observe(boite);
+    signal?.addEventListener("abort", () => {
+      taille.disconnect();
+      vue.disconnect();
+    });
+  }
+
+  function surfaceDuFond(champ: HTMLElement): Toile {
+    const src = champ.dataset.glyphSrc!;
+    return {
+      canvas: champ.querySelector("canvas")!,
+      cellule: 9,
+      niveaux: NIVEAUX_MATIERE,
+      source: () => chargerMatiere(src),
+      cadre: (largeur, hauteur) =>
+        cadrageFond(largeur, hauteur, parseFloat(getComputedStyle(root).fontSize) || 16),
+      anime: () => true,
+      temps: (maintenant) => (maintenant - debut) / 1000,
+      prete: () => root.setAttribute("data-glyph-ready", ""),
+      visible: true,
+    };
+  }
+
+  function surfaceDeCouverture(canvas: HTMLCanvasElement, src: string, signal: AbortSignal): Toile {
+    const couverture = canvas.parentElement!;
+    const carte = couverture.closest<HTMLElement>(".group") ?? couverture;
+    const style = getComputedStyle(couverture);
+    const x = fraction(style.getPropertyValue("--cover-x"));
+    const y = fraction(style.getPropertyValue("--cover-y"));
+
+    /*
+     * Survolée, la couverture lance un reflet trois fois plus vif que celui du
+     * fond. Quittée, elle le laisse finir sa traversée avant de se figer : un
+     * reflet coupé net au milieu se verrait comme un saut.
+     */
+    const ACCELERATION = 3;
+    let depart: number | undefined;
+    let sortie = false;
+    const temps = (maintenant: number) => ((maintenant - (depart ?? maintenant)) / 1000) * ACCELERATION;
+
+    const entrer = () => {
+      depart ??= performance.now();
+      sortie = false;
+    };
+    const sortir = () => {
+      sortie = true;
+    };
+
+    for (const type of ["pointerenter", "focusin"]) carte.addEventListener(type, entrer, { signal });
+    for (const type of ["pointerleave", "focusout"]) carte.addEventListener(type, sortir, { signal });
+
+    return {
+      canvas,
+      cellule: 6,
+      niveaux: NIVEAUX_MATIERE,
+      source: () => chargerMatiere(src),
+      cadre: (largeur, hauteur) => cadrageCouverture(largeur, hauteur, x, y),
+      anime: () => {
+        if (depart === undefined) return false;
+        // Le reflet est sorti de la carte : la couverture peut se figer.
+        if (sortie && (temps(performance.now()) % BALAYAGE) / BALAYAGE > 0.95) {
+          depart = undefined;
+          sortie = false;
+          return false;
+        }
+        return true;
+      },
+      temps,
+      prete: () => couverture.setAttribute("data-glyph-ready", ""),
+      visible: true,
+    };
+  }
+
+  function surfaceDAffiche(canvas: HTMLCanvasElement): Toile {
+    const figure = canvas.closest<HTMLElement>("[data-demo]");
+    const affiche = canvas.parentElement!.querySelector("img")!;
+    const chargee = () =>
+      affiche.complete && affiche.naturalWidth > 0
+        ? Promise.resolve(affiche)
+        : new Promise<HTMLImageElement | null>((resolve) => {
+            affiche.addEventListener("load", () => resolve(affiche), { once: true });
+            affiche.addEventListener("error", () => resolve(null), { once: true });
+          });
+
+    return {
+      canvas,
+      cellule: 8,
+      niveaux: NIVEAUX_AFFICHE,
+      source: chargee,
+      cadre: (largeur, hauteur) =>
+        cadrageCouvrant(largeur, hauteur, affiche.naturalWidth, affiche.naturalHeight),
+      // Le jeu lancé recouvre l'affiche : inutile de l'animer dessous.
+      anime: () => figure?.dataset.state !== "ready",
+      temps: (maintenant) => (maintenant - debut) / 1000,
+      prete: () => canvas.parentElement!.setAttribute("data-glyph-ready", ""),
+      visible: true,
+    };
+  }
+
+  // Le thème change les couleurs ; l'interrupteur, l'animation.
+  new MutationObserver((mutations) => {
+    repeindre(mutations.some((mutation) => mutation.attributeName === "data-theme"));
+  }).observe(root, { attributes: true, attributeFilter: ["data-theme", "data-glyph"] });
+
+  onEachPage((signal) => {
+    const champ = document.querySelector<HTMLElement>("[data-glyph-field]");
+    if (!champ || !("ResizeObserver" in window) || !("IntersectionObserver" in window)) return;
+
+    // Le calque persiste d'une page à l'autre : sa surface aussi.
+    if (!fond) {
+      fond = surfaceDuFond(champ);
+      observer(fond);
+    }
+
+    const src = champ.dataset.glyphSrc!;
+    const page = [
+      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-cover]")].map((canvas) =>
+        surfaceDeCouverture(canvas, src, signal),
+      ),
+      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-poster]")].map(surfaceDAffiche),
+    ];
+
+    for (const toile of page) observer(toile, signal);
+    toiles = [fond, ...page];
+
+    boucle ||= requestAnimationFrame(image);
+  });
+</script>

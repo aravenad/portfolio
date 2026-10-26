@@ -40,6 +40,7 @@ const setting = [
 const switches = [
   { attribute: "data-theme-toggle", label: t.header.lightTheme },
   { attribute: "data-shine-toggle", label: t.header.animateTitles },
+  { attribute: "data-glyph-toggle", label: t.header.animateBackground },
 ];
 ---
 
@@ -1063,6 +1064,7 @@ const switches = [
   import { onEachPage } from "../../lib/enhance";
   import { switchLangPath, type Lang } from "../../lib/i18n";
   import { readingPosition, restoredScrollY, type ReadingPosition } from "../../lib/lang-switch";
+  import { wireGlyphToggle } from "../../lib/glyph";
   import { wireShineToggle } from "../../lib/shine";
   import { wireThemeToggle, withViewTransition } from "../../lib/theme";
 
@@ -1070,18 +1072,20 @@ const switches = [
 
   /**
    * Interrupteurs du panneau de réglages et du menu replié : voir src/lib/theme.ts et
-   * src/lib/shine.ts, où ils sont testés. Le changement de thème se fait dans
-   * un fondu enchaîné de toute la page. Les deux réglages sont posés avant le
+   * src/lib/shine.ts et src/lib/glyph.ts, où ils sont testés. Le changement de
+   * thème se fait dans un fondu enchaîné de toute la page. Les réglages sont posés avant le
    * premier rendu par le script en ligne de BaseLayout.
    */
   onEachPage((signal) => {
     const theme = [...document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")];
     const shine = [...document.querySelectorAll<HTMLButtonElement>("[data-shine-toggle]")];
+    const glyph = [...document.querySelectorAll<HTMLButtonElement>("[data-glyph-toggle]")];
 
     wireThemeToggle(theme, document.documentElement, () => localStorage, signal, (update) =>
       withViewTransition(document, motionOk(), update),
     );
     wireShineToggle(shine, document.documentElement, () => localStorage, signal);
+    wireGlyphToggle(glyph, document.documentElement, () => localStorage, signal);
   });
 
   /**

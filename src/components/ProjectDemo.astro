@@ -52,6 +52,12 @@ const folder = url(src);
       decoding="async"
       class="absolute inset-0 size-full object-cover transition-opacity duration-500 group-data-[state=ready]:opacity-0"
     />
+    {/* L'image d'attente tramée en glyphes, peinte par GlyphField.astro. */}
+    <canvas
+      data-glyph-poster
+      aria-hidden="true"
+      class="glyph-poster absolute inset-0 transition-opacity duration-500 group-data-[state=ready]:opacity-0"
+    ></canvas>
     <a
       href={demoUrl(folder, lang)}
       data-demo-play

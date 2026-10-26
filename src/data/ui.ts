@@ -40,6 +40,7 @@ const fr = {
     settingsTitle: "Affichage",
     lightTheme: "Thème clair",
     animateTitles: "Animer les titres",
+    animateBackground: "Animer le fond",
     /**
      * Lien vers l'autre langue : texte court, nom complet pour les lecteurs
      * d'écran. Le nom commence par le texte visible, pour qu'une commande
@@ -268,9 +269,9 @@ const fr = {
     display: {
       title: "Réglages d'affichage",
       settings:
-        "Le bouton en forme d'engrenage, en haut de chaque page, propose le thème clair et l'arrêt de l'animation des titres. Sur un écran étroit, ces réglages se trouvent en bas du menu.",
+        "Le bouton en forme d'engrenage, en haut de chaque page, propose le thème clair et l'arrêt des animations : le reflet des titres et la trame du fond. Sur un écran étroit, ces réglages se trouvent en bas du menu.",
       motion:
-        "Si votre système demande de réduire les animations, le site s'en passe : apparitions, défilements doux et reflet des titres compris.",
+        "Si votre système demande de réduire les animations, le site s'en passe : apparitions, défilements doux, reflet des titres et trame du fond compris.",
     },
     contact: {
       title: "Retour d'information et contact",
@@ -327,6 +328,7 @@ const en = {
     settingsTitle: "Display",
     lightTheme: "Light theme",
     animateTitles: "Animate titles",
+    animateBackground: "Animate background",
     otherLang: { short: "FR", label: "FR, version française" },
   },
 
@@ -546,9 +548,9 @@ const en = {
     display: {
       title: "Display settings",
       settings:
-        "The gear button at the top of every page offers a light theme and a way to stop the title animation. On a narrow screen, these settings sit at the bottom of the menu.",
+        "The gear button at the top of every page offers a light theme and a way to stop the animations: the title shine and the background pattern. On a narrow screen, these settings sit at the bottom of the menu.",
       motion:
-        "If your system asks for reduced motion, the site does without it: reveal effects, smooth scrolling and the title shine included.",
+        "If your system asks for reduced motion, the site does without it: reveal effects, smooth scrolling, the title shine and the background pattern included.",
     },
     contact: {
       title: "Feedback and contact",

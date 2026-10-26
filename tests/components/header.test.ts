@@ -346,6 +346,7 @@ describe("panneau de réglages", () => {
   it.each([
     ["[data-theme-toggle]", "Thème clair", "Light theme"],
     ["[data-shine-toggle]", "Animer les titres", "Animate titles"],
+    ["[data-glyph-toggle]", "Animer le fond", "Animate background"],
   ])("contient l'interrupteur %s, nommé par son texte", async (selector, fr, en) => {
     const french = (await panel("/portfolio/")).target?.querySelector(selector);
     const english = (await panel("/portfolio/en/")).target?.querySelector(selector);
@@ -375,6 +376,7 @@ describe("panneau de réglages", () => {
     expect(title?.textContent?.trim()).toBe("Affichage");
     expect(group?.querySelector("[data-theme-toggle]")?.textContent?.trim()).toBe("Thème clair");
     expect(group?.querySelector("[data-shine-toggle]")?.textContent?.trim()).toBe("Animer les titres");
+    expect(group?.querySelector("[data-glyph-toggle]")?.textContent?.trim()).toBe("Animer le fond");
     expect(order.indexOf(group!.querySelector("button")!)).toBe(order.indexOf(lastLink) + 1);
   });
 

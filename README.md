@@ -41,7 +41,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 651 tests
+npm test         # 766 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -158,7 +158,8 @@ sombre dans `@theme`, et toute la palette du thème clair dans le bloc
 ```
 
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
-noir, matière métallique en haut de page, lettrage chromé. Le thème clair en
+noir, matière métallique en haut de page, tramée en glyphes ASCII animés
+(que les réglages peuvent figer), lettrage chromé. Le thème clair en
 est le négatif doux : fond gris perle, matière en plis gris, lettrage graphite.
 Elle tient dans `src/styles/global.css` (palette, calques, utilitaires),
 `src/assets/` (la matière et son masque de fondu) et `tools/og.html` (l'image

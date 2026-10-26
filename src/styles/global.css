@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/noto-sans";
+/* La police de la trame de glyphes (ui/GlyphField.astro) : une seule graisse, latin seul. */
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 
 /*
  * Couleur d'accent du site. Un argent froid, calqué sur les hautes lumières de
@@ -57,6 +59,19 @@
  */
 :root {
   color-scheme: dark;
+
+  /*
+   * La palette de la trame de glyphes (src/lib/glyph.ts), de la nuit au givre,
+   * et la cendre des demi-teintes neutres. Le moteur la lit au moment de
+   * peindre : un changement de thème repeint la trame dans l'autre.
+   */
+  --glyph-nuit: #141619;
+  --glyph-abysse: #0b337a;
+  --glyph-cobalt: #2c63c7;
+  --glyph-azur: #618cd6;
+  --glyph-ciel: #87a9ea;
+  --glyph-givre: #e0e9f2;
+  --glyph-cendre: #8c9196;
 }
 
 :root[data-theme="light"] {
@@ -76,6 +91,18 @@
   --color-white: oklch(18% 0.005 286);
   --color-black: oklch(97% 0.003 286);
   --color-accent: oklch(46% 0.08 250);
+
+  /*
+   * En clair, l'encre s'inverse comme la matière : les reflets, les glyphes
+   * les plus pleins, deviennent les plus foncés, et la nuit se fond au papier.
+   */
+  --glyph-nuit: #dfe1e6;
+  --glyph-abysse: #c5d0e3;
+  --glyph-cobalt: #8fa6cf;
+  --glyph-azur: #5b7cb8;
+  --glyph-ciel: #3b5b9a;
+  --glyph-givre: #1f3566;
+  --glyph-cendre: #6b7078;
 }
 
 /*
@@ -174,6 +201,58 @@ body[data-home="true"]::before {
   body[data-home="true"]::before {
     mask-size: 100% 52rem;
   }
+}
+
+/*
+ * La même matière, tramée en glyphes (ui/GlyphField.astro) : même boîte, même
+ * masque. La photo de `body::before` reste dessous tant que la trame n'a pas
+ * peint, et pour qui n'a pas de script ; elle s'efface ensuite.
+ *
+ * Les glyphes sont composés normalement, sans `screen` : leur couleur est déjà
+ * celle de la palette, et la grille dessine assez de vide entre eux pour que le
+ * texte reste lisible par-dessus.
+ */
+.glyph-field {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 64rem;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.3;
+  mask-image: url("../assets/chrome-fade.webp");
+  mask-mode: alpha;
+  mask-repeat: no-repeat;
+  mask-size: 100% 64rem;
+}
+
+.glyph-field canvas,
+.glyph-cover,
+.glyph-poster {
+  display: block;
+  image-rendering: pixelated;
+}
+
+body[data-home="true"] .glyph-field {
+  opacity: 0.8;
+}
+
+:root[data-theme="light"] .glyph-field {
+  opacity: 0.35;
+}
+
+:root[data-theme="light"] body[data-home="true"] .glyph-field {
+  opacity: 0.7;
+}
+
+@media (min-width: 40rem) and (max-height: 44rem) {
+  body[data-home="true"] .glyph-field {
+    mask-size: 100% 52rem;
+  }
+}
+
+:root[data-glyph-ready] body::before {
+  display: none;
 }
 
 /*
@@ -432,6 +511,28 @@ body::after {
 
 :root[data-theme="light"] .group:hover .project-cover::before {
   opacity: 0.4;
+}
+
+/* La trame remplace la photo dès qu'elle a peint, avec le même fondu. */
+.project-cover[data-glyph-ready]::before {
+  display: none;
+}
+
+/* De même pour l'image d'attente d'une démo : elle transparaîtrait entre les glyphes. */
+.demo-stage[data-glyph-ready] > img {
+  visibility: hidden;
+}
+
+.glyph-cover {
+  position: absolute;
+  inset: 0;
+  opacity: 0.75;
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  transition: opacity 0.3s;
+}
+
+.group:hover .glyph-cover {
+  opacity: 1;
 }
 
 /*

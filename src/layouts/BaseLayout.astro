@@ -17,6 +17,7 @@ import { ClientRouter } from "astro:transitions";
 import chromeField from "../assets/chrome-original-hq.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
+import GlyphField from "../components/ui/GlyphField.astro";
 import Header from "../components/layout/Header.astro";
 import { site } from "../data/site";
 import { useTranslations } from "../data/ui";
@@ -210,24 +211,36 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       Le reflet des titres chromés suit le même chemin (`data-shine`, voir
       src/lib/shine.ts et sa fonction `initialShine`) : le choix mémorisé, ou à
       défaut le réglage du système. Posé plus tard, le reflet démarrerait avant
-      d'être coupé chez qui l'a désactivé.
+      d'être coupé chez qui l'a désactivé. L'animation de la trame du fond
+      aussi (`data-glyph`, src/lib/glyph.ts).
+
+      `data-glyph-ready`, posé une fois la trame peinte, retire la photo du
+      fond qu'elle remplace : il doit, lui aussi, survivre à l'échange.
     */}
     <script is:inline>
       (() => {
         const root = document.documentElement;
         let theme = "dark";
-        let shine = matchMedia("(prefers-reduced-motion: reduce)").matches ? "off" : "on";
+        const motion = matchMedia("(prefers-reduced-motion: reduce)").matches ? "off" : "on";
+        let shine = motion;
+        let glyph = motion;
         try {
           if (localStorage.getItem("theme") === "light") theme = "light";
           const stored = localStorage.getItem("shine");
           if (stored === "on" || stored === "off") shine = stored;
+          const storedGlyph = localStorage.getItem("glyph");
+          if (storedGlyph === "on" || storedGlyph === "off") glyph = storedGlyph;
         } catch {}
         root.dataset.theme = theme;
         root.dataset.shine = shine;
+        root.dataset.glyph = glyph;
 
         document.addEventListener("astro:before-swap", (event) => {
-          event.newDocument.documentElement.dataset.theme = root.dataset.theme;
-          event.newDocument.documentElement.dataset.shine = root.dataset.shine;
+          const next = event.newDocument.documentElement;
+          next.dataset.theme = root.dataset.theme;
+          next.dataset.shine = root.dataset.shine;
+          next.dataset.glyph = root.dataset.glyph;
+          if (root.hasAttribute("data-glyph-ready")) next.setAttribute("data-glyph-ready", "");
         });
       })();
     </script>
@@ -285,6 +298,8 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     >
       {t.header.skipLink}
     </a>
+
+    <GlyphField />
 
     <div class="flex min-h-screen flex-col">
       <Header />

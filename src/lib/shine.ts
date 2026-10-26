@@ -26,43 +26,53 @@ export function initialShine(stored: string | null, reduceMotion: boolean): Shin
   return reduceMotion ? "off" : "on";
 }
 
-type ShineStore = Pick<Storage, "setItem">;
+/** Un réglage d'animation : son attribut sur `<html>` et sa clé de stockage portent le même nom. */
+export type MotionSetting = typeof SHINE_KEY | "glyph";
+
+/** Ce que les interrupteurs utilisent du stockage. */
+export type MotionStore = Pick<Storage, "setItem">;
 
 /**
  * Mémorise le choix. En navigation privée, le stockage peut refuser : le
  * réglage change quand même, il ne survivra simplement pas au chargement suivant.
  */
-export function saveShine(getStore: () => ShineStore, shine: Shine): void {
+export function saveMotion(getStore: () => MotionStore, setting: MotionSetting, value: Shine): void {
   try {
-    getStore().setItem(SHINE_KEY, shine);
+    getStore().setItem(setting, value);
   } catch {
     // Rien à faire : le choix reste valable pour la page en cours.
   }
 }
 
+export function saveShine(getStore: () => MotionStore, shine: Shine): void {
+  saveMotion(getStore, SHINE_KEY, shine);
+}
+
 /** Ce que l'interrupteur utilise de l'élément `<html>`. */
-export type ShineRoot = Pick<HTMLElement, "dataset">;
+export type MotionRoot = Pick<HTMLElement, "dataset">;
 
 /** Ce que l'interrupteur utilise de lui-même. */
-export type ShineButton = Pick<HTMLElement, "setAttribute" | "addEventListener">;
+export type MotionButton = Pick<HTMLElement, "setAttribute" | "addEventListener">;
 
 /**
- * Câble les interrupteurs : leur état pressé suit le réglage courant, et un clic
- * sur l'un d'eux bascule, applique et mémorise. Comme le bouton de thème, ils
- * sont deux (panneau de l'engrenage, menu replié), gardent un libellé fixe
- * (« Animer les titres ») et annoncent leur état par `aria-pressed`.
+ * Câble les interrupteurs d'un réglage d'animation : leur état pressé suit le
+ * réglage courant, et un clic sur l'un d'eux bascule, applique et mémorise.
+ * Comme le bouton de thème, ils sont deux (panneau de l'engrenage, menu
+ * replié), gardent un libellé fixe (« Animer les titres ») et annoncent leur
+ * état par `aria-pressed`.
  */
-export function wireShineToggle(
-  buttons: readonly ShineButton[],
-  root: ShineRoot,
-  getStore: () => ShineStore,
+export function wireMotionToggle(
+  buttons: readonly MotionButton[],
+  root: MotionRoot,
+  setting: MotionSetting,
+  getStore: () => MotionStore,
   signal: AbortSignal,
 ): void {
-  const current = (): Shine => (root.dataset.shine === "off" ? "off" : "on");
+  const current = (): Shine => (root.dataset[setting] === "off" ? "off" : "on");
 
-  const apply = (shine: Shine) => {
-    root.dataset.shine = shine;
-    for (const button of buttons) button.setAttribute("aria-pressed", String(shine === "on"));
+  const apply = (value: Shine) => {
+    root.dataset[setting] = value;
+    for (const button of buttons) button.setAttribute("aria-pressed", String(value === "on"));
   };
 
   apply(current());
@@ -73,9 +83,19 @@ export function wireShineToggle(
       () => {
         const next: Shine = current() === "on" ? "off" : "on";
         apply(next);
-        saveShine(getStore, next);
+        saveMotion(getStore, setting, next);
       },
       { signal },
     );
   }
+}
+
+/** Les interrupteurs « Animer les titres ». */
+export function wireShineToggle(
+  buttons: readonly MotionButton[],
+  root: MotionRoot,
+  getStore: () => MotionStore,
+  signal: AbortSignal,
+): void {
+  wireMotionToggle(buttons, root, SHINE_KEY, getStore, signal);
 }
