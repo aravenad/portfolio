@@ -5,14 +5,12 @@ import {
   GLYPH_KEY,
   MATIERE_LARGEUR,
   NIVEAUX,
-  NIVEAUX_AFFICHE,
   NIVEAUX_MATIERE,
   RAMPE,
   TEINTES,
   atlas,
   bande,
   cadrageCouverture,
-  cadrageCouvrant,
   cadrageFond,
   champ,
   code,
@@ -170,14 +168,6 @@ describe("trame", () => {
     expect(teintes(colore)).not.toContain("cendre");
   });
 
-  it("lit une image d'attente en négatif : son fond clair reste vide", () => {
-    const blanc = trame(champ(gris(255, 16), 4, 4), new Uint8Array(16), null, NIVEAUX_AFFICHE);
-    const noir = trame(champ(gris(0, 16), 4, 4), new Uint8Array(16), null, NIVEAUX_AFFICHE);
-
-    expect([...blanc].every((valeur) => valeur === 0)).toBe(true);
-    expect([...noir].every((valeur) => valeur % RAMPE.length === RAMPE.length - 1)).toBe(true);
-  });
-
   it("change sous la lumière, sans toucher à la grille", () => {
     const source = champ(gris(110, 400), 20, 20);
     const fige = trame(source, new Uint8Array(400));
@@ -251,13 +241,6 @@ describe("cadrageCouverture", () => {
     expect(gauche.sw).toBeCloseTo(MATIERE_LARGEUR / 3.6);
     expect(droite.sx + droite.sw).toBeCloseTo(MATIERE_LARGEUR);
     expect(droite.sy + droite.sh).toBeCloseTo(3770);
-  });
-});
-
-describe("cadrageCouvrant", () => {
-  it("coupe les bords de trop, au centre", () => {
-    expect(cadrageCouvrant(200, 400, 640, 640)).toEqual({ sx: 160, sy: 0, sw: 320, sh: 640 });
-    expect(cadrageCouvrant(400, 200, 640, 640)).toEqual({ sx: 0, sy: 160, sw: 640, sh: 320 });
   });
 });
 

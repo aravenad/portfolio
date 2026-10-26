@@ -94,15 +94,16 @@
 
   /*
    * En clair, l'encre s'inverse comme la matière : les reflets, les glyphes
-   * les plus pleins, deviennent les plus foncés, et la nuit se fond au papier.
+   * les plus pleins, deviennent les plus foncés. L'encre est plus soutenue
+   * qu'en sombre : sur le papier clair, des bleus pâles ne se voyaient plus.
    */
-  --glyph-nuit: #dfe1e6;
-  --glyph-abysse: #c5d0e3;
-  --glyph-cobalt: #8fa6cf;
-  --glyph-azur: #5b7cb8;
-  --glyph-ciel: #3b5b9a;
-  --glyph-givre: #1f3566;
-  --glyph-cendre: #6b7078;
+  --glyph-nuit: #c9ced8;
+  --glyph-abysse: #9fb0d0;
+  --glyph-cobalt: #6a85bd;
+  --glyph-azur: #3f61a6;
+  --glyph-ciel: #284887;
+  --glyph-givre: #132750;
+  --glyph-cendre: #555b64;
 }
 
 /*
@@ -227,8 +228,8 @@ body[data-home="true"]::before {
 }
 
 .glyph-field canvas,
-.glyph-cover,
-.glyph-poster {
+.glyph-echo canvas,
+.glyph-cover {
   display: block;
   image-rendering: pixelated;
 }
@@ -238,17 +239,82 @@ body[data-home="true"] .glyph-field {
 }
 
 :root[data-theme="light"] .glyph-field {
-  opacity: 0.35;
+  opacity: 0.6;
 }
 
 :root[data-theme="light"] body[data-home="true"] .glyph-field {
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 @media (min-width: 40rem) and (max-height: 44rem) {
   body[data-home="true"] .glyph-field {
     mask-size: 100% 52rem;
   }
+}
+
+/*
+ * Les échos de la trame plus bas dans la page (ui/GlyphEchoes.astro). Le
+ * calque couvre tout `body` ; ses taches débordent des bords, d'où
+ * `overflow: hidden`, sans quoi la page défilerait de côté.
+ */
+.glyph-echoes {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Le long de la page : arrêté au-dessus du pied de page, en fondu. */
+.glyph-echoes-trail {
+  position: absolute;
+  inset: 0 0 26rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black calc(100% - 14rem), transparent);
+}
+
+.glyph-echo {
+  position: absolute;
+  top: var(--echo-top);
+  width: 46rem;
+  height: 34rem;
+  overflow: hidden;
+  opacity: 0.45;
+  mask-image: radial-gradient(closest-side, black 25%, transparent);
+}
+
+.glyph-echo[data-side="left"] {
+  left: -16rem;
+}
+
+.glyph-echo[data-side="right"] {
+  right: -16rem;
+}
+
+/* Le halo du pied de page : mêmes centre et taille que son dégradé sur `body`. */
+.glyph-echo-halo {
+  top: auto;
+  right: calc(12% - 24rem);
+  bottom: -14rem;
+  width: 48rem;
+  height: 28rem;
+  opacity: 0.65;
+  mask-image: radial-gradient(closest-side, black 40%, transparent);
+}
+
+/*
+ * Sur un écran étroit, pas de marge à côté du texte : les taches passeraient
+ * dessous. Seul le halo du pied de page reste. `display: none` épargne aussi
+ * leur peinture (GlyphField.astro ne prépare pas une surface sans taille).
+ */
+@media (max-width: 64rem) {
+  .glyph-echoes-trail {
+    display: none;
+  }
+}
+
+:root[data-theme="light"] .glyph-echo {
+  opacity: 1;
 }
 
 :root[data-glyph-ready] body::before {
@@ -516,11 +582,6 @@ body::after {
 /* La trame remplace la photo dès qu'elle a peint, avec le même fondu. */
 .project-cover[data-glyph-ready]::before {
   display: none;
-}
-
-/* De même pour l'image d'attente d'une démo : elle transparaîtrait entre les glyphes. */
-.demo-stage[data-glyph-ready] > img {
-  visibility: hidden;
 }
 
 .glyph-cover {

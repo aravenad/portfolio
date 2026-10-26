@@ -17,6 +17,7 @@ import { ClientRouter } from "astro:transitions";
 import chromeField from "../assets/chrome-original-hq.webp";
 import BackToTop from "../components/ui/BackToTop.astro";
 import Footer from "../components/layout/Footer.astro";
+import GlyphEchoes from "../components/ui/GlyphEchoes.astro";
 import GlyphField from "../components/ui/GlyphField.astro";
 import Header from "../components/layout/Header.astro";
 import { site } from "../data/site";
@@ -300,6 +301,7 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     </a>
 
     <GlyphField />
+    <GlyphEchoes />
 
     <div class="flex min-h-screen flex-col">
       <Header />

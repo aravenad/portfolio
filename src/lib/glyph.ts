@@ -58,8 +58,6 @@ export interface Niveaux {
   gamma: number;
   /** Saturation sous laquelle un demi-ton passe en cendre. */
   neutre: number;
-  /** Lit la source en négatif : le clair devient le vide. */
-  inverse?: boolean;
 }
 
 export const NIVEAUX: Niveaux = { noir: 0.18, blanc: 0.85, gamma: 1.15, neutre: 0.16 };
@@ -73,13 +71,6 @@ export const NIVEAUX: Niveaux = { noir: 0.18, blanc: 0.85, gamma: 1.15, neutre: 
  * cendre : les plis gardent les bleus de la palette.
  */
 export const NIVEAUX_MATIERE: Niveaux = { noir: 0.04, blanc: 0.6, gamma: 1.15, neutre: 0.02 };
-
-/**
- * Les niveaux d'une image d'attente de démo. Ce sont des rendus sur fond
- * clair : lus tels quels, le fond deviendrait un mur de glyphes pleins sur un
- * site sombre. En négatif, le fond reste vide et le sujet ressort en glyphes.
- */
-export const NIVEAUX_AFFICHE: Niveaux = { ...NIVEAUX, inverse: true };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -168,7 +159,7 @@ export function trame(
     for (let x = 0; x < colonnes; x++) {
       const i = y * colonnes + x;
       const eclat = temps === null ? 0 : lumiere(x, y, colonnes, lignes, temps);
-      const t = ton((niveaux.inverse ? 1 - luminance[i] : luminance[i]) + eclat, niveaux);
+      const t = ton(luminance[i] + eclat, niveaux);
       const seuil = (BAYER4[y & 3][x & 3] + 0.5) / 16;
       const glyphe = clamp(Math.floor(t * marches + seuil), 0, marches);
       // Les bandes sont tramées elles aussi : pas de frontière nette entre deux teintes.
@@ -320,20 +311,6 @@ export function cadrageCouverture(largeur: number, hauteur: number, x: number, y
     sw: largeur * echelle,
     sh: hauteur * echelle,
   };
-}
-
-/** La part d'une image que montre `object-fit: cover` dans `largeur × hauteur`. */
-export function cadrageCouvrant(
-  largeur: number,
-  hauteur: number,
-  imageLargeur: number,
-  imageHauteur: number,
-): Cadre {
-  const echelle = Math.min(imageLargeur / largeur, imageHauteur / hauteur);
-  const sw = largeur * echelle;
-  const sh = hauteur * echelle;
-
-  return { sx: (imageLargeur - sw) / 2, sy: (imageHauteur - sh) / 2, sw, sh };
 }
 
 /** Lit un pourcentage CSS (« 22% ») en fraction, `repli` s'il est illisible. */

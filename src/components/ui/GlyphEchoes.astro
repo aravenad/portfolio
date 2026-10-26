@@ -1,0 +1,48 @@
+---
+/*
+ * Des échos de la trame du fond, plus bas dans la page : sans eux, passé le
+ * haut de page, on ne lisait plus qu'un noir uni jusqu'au pied de page.
+ *
+ * - Le long de la page, une tache tous les 66rem, d'un bord puis de l'autre,
+ *   à côté de la colonne de texte plutôt que dessous. Le calque s'arrête au-dessus
+ *   du pied de page, en fondu : une page courte n'en montre qu'une, ou aucune.
+ *   Sur un écran étroit, sans marge à côté du texte, il disparaît.
+ * - Dans le pied de page, le halo du bas à droite (global.css, sur `body`) se
+ *   remplit de la même matière.
+ *
+ * Chaque écho montre un fragment différent de la matière (`--echo-x`,
+ * `--echo-y`, comme `--cover-x` et `--cover-y` d'une couverture). Ils sont
+ * peints et animés par GlyphField.astro, avec le reflet du fond, et se figent
+ * avec lui (« Animer le fond »). Sans script, ils restent vides.
+ */
+const traces = [
+  { side: "right", x: "18%", y: "30%" },
+  { side: "left", x: "72%", y: "58%" },
+  { side: "right", x: "40%", y: "80%" },
+  { side: "left", x: "88%", y: "22%" },
+  { side: "right", x: "8%", y: "66%" },
+  { side: "left", x: "56%", y: "40%" },
+  { side: "right", x: "30%", y: "12%" },
+  { side: "left", x: "64%", y: "90%" },
+];
+---
+
+<div class="glyph-echoes" aria-hidden="true">
+  <div class="glyph-echoes-trail">
+    {
+      traces.map(({ side, x, y }, index) => (
+        <div
+          class="glyph-echo"
+          data-side={side}
+          style={`--echo-top: ${84 + index * 66}rem; --echo-x: ${x}; --echo-y: ${y}`}
+        >
+          <canvas data-glyph-echo />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="glyph-echo glyph-echo-halo" style="--echo-x: 70%; --echo-y: 30%">
+    <canvas data-glyph-echo></canvas>
+  </div>
+</div>

@@ -133,7 +133,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 | Démo jouable chargée au clic, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
-| Trame de glyphes du fond, des couvertures et de l'image d'attente des démos | `ui/GlyphField.astro` | `lib/glyph.ts` |
+| Trame de glyphes du fond, de ses échos et des couvertures | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro` | `lib/glyph.ts` |
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une
@@ -154,7 +154,10 @@ Une iframe sans `allow-same-origin` a l'origine `null` : ses polices ne se
 chargent qu'avec `Access-Control-Allow-Origin`. GitHub Pages l'envoie
 (`*`) sur toutes ses réponses ; `server.headers` dans `astro.config.mjs` fait
 de même pour `astro dev` et `astro preview`, sinon les tests de bout en bout
-échouent sur les erreurs de la console. Les fichiers de `public/demos/` viennent
+échouent sur les erreurs de la console. En dev, le greffon
+`publicDirectoryIndex` (même fichier) sert aussi l'`index.html` d'un dossier
+de `public/` et laisse passer vers ses fichiers les requêtes de l'iframe,
+qu'Astro refuse sinon (`Sec-Fetch-Site: cross-site`). Les fichiers de `public/demos/` viennent
 du dépôt du projet : pour Arrow Block, `npm run embed -- <chemin du portfolio>`
 dans le dépôt du jeu les reconstruit et les recopie.
 
@@ -176,7 +179,9 @@ ASCII (rampe ` ·:+×xX#`, tramage de Bayer 4×4, IBM Plex Mono) sur un canvas
 persistant d'une page à l'autre ; la photo de `body::before` ne s'efface
 qu'une fois la trame peinte (`html[data-glyph-ready]`), et reste sans script.
 Le même moteur trame les couvertures de projet (animées au survol de la carte)
-et l'image d'attente des démos (lue en négatif, animée jusqu'au lancement).
+ainsi que ses échos plus bas dans la page (`ui/GlyphEchoes.astro`) : une tache
+tous les 66rem, d'un bord puis de l'autre (sur un écran de plus de 64rem),
+et le halo du pied de page.
 Une seule boucle à 12 images/s, qui ne repeint que les cellules changées et
 s'arrête hors écran. Les teintes sont les variables `--glyph-*` de
 `global.css`, une palette par thème. L'interrupteur « Animer le fond » du

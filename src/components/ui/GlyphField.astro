@@ -1,16 +1,16 @@
 ---
 /*
  * La matière du fond, recomposée en glyphes (src/lib/glyph.ts), et le moteur
- * qui trame aussi les couvertures de projet et l'image d'attente des démos.
+ * qui trame aussi les couvertures de projet.
  *
  * Trois surfaces, une même boucle à 12 images par seconde :
  *
  * - le fond, en haut de chaque page, anime en continu un reflet qui traverse
  *   la matière ;
+ * - ses échos plus bas dans la page et dans le halo du pied de page
+ *   (`[data-glyph-echo]`, GlyphEchoes.astro) font de même ;
  * - chaque couverture de carte (`[data-glyph-cover]`, ProjectCover.astro) est
- *   figée, et s'anime le temps du survol ou du focus de sa carte ;
- * - l'image d'attente d'une démo (`[data-glyph-poster]`, ProjectDemo.astro)
- *   s'anime en continu jusqu'au lancement du jeu.
+ *   figée, et s'anime le temps du survol ou du focus de sa carte.
  *
  * Tout s'arrête avec l'interrupteur « Animer le fond » (`<html data-glyph>`) :
  * chaque surface repasse alors sur une image figée. Une surface hors de
@@ -40,7 +40,6 @@ import chromeField from "../../assets/chrome-original-hq.webp";
   import {
     BALAYAGE,
     type Cadre,
-    NIVEAUX_AFFICHE,
     NIVEAUX_MATIERE,
     type Niveaux,
     POLICE,
@@ -48,7 +47,6 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     TEINTES,
     atlas,
     cadrageCouverture,
-    cadrageCouvrant,
     cadrageFond,
     champ,
     fraction,
@@ -294,28 +292,21 @@ import chromeField from "../../assets/chrome-original-hq.webp";
     };
   }
 
-  function surfaceDAffiche(canvas: HTMLCanvasElement): Toile {
-    const figure = canvas.closest<HTMLElement>("[data-demo]");
-    const affiche = canvas.parentElement!.querySelector("img")!;
-    const chargee = () =>
-      affiche.complete && affiche.naturalWidth > 0
-        ? Promise.resolve(affiche)
-        : new Promise<HTMLImageElement | null>((resolve) => {
-            affiche.addEventListener("load", () => resolve(affiche), { once: true });
-            affiche.addEventListener("error", () => resolve(null), { once: true });
-          });
+  function surfaceDEcho(canvas: HTMLCanvasElement, src: string, rang: number): Toile {
+    const echo = canvas.parentElement!;
+    const style = getComputedStyle(echo);
+    const x = fraction(style.getPropertyValue("--echo-x"));
+    const y = fraction(style.getPropertyValue("--echo-y"));
 
     return {
       canvas,
-      cellule: 8,
-      niveaux: NIVEAUX_AFFICHE,
-      source: chargee,
-      cadre: (largeur, hauteur) =>
-        cadrageCouvrant(largeur, hauteur, affiche.naturalWidth, affiche.naturalHeight),
-      // Le jeu lancé recouvre l'affiche : inutile de l'animer dessous.
-      anime: () => figure?.dataset.state !== "ready",
-      temps: (maintenant) => (maintenant - debut) / 1000,
-      prete: () => canvas.parentElement!.setAttribute("data-glyph-ready", ""),
+      cellule: 9,
+      niveaux: NIVEAUX_MATIERE,
+      source: () => chargerMatiere(src),
+      cadre: (largeur, hauteur) => cadrageCouverture(largeur, hauteur, x, y),
+      anime: () => true,
+      // Décalés d'un écho à l'autre : les reflets ne passent pas tous ensemble.
+      temps: (maintenant) => (maintenant - debut) / 1000 + rang * 2.3,
       visible: true,
     };
   }
@@ -340,7 +331,9 @@ import chromeField from "../../assets/chrome-original-hq.webp";
       ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-cover]")].map((canvas) =>
         surfaceDeCouverture(canvas, src, signal),
       ),
-      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-poster]")].map(surfaceDAffiche),
+      ...[...document.querySelectorAll<HTMLCanvasElement>("[data-glyph-echo]")].map((canvas, rang) =>
+        surfaceDEcho(canvas, src, rang),
+      ),
     ];
 
     for (const toile of page) observer(toile, signal);
