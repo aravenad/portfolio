@@ -69,6 +69,11 @@ describe("compétences techniques", () => {
     expect(new Set(labels).size).toBe(labels.length);
   });
 
+  it("remplit toutes les rangées de la grille de quatre colonnes", () => {
+    // Une tuile de plus ou de moins laisse la dernière rangée à trous.
+    expect(technicalSkills.length % 4).toBe(0);
+  });
+
   it("donne une icône ou un repli textuel à chaque tuile", () => {
     // Sans l'un des deux, la tuile serait un carré vide.
     for (const skill of technicalSkills) {
@@ -100,7 +105,7 @@ describe("compétences techniques", () => {
 
   it("garde le logo lisible sur la tuile une fois teinté", () => {
     // WCAG 1.4.11 : 3:1 pour un objet graphique. Un hex de marque très sombre —
-    // le cas d'OpenJDK, de GitHub ou de JetBrains — doit être adapté avant
+    // le cas d'OpenJDK, de GitHub ou du marine de Flutter — doit être adapté avant
     // d'entrer ici, sinon le survol efface le logo au lieu de le révéler.
     for (const skill of technicalSkills) {
       for (const color of [skill.color, skill.color2]) {

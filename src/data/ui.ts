@@ -60,24 +60,23 @@ const fr = {
   about: {
     title: "À propos",
     paragraphs: [
-      "Après un bac STI2D, j'ai passé trois ans en classe préparatoire TSI à Chambéry. J'y ai appris à tenir une forte charge de travail dans la durée, la rigueur, et ce que l'entraide entre camarades change au travail d'équipe. En rejoignant le BUT Informatique, je suis passé d'un enseignement très théorique à une formation par la pratique : une adaptation exigeante, que j'ai appréciée dès la première année.",
+      "Après un bac STI2D, j'ai passé trois ans en classe préparatoire TSI à Chambéry. J'y ai appris à tenir une forte charge de travail dans la durée, à être rigoureux, et à mesurer ce que l'entraide change au travail d'équipe. En rejoignant le BUT Informatique, je suis passé d'un enseignement très théorique à une formation par la pratique : une adaptation exigeante, que j'ai appréciée dès la première année.",
       "En 2025-2026, j'ai pris une année de césure pour découvrir le monde du travail. Chez Microstore (Horizon Groupe), une entreprise du Green IT qui gère et reconditionne les parcs informatiques de grands comptes, j'ai occupé trois postes au pôle technique, de la réception du matériel à la préparation logicielle d'environ 800 machines par mois. En parallèle, j'ai continué à développer des projets personnels.",
-      "Ce que je préfère, c'est mener un projet de A à Z, du besoin jusqu'à une application qui fonctionne. Le développement web reste mon terrain favori, mais je suis ouvert à tous les types de développement d'applications.",
-      "En dehors de l'informatique, j'aime la musique, les jeux vidéo et les documentaires, surtout ceux d'investigation. Curieux de nature, j'aime apprendre un peu sur tout, et je suis de près l'actualité des nouvelles technologies.",
+      "Ce que je préfère, c'est mener un projet de A à Z, du besoin jusqu'à une application qui fonctionne. Arrow Block en est l'exemple : des règles du jeu et de ses douze mondes jusqu'à une démo jouable en ligne et une application Android.",
+      "En dehors de l'informatique, je partage mon temps entre la musique, les jeux vidéo et les documentaires, surtout d'investigation, et je suis de près l'actualité des nouvelles technologies.",
     ],
     facts: [
-      {
-        label: "Formation",
-        value: "BUT Informatique, 2e année · IUT2 Grenoble",
-      },
-      { label: "Métier visé", value: "Développeur web, et plus largement développeur d'applications" },
-      { label: "Diplôme", value: "Baccalauréat STI2D, spécialité SIN, mention assez bien (2020)" },
       {
         label: "Recherche",
         value:
           "Stage du 19 avril au 25 juin 2027 (jusqu'au 9 juillet possible), puis alternance en 3e année",
       },
-      { label: "Secteur", value: "Grenoble et alentours, en transports en commun" },
+      {
+        label: "Formation",
+        value: "BUT Informatique, 2e année · IUT2 Grenoble",
+      },
+      { label: "Métier visé", value: "Développeur web, et plus largement développeur d'applications" },
+      { label: "Mobilité", value: "Grenoble et alentours, en transports en commun" },
     ],
     cta: "Un stage ou une alternance à me proposer ?",
   },
@@ -86,15 +85,17 @@ const fr = {
     technical: {
       title: "Compétences techniques",
       paragraphs: [
-        "Au fil de mes projets et de ma formation, j'ai pratiqué plusieurs langages et environnements de développement. Côté web, je travaille avec HTML, CSS, JavaScript et TypeScript, ainsi qu'avec PHP et le framework Symfony. Ce portfolio est lui-même construit avec Astro et Tailwind CSS. J'ai également développé en Java et en Python pour la programmation orientée objet, et en C++ pour une approche plus procédurale. Je manipule enfin les données en SQL, avec une pratique plus poussée de PostgreSQL.",
-        "Côté outils, j'utilise les IDE de la suite JetBrains adaptés à ces langages, ainsi que Git et GitHub pour le versionnement et le travail collaboratif.",
+        "Au fil de mes projets et de ma formation, j'ai pratiqué plusieurs langages et environnements de développement. Côté web, je travaille avec HTML, CSS, JavaScript et TypeScript, ainsi qu'avec PHP et le framework Symfony. Ce portfolio est lui-même construit avec Astro et Tailwind CSS. J'ai développé des applications en Java, avec JavaFX, en Python et en C++, et un jeu 3D, d'abord pour le web avec three.js, puis sur Android en Flutter. Côté données, j'écris du SQL, surtout sous PostgreSQL, et j'analyse les résultats avec R.",
+        "Je travaille sous Linux, où j'ai installé des postes de développement et des serveurs Debian (Apache, PostgreSQL, PHP). Je teste mon code avec JUnit, je l'intègre en continu avec GitHub Actions, et j'utilise Git et GitHub pour le versionnement et le travail à plusieurs.",
+        "Je développe aussi avec une IA de code, Claude : je cadre chaque tâche, je relis et je valide ce qu'elle produit, et je garde la main sur les choix techniques. C'est ainsi que j'ai mené Arrow Block.",
       ],
     },
     soft: {
       title: "Compétences transversales",
       paragraphs: [
-        "La plupart de mes projets se sont déroulés en équipe, de deux à sept personnes. J'y ai appris à répartir le travail, à tenir des délais et à documenter mes choix pour que les autres puissent reprendre le code derrière moi.",
+        "La plupart de mes projets se sont déroulés en équipe, de deux à sept personnes, et j'en ai mené trois comme chef de projet. J'y ai appris à répartir le travail, à tenir des délais et à documenter mes choix pour que les autres puissent reprendre le code derrière moi.",
         "Plusieurs d'entre eux m'ont demandé de sortir du code : recueillir un besoin auprès d'un client, vulgariser un sujet technique pour un public qui ne l'est pas, ou rédiger en anglais un guide d'installation suffisamment précis pour être reproduit pas à pas.",
+        "Mon année chez Horizon Groupe m'a appris la rigueur d'un service technique : quatre postes en un an, de la réception du matériel à sa préparation pour des clients grands comptes. En 2026, j'ai aussi repris seul trois anciens projets d'équipe : audit du code, tests avant chaque correction, puis finitions.",
       ],
     },
   },
@@ -347,22 +348,21 @@ const en = {
     paragraphs: [
       "After a technology baccalaureate (STI2D), I spent three years in a TSI preparatory class in Chambéry. It taught me to sustain a heavy workload over time, to be rigorous, and how much helping one another changes teamwork. Moving on to the BUT in computer science took me from very theoretical teaching to learning by doing: a demanding shift, and one I enjoyed from the first year.",
       "In 2025-2026, I took a gap year to discover the working world. At Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large corporate clients, I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside, I kept building personal projects.",
-      "What I enjoy most is carrying a project from start to finish, from the need to an application that works. Web development remains my favourite field, but I am open to every kind of application development.",
-      "Outside computing, I enjoy music, video games and documentaries, especially investigative ones. Curious by nature, I like learning a little about everything, and I closely follow news about new technologies.",
+      "What I enjoy most is carrying a project from start to finish, from the need to an application that works. Arrow Block is one example: from the rules of the game and its twelve worlds to a playable online demo and an Android app.",
+      "Outside computing, I spend my time on music, video games and documentaries, especially investigative ones, and I closely follow news about new technologies.",
     ],
     facts: [
-      {
-        label: "Studies",
-        value: "BUT in computer science, 2nd year · IUT2 Grenoble",
-      },
-      { label: "Target role", value: "Web developer, and more broadly application developer" },
-      { label: "Diploma", value: "STI2D baccalaureate, SIN specialty, with honors (2020)" },
       {
         label: "Looking for",
         value:
           "Internship from April 19 to June 25, 2027 (extendable to July 9), then work-study in my 3rd year",
       },
-      { label: "Area", value: "Grenoble and surroundings, by public transport" },
+      {
+        label: "Studies",
+        value: "BUT in computer science, 2nd year · IUT2 Grenoble",
+      },
+      { label: "Target role", value: "Web developer, and more broadly application developer" },
+      { label: "Location", value: "Grenoble and surroundings, by public transport" },
     ],
     cta: "An internship or a work-study position to offer?",
   },
@@ -371,15 +371,17 @@ const en = {
     technical: {
       title: "Technical skills",
       paragraphs: [
-        "Through my projects and my studies, I have worked with several languages and development environments. On the web side, I use HTML, CSS, JavaScript and TypeScript, as well as PHP with the Symfony framework. This portfolio itself is built with Astro and Tailwind CSS. I have also developed in Java and Python for object-oriented programming, and in C++ for a more procedural approach. Finally, I handle data with SQL, with deeper experience of PostgreSQL.",
-        "As for tools, I use the JetBrains IDEs suited to these languages, along with Git and GitHub for version control and collaborative work.",
+        "Through my projects and my studies, I have worked with several languages and development environments. On the web side, I use HTML, CSS, JavaScript and TypeScript, as well as PHP with the Symfony framework. This portfolio itself is built with Astro and Tailwind CSS. I have built applications in Java, with JavaFX, in Python and in C++, and a 3D game, first for the web with three.js, then on Android with Flutter. On the data side, I write SQL, mostly with PostgreSQL, and analyze the results with R.",
+        "I work on Linux, where I have set up development workstations and Debian servers (Apache, PostgreSQL, PHP). I test my code with JUnit, integrate it continuously with GitHub Actions, and use Git and GitHub for version control and teamwork.",
+        "I also develop with an AI coding assistant, Claude: I frame each task, review and validate what it produces, and keep control of the technical choices. That is how I built Arrow Block.",
       ],
     },
     soft: {
       title: "Soft skills",
       paragraphs: [
-        "Most of my projects were team efforts, with two to seven people. They taught me to share the work, meet deadlines and document my choices so that others can pick up the code after me.",
+        "Most of my projects were team efforts, with two to seven people, and I led three of them as project lead. They taught me to share the work, meet deadlines and document my choices so that others can pick up the code after me.",
         "Several of them required me to step away from the code: gathering a client's requirements, explaining a technical topic to a non-technical audience, or writing an installation guide in English precise enough to be followed step by step.",
+        "My year at Horizon Groupe taught me the rigor of a technical department: four positions in a year, from receiving hardware to preparing it for large corporate clients. In 2026, I also took over three former team projects on my own: code audit, tests before each fix, then finishing touches.",
       ],
     },
   },

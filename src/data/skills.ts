@@ -16,7 +16,11 @@ import { withFrenchSpacing } from "../lib/typography";
  * En thème clair, les logos gardent ces mêmes couleurs vives. Seule une marque
  * dont la couleur disparaîtrait sur la tuile claire en porte une autre,
  * `colorLight` : c'est le cas du blanc de GitHub et de Symfony, du jaune de
- * JavaScript et du cyan de Tailwind CSS.
+ * JavaScript et de Linux, du cyan de Tailwind CSS et du bleu clair de Flutter.
+ *
+ * Vingt tuiles, soit cinq rangées pleines sur la grille de quatre colonnes,
+ * groupées par rangée : web, web et serveur, applications, données et système,
+ * outils. Une tuile en plus ou en moins laisse une rangée à trous.
  */
 export const technicalSkills: Skill[] = [
   { label: "HTML", icon: "simple-icons:html5", color: "#E34F26" },
@@ -78,6 +82,15 @@ export const technicalSkills: Skill[] = [
     lineArt: true,
   },
   { label: "Python", icon: "simple-icons:python", color: "#3776AB" },
+  // Le logo Flutter mêle deux bleus officiels. Le marine (#02569B) ne tient que
+  // 2,5:1 sur la tuile sombre : on y prend le bleu clair, et le marine en thème
+  // clair, où le bleu clair disparaîtrait.
+  {
+    label: "Flutter",
+    icon: "simple-icons:flutter",
+    color: "#54C5F8",
+    colorLight: "#02569B",
+  },
   // SQL n'a pas de logo — c'est une norme ISO. Le cylindre générique
   // (src/icons/database.svg) est le seul pictogramme non-marque de la grille,
   // posé pour que cette tuile ne soit plus la seule sans glyphe. Pas de `color`
@@ -95,13 +108,17 @@ export const technicalSkills: Skill[] = [
     color: "#4169E1",
     lineArt: true,
   },
-  // Le logo JetBrains est un dégradé noir/rose : on garde le rose.
+  { label: "R", icon: "simple-icons:r", color: "#276DC3" },
+  // Le jaune de Tux disparaît sur la tuile claire : en thème clair, il reprend
+  // le noir du manchot, comme Symfony. Tux est un dessin au trait : `lineArt`.
   {
-    label: "JetBrains",
-    short: "JB",
-    icon: "simple-icons:jetbrains",
-    color: "#FF318C",
+    label: "Linux",
+    icon: "simple-icons:linux",
+    color: "#FCC624",
+    colorLight: "#000000",
+    lineArt: true,
   },
+  { label: "JUnit", icon: "simple-icons:junit5", color: "#25A162" },
   { label: "Git", icon: "simple-icons:git", color: "#F05032" },
   // GitHub s'affiche en blanc sur fond sombre, son noir serait invisible ; en
   // thème clair, c'est l'inverse : il reprend le noir officiel de la marque.
@@ -111,29 +128,34 @@ export const technicalSkills: Skill[] = [
     color: "#FFFFFF",
     colorLight: "#181717",
   },
+  // Le développement avec une IA de code, comme sur Arrow Block. Les rayons fins
+  // du logo s'effaçaient à côté de leurs voisins : `lineArt` les épaissit.
+  { label: "Claude", icon: "simple-icons:claude", color: "#D97757", lineArt: true },
 ];
 
 export const softSkills: Skill[] = withFrenchSpacing([
   { label: "Travail en équipe", detail: "Projets de 2 à 7 personnes" },
-  { label: "Gestion de projet", detail: "Découpage, planning, délais" },
+  { label: "Gestion de projet", detail: "Chef de projet trois fois · planning, délais" },
   { label: "Recueil de besoins", detail: "Entretiens client, spécifications" },
-  { label: "Vulgarisation", detail: "Publics non techniques" },
-  { label: "Rédaction technique", detail: "Guides d'installation, rapports" },
-  { label: "Anglais", detail: "Niveau B2 · guides et rapports rédigés" },
+  { label: "Adaptabilité", detail: "Quatre postes en un an d'entreprise" },
+  { label: "Rigueur", detail: "Audit et qualification de matériel" },
+  { label: "Reprise de code", detail: "Audit, tests, puis corrections" },
   { label: "Autonomie", detail: "Projets menés seul de bout en bout" },
-  { label: "Documentation", detail: "Choix de conception justifiés" },
-  { label: "Analyse de données", detail: "Nettoyage SQL, visualisations" },
+  { label: "Vulgarisation", detail: "Publics non techniques" },
+  { label: "Rédaction technique", detail: "Guides, rapports, choix justifiés" },
+  { label: "Anglais", detail: "Niveau B2 · guides et rapports rédigés" },
 ]);
 
 /** Les mêmes compétences en anglais, dans le même ordre. */
 export const softSkillsEn: Skill[] = [
   { label: "Teamwork", detail: "Projects with 2 to 7 people" },
-  { label: "Project management", detail: "Task breakdown, planning, deadlines" },
+  { label: "Project management", detail: "Project lead three times · planning, deadlines" },
   { label: "Requirements gathering", detail: "Client interviews, specifications" },
-  { label: "Popularization", detail: "Non-technical audiences" },
-  { label: "Technical writing", detail: "Installation guides, reports" },
-  { label: "English", detail: "B2 level · guides and reports written" },
+  { label: "Adaptability", detail: "Four positions in a year of work" },
+  { label: "Rigor", detail: "Hardware audit and qualification" },
+  { label: "Taking over code", detail: "Audit, tests, then fixes" },
   { label: "Autonomy", detail: "Projects led alone from start to finish" },
-  { label: "Documentation", detail: "Justified design choices" },
-  { label: "Data analysis", detail: "SQL cleaning, visualizations" },
+  { label: "Popularization", detail: "Non-technical audiences" },
+  { label: "Technical writing", detail: "Guides, reports, justified choices" },
+  { label: "English", detail: "B2 level · guides and reports written" },
 ];
