@@ -231,17 +231,18 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
   clair) et l'accent argent devient un bleu acier. Les logos des compétences
   gardent leurs couleurs vives ; seule une marque qui disparaîtrait sur la tuile
-  claire en porte une autre (`colorLight` : le noir de GitHub et de Symfony, le
-  jaune assombri de JavaScript, le cyan assombri de Tailwind CSS).
+  claire en porte une autre (`colorLight` : le noir de GitHub, de Symfony et de
+  Linux, le marine de Flutter, le jaune assombri de JavaScript, le cyan assombri
+  de Tailwind CSS).
 - **Un réglage propre au clair** s'écrit avec la variante `light:` (définie
   dans `global.css`), par exemple `light:hover:bg-zinc-900`.
 
 ## 5. Tests
 
 ```sh
-npm test          # 766 tests, quelques secondes
+npm test          # 787 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 57 tests de bout en bout, une quarantaine de secondes
+npm run test:e2e  # 82 tests de bout en bout, une quarantaine de secondes
 ```
 
 Deux niveaux, qui se complètent :

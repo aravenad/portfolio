@@ -3,11 +3,12 @@
 Portfolio personnel de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : vingt-quatre pages HTML (douze en français, douze
-en anglais), une feuille de style et environ 28 Ko de JavaScript (9 Ko compressés).
-Ce JavaScript se limite au routeur de transitions d'Astro et à une dizaine de
-petits comportements (menu, navigation active, apparition au défilement, thème,
-plan du site, texte replié sur téléphone).
+Site entièrement statique : trente-deux pages HTML (seize en français, seize
+en anglais), une feuille de style et environ 43 Ko de JavaScript (20 Ko compressés).
+Ce JavaScript se limite au routeur de transitions d'Astro, à la trame de glyphes
+du fond et à une dizaine de petits comportements (menu, navigation active,
+apparition au défilement, thème, plan du site, texte replié sur téléphone, démo
+jouable).
 
 Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
 choix du visiteur, mémorisé d'une visite à l'autre.
@@ -197,8 +198,8 @@ bureau et sur téléphone. Les vérifications de mise en page mobile tournent à
 
 Les logos des compétences viennent de [Simple Icons](https://simpleicons.org)
 via `astro-icon` et sont inlinés au build. Ils s'affichent en tuiles
-(`SkillTile`) sur grand écran et en pastilles (`SkillChip`) sur téléphone ; les
-deux lisent leurs couleurs de marque par `brandStyle()`, dans `src/lib/skills.ts`. Pour un logo absent du jeu, déposer un
+(`SkillTile`, tramées en glyphes par `GlyphLogo`) sur grand écran et en
+pastilles (`SkillChip`) sur téléphone ; les deux lisent leurs couleurs de marque par `brandStyle()`, dans `src/lib/skills.ts`. Pour un logo absent du jeu, déposer un
 SVG dans `src/icons/` et le référencer par son nom de fichier, sans préfixe.
 Pour un logo d'organisation du parcours, déposer plutôt le fichier dans
 `public/logos/` et renseigner `logo:` dans `src/data/career.ts`.
