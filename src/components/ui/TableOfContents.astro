@@ -76,6 +76,9 @@ const title = "pl-4 text-sm font-semibold text-zinc-100";
             class:list={[
               title,
               "flex cursor-pointer list-none items-center justify-between gap-4 transition hover:text-white",
+              // La zone cliquable couvre le filet de part et d'autre (44 px au doigt)
+              // sans rien déplacer : le texte, lui, ne fait que 20 px de haut.
+              "relative after:absolute after:inset-x-0 after:-inset-y-3",
             ]}
           >
             {t.toc.title}

@@ -44,7 +44,8 @@ const pageLink = "whitespace-nowrap transition hover:text-zinc-200";
       </span>
     </p>
 
-    <ul class="flex items-center gap-6">
+    {/* Elle va à la ligne si le texte est agrandi (WCAG 1.4.4) : sinon toute la page défile en largeur. */}
+    <ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
       {
         socialLinks.map((link) => (
           <li>
