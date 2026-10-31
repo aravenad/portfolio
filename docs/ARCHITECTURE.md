@@ -34,7 +34,7 @@ justifie : ce document n'en donne que la carte.
 | `src/content/projects/` | Une fiche Markdown par projet ; `en/` : les mêmes en anglais | Schéma dans `src/content.config.ts`, vérifié au build |
 | `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination, CV public, données structurées | Sans DOM, couverte à 100 % |
 | `src/styles/global.css` | Thème Tailwind, calques du fond, utilitaires, rendu Markdown | Seule feuille de style globale |
-| `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS ou le code importent |
+| `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS, le code ou les fiches importent |
 | `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) ; `demos/` : les démos jouables, construites dans le dépôt de chaque projet | Nom stable : c'est lui qui fait l'URL. Ne jamais retoucher `demos/` à la main |
 | `tests/` | Vitest, rangé comme `src/` | Voir §5 |
 | `e2e/` | Playwright : le site construit, dans Chromium | Voir §5 |
@@ -240,7 +240,7 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 ## 5. Tests
 
 ```sh
-npm test          # 787 tests, quelques secondes
+npm test          # 806 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
 npm run test:e2e  # 82 tests de bout en bout, une quarantaine de secondes
 ```

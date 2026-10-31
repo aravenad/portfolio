@@ -105,6 +105,16 @@ n'était pas reliée à l'API sur toutes ses pages, son paiement n'avait jamais
   dans le navigateur. GitHub Actions lance les tests, l'analyse et le
   déploiement à chaque modification.
 
+## En images
+
+![Page d'accueil de Dauphinéo : une photo aérienne d'Hières-sur-Amby, la question « Que souhaitez-vous visiter ? », une barre de recherche et le bouton du questionnaire.](../../assets/projects/dauphineo/accueil-fr.webp "L'accueil de la démonstration, avec un bandeau qui rappelle que les données restent dans le navigateur.")
+
+![Page « Explorez le patrimoine » : 46 sites sur 46, triés par note, avec Saint-Véran, Saint-Antoine-l'Abbaye, Vienne et Mirmande en tête.](../../assets/projects/dauphineo/explorer-fr.webp "L'exploration des 46 sites, triés ici par note moyenne.")
+
+![Fenêtre « Nos recommandations » : Espeluche, Tallard et Revel-Tourdan, avec les thèmes de chacun cochés quand ils répondent au questionnaire.](../../assets/projects/dauphineo/recommandations-fr.webp "Les recommandations après le questionnaire, classées par le moteur local, chacune avec ses raisons.")
+
+![Formulaire « Réserver une visite guidée » à Grenoble : choix de la date, du créneau de 13 h à 17 h et du nombre de personnes, avec le total.](../../assets/projects/dauphineo/reservation-fr.webp "La réservation d'une visite : l'API vérifie le prix et les places restantes avant de l'accepter.")
+
 ## Résultats
 
 Dauphinéo couvre les cas d'utilisation principaux de notre conception :

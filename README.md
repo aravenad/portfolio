@@ -42,7 +42,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 766 tests
+npm test         # 806 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -57,7 +57,7 @@ l'un des deux échoue. Rien n'est publié non plus si les tests de bout en bout
 
 ```text
 src/
-├── assets/          images traitées par Vite (la matière du fond)
+├── assets/          images traitées par Vite (le fond, les captures des fiches)
 ├── components/
 │   ├── ui/          primitives réutilisables (Button, Card, Pagination…)
 │   ├── layout/      Header et Footer
@@ -139,6 +139,15 @@ learned: # techniques et savoir-faire acquis
 
 Le schéma est validé au build par `src/content.config.ts` : un champ manquant ou
 mal typé arrête la compilation.
+
+Une capture d'écran se place dans `src/assets/projects/<nom>/`, en WebP, et
+s'insère seule sur sa ligne avec un chemin relatif. Le texte entre crochets
+la décrit pour qui ne la voit pas ; le titre entre guillemets s'affiche dessous
+en légende (`src/lib/figures.ts`). Astro en calcule les dimensions au build.
+
+```md
+![Page d'accueil : la recherche et le questionnaire.](../../assets/projects/mon-projet/accueil-fr.webp "L'accueil du site.")
+```
 
 `role`, `competences` et `learned` sont les rubriques de la grille du PPP. Elles
 s'affichent à la suite du corps, avec leur entrée dans le sommaire, et seulement

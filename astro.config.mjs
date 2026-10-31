@@ -16,6 +16,8 @@ import { satteriFrenchSpacing } from './src/lib/typography.ts';
 
 import { satteriExternalLinks } from './src/lib/external-links.ts';
 
+import { satteriFigures } from './src/lib/figures.ts';
+
 // https://astro.build/config
 export default defineConfig({
   // Publié par GitHub Pages sous un domaine à soi : le site vit à la racine,
@@ -41,11 +43,12 @@ export default defineConfig({
   // Espace insécable devant « ; : ? ! » dans le corps des fiches, comme dans
   // les données (src/lib/typography.ts) : un signe ne part plus seul à la ligne.
   // Les liens vers un autre site s'y ouvrent dans un nouvel onglet, flèche à
-  // l'appui (src/lib/external-links.ts).
+  // l'appui (src/lib/external-links.ts). Une image seule et titrée devient une
+  // figure légendée (src/lib/figures.ts).
   markdown: {
     processor: satteri({
       mdastPlugins: [satteriFrenchSpacing],
-      hastPlugins: [satteriExternalLinks],
+      hastPlugins: [satteriExternalLinks, satteriFigures],
     }),
   },
 

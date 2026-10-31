@@ -100,6 +100,16 @@ been shut down.
   data and keeps the account, bookings and reviews in the browser. GitHub
   Actions runs the tests, the linting and the deployment on every change.
 
+## Screenshots
+
+![Dauphinéo home page: an aerial photo of Hières-sur-Amby, the question “What would you like to visit?”, a search bar and the questionnaire button.](../../../assets/projects/dauphineo/accueil-en.webp "The home page of the demo, with a banner reminding visitors that the data stays in their browser.")
+
+![The “Explore the heritage” page: 46 sites out of 46, sorted by rating, led by Saint-Véran, Saint-Antoine-l'Abbaye, Vienne and Mirmande.](../../../assets/projects/dauphineo/explorer-en.webp "Browsing the 46 sites, sorted here by average rating.")
+
+![The “Our recommendations” dialog: Espeluche, Tallard and Revel-Tourdan, each with the themes that match the questionnaire ticked.](../../../assets/projects/dauphineo/recommandations-en.webp "The recommendations after the questionnaire, ranked by the local engine, each with its reasons.")
+
+![The “Book a guided tour” form in Grenoble: picking a date, the 13:00 to 17:00 slot and the group size, with the total.](../../../assets/projects/dauphineo/reservation-en.webp "Booking a tour: the API checks the price and the remaining seats before accepting it.")
+
 ## Results
 
 Dauphinéo covers the main use cases of our design: site pages, browsing, the
