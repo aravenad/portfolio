@@ -5,7 +5,7 @@ tags: ["Java", "Algorithmique", "Optimisation", "Apprentissage automatique", "Te
 status: "termine"
 team: "En binôme"
 year: 2024
-order: 5
+order: 6
 cover: algo
 featured: false
 links:

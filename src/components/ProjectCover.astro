@@ -20,6 +20,10 @@ const { cover, class: className } = Astro.props;
  * Il suit `currentColor`, donc les deux thèmes sans règle à part ; le seul
  * détail mis en valeur prend la couleur d'accent.
  */
+/** Repère de carte dont la pointe touche (x, y) : tête ronde de rayon 10. */
+const pin = (x: number, y: number) =>
+  `M${x} ${y}c-6-7-10-12-10-17a10 10 0 0 1 20 0c0 5-4 10-10 17z`;
+
 const framing: Record<Cover, string> = {
   uml: "--cover-x: 22%; --cover-y: 38%",
   algo: "--cover-x: 70%; --cover-y: 30%",
@@ -30,6 +34,7 @@ const framing: Record<Cover, string> = {
   terminal: "--cover-x: 34%; --cover-y: 86%",
   calendar: "--cover-x: 62%; --cover-y: 78%",
   cube: "--cover-x: 40%; --cover-y: 44%",
+  map: "--cover-x: 90%; --cover-y: 24%",
 };
 ---
 
@@ -232,6 +237,30 @@ const framing: Record<Cover, string> = {
               stroke="currentColor"
             />
             <path d="M206.8 112.2l11.4 6.6M218.2 113.3v5.5h-9.5" class="text-accent" stroke="currentColor" />
+          </>
+        )}
+        {cover === "map" && (
+          <>
+            <path
+              d="M56 40 128 28l64 12 72-12v112l-72 12-64-12-72 12z"
+              class="fill-zinc-950/70"
+            />
+            <path d="M128 28v112M192 40v112" />
+            <path
+              d="M70 74c14-8 26 2 40-6M70 86c16-6 28 4 44-4M204 118c14-6 26 2 44-6M204 130c14-4 28 4 46-4"
+              class="opacity-50"
+            />
+            <path
+              d="M92 124c16-6 26-26 44-26s30 10 48-8 28-30 46-36"
+              stroke-dasharray="4 6"
+              class="opacity-70"
+            />
+            <path d={pin(92, 124)} class="fill-zinc-950" />
+            <circle cx="92" cy="107" r="3" />
+            <path d={pin(176, 92)} class="fill-zinc-950" />
+            <circle cx="176" cy="75" r="3" />
+            <path d={pin(232, 54)} class="fill-zinc-950 text-accent" stroke="currentColor" />
+            <circle cx="232" cy="37" r="3" class="fill-current text-accent" stroke="none" />
           </>
         )}
       </svg>

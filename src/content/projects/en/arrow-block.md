@@ -5,7 +5,7 @@ tags: ["JavaScript", "three.js", "Flutter", "Dart", "Android"]
 status: "en-cours"
 team: "Personal project"
 year: 2026
-order: 3
+order: 4
 cover: cube
 featured: true
 demo:

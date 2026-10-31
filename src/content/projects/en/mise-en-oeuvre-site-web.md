@@ -5,7 +5,7 @@ tags: ["HTML", "CSS", "Responsive design", "Eco-design", "Requirements gathering
 status: "termine"
 team: "Team of 4"
 year: 2024
-order: 6
+order: 7
 cover: web
 featured: true
 links:

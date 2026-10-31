@@ -5,7 +5,7 @@ tags: ["PostgreSQL", "SQL", "Modeling"]
 status: "termine"
 team: "In pairs"
 year: 2024
-order: 7
+order: 8
 cover: erd
 featured: true
 role:

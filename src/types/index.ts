@@ -21,7 +21,7 @@ export type Competence = (typeof COMPETENCES)[number];
  * Motifs dessinés sur la couverture d'une carte projet (ProjectCover.astro) :
  * diagramme de classes, barres d'un tri, fenêtre de navigateur, schéma
  * entités-associations, courbe, serveur en réseau, terminal, calendrier,
- * cube en 3D dont sort un petit cube fléché.
+ * cube en 3D dont sort un petit cube fléché, carte dépliée avec un itinéraire.
  */
 export const COVERS = [
   "uml",
@@ -33,6 +33,7 @@ export const COVERS = [
   "terminal",
   "calendar",
   "cube",
+  "map",
 ] as const;
 
 export type Cover = (typeof COVERS)[number];
