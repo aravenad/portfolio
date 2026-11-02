@@ -147,21 +147,44 @@ test.describe("accueil allégé", () => {
     const text = block.locator(".read-more-text");
     const height = () => text.evaluate((element) => element.getBoundingClientRect().height);
 
+    /*
+     * Clique, et mesure la hauteur au tiers de l'animation. Celle-ci part en
+     * pause et ne reprend qu'après la mesure : attendre un délai réel ne
+     * suffisait pas, une machine de CI chargée finissait parfois les 380 ms
+     * avant de mesurer.
+     */
+    const clickAndMeasureMidway = async () => {
+      await text.evaluate((element) => {
+        const animate = element.animate.bind(element);
+        element.animate = (...args) => {
+          element.animate = animate;
+          const animation = animate(...args);
+          animation.pause();
+          return animation;
+        };
+      });
+      await block.locator(":scope > button").click();
+      return text.evaluate((element) => {
+        const [animation] = element.getAnimations();
+        if (!animation) throw new Error("aucune animation en cours");
+        animation.currentTime = Number(animation.effect?.getTiming().duration) / 3;
+        const midway = element.getBoundingClientRect().height;
+        animation.play();
+        return midway;
+      });
+    };
+
     const collapsed = await height();
-    await block.locator(":scope > button").click();
-    await page.waitForTimeout(120);
 
     // En cours de route : ni l'ancienne hauteur, ni encore la nouvelle.
-    const midway = await height();
+    const midway = await clickAndMeasureMidway();
     expect(midway).toBeGreaterThan(collapsed);
     await expect(block).not.toHaveAttribute("data-collapsed");
     await expect.poll(() => text.evaluate((element) => element.getAnimations().length)).toBe(0);
     const open = await height();
     expect(midway).toBeLessThan(open);
 
-    await block.locator(":scope > button").click();
-    await page.waitForTimeout(120);
-    const closing = await height();
+    const closing = await clickAndMeasureMidway();
     expect(closing).toBeLessThan(open);
     expect(closing).toBeGreaterThan(collapsed);
 
