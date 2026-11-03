@@ -144,6 +144,9 @@ Une capture d'écran se place dans `src/assets/projects/<nom>/`, en WebP, et
 s'insère seule sur sa ligne avec un chemin relatif. Le texte entre crochets
 la décrit pour qui ne la voit pas ; le titre entre guillemets s'affiche dessous
 en légende (`src/lib/figures.ts`). Astro en calcule les dimensions au build.
+Sur la fiche, un clic l'agrandit en plein écran, où l'on peut zoomer
+(`src/components/ImageViewer.astro`) : une capture en 1600 px de large reste
+nette jusqu'à sa taille réelle.
 
 ```md
 ![Page d'accueil : la recherche et le questionnaire.](../../assets/projects/mon-projet/accueil-fr.webp "L'accueil du site.")

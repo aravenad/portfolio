@@ -133,6 +133,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 | Démo jouable chargée au clic, arrêtable, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
+| Captures agrandies au clic, zoom (molette, pincement, clic, clavier) et retour animé vers la miniature | `ImageViewer.astro` | `lib/viewer.ts`, `e2e/viewer.spec.ts` |
 | Trame de glyphes du fond, de ses échos, des couvertures, des logos et du survol des boutons | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro`, `ui/GlyphLogo.astro`, `ui/Button.astro` | `lib/glyph.ts` |
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous

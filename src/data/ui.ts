@@ -140,6 +140,18 @@ const fr = {
       frameTitle: (title: string) => `${title} : démo jouable`,
       solved: "Niveau réussi en {time} s.",
     },
+    /**
+     * La visionneuse des captures d'écran (ImageViewer.astro). `open` suit le
+     * texte alternatif dans le nom de chaque miniature devenue bouton.
+     */
+    viewer: {
+      label: "Capture agrandie",
+      open: "Agrandir l'image",
+      zoomIn: "Zoomer",
+      zoomOut: "Dézoomer",
+      level: "Niveau de zoom",
+      close: "Fermer",
+    },
     sections: {
       role: { slug: "mon-role", title: "Mon rôle" },
       competences: { slug: "competences-mobilisees", title: "Compétences mobilisées" },
@@ -425,6 +437,14 @@ const en = {
       loading: "Loading the demo…",
       frameTitle: (title: string) => `${title}: playable demo`,
       solved: "Level cleared in {time} s.",
+    },
+    viewer: {
+      label: "Enlarged screenshot",
+      open: "Enlarge the image",
+      zoomIn: "Zoom in",
+      zoomOut: "Zoom out",
+      level: "Zoom level",
+      close: "Close",
     },
     sections: {
       role: { slug: "my-role", title: "My role" },

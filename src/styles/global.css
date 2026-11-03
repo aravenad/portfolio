@@ -982,6 +982,53 @@ html {
   border: 1px solid var(--color-zinc-800);
 }
 
+/*
+ * Avec script, l'image d'une figure devient un bouton qui l'agrandit
+ * (ImageViewer.astro). Il garde la mise en page de l'image seule ; au survol,
+ * le liseré s'éclaire et une loupe apparaît dans le coin.
+ */
+.prose .figure-zoom {
+  cursor: zoom-in;
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.prose .figure-zoom img {
+  transition: border-color 0.2s ease-out;
+}
+
+.prose .figure-zoom:hover img {
+  border-color: var(--color-zinc-600);
+}
+
+/* Une pastille sombre dans les deux thèmes : elle se pose sur la capture, pas sur la page. */
+.prose .figure-zoom::after {
+  backdrop-filter: blur(4px);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M10.5 10.5 14 14M5 7h4M7 5v4'/%3E%3C/svg%3E")
+    center / 1rem no-repeat,
+    rgb(9 9 11 / 0.7);
+  border-radius: 9999px;
+  content: "";
+  height: 2.25rem;
+  opacity: 0;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  transform: scale(0.85);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+  width: 2.25rem;
+}
+
+.prose .figure-zoom:hover::after,
+.prose .figure-zoom:focus-visible::after {
+  opacity: 1;
+  transform: none;
+}
+
 .prose figcaption {
   color: var(--color-zinc-500);
   font-size: 0.875rem;

@@ -1,0 +1,212 @@
+---
+import { outlineButton } from "./ui/button-styles";
+import { useTranslations } from "../data/ui";
+import { getLang } from "../lib/i18n";
+
+/*
+ * La visionneuse des captures d'écran légendées d'une fiche (src/lib/figures.ts).
+ * Le script fait de chaque image de figure un bouton : un clic l'agrandit en
+ * plein écran, dans un `<dialog>` modal (focus piégé, Échap, fond inerte),
+ * où l'on peut zoomer et se déplacer (src/lib/viewer.ts).
+ *
+ * Sans script, ni bouton ni visionneuse : les captures restent de simples
+ * images, et le `<dialog>` fermé ne s'affiche pas.
+ */
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+
+const control = [
+  "inline-flex size-10 items-center justify-center rounded-lg transition disabled:pointer-events-none disabled:opacity-40",
+  outlineButton,
+];
+---
+
+<dialog
+  data-viewer
+  data-viewer-lang={lang}
+  data-viewer-open={t.projects.viewer.open}
+  aria-label={t.projects.viewer.label}
+  aria-describedby="viewer-caption"
+  class="image-viewer"
+>
+  <div data-viewer-backdrop class="image-viewer-backdrop"></div>
+
+  <div data-viewer-stage class="image-viewer-stage">
+    <img data-viewer-image alt="" draggable="false" decoding="async" />
+  </div>
+
+  <button
+    type="button"
+    data-viewer-close
+    data-viewer-chrome
+    autofocus
+    aria-label={t.projects.viewer.close}
+    class:list={[control, "absolute top-4 right-4 z-10"]}
+  >
+    <svg viewBox="0 0 16 16" aria-hidden="true" class="size-4 fill-none stroke-current stroke-[1.75]">
+      <path d="M3.5 3.5l9 9m0-9l-9 9" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <div
+    data-viewer-chrome
+    class="image-viewer-bar flex flex-col gap-3 px-4 pt-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-6"
+  >
+    <p id="viewer-caption" data-viewer-caption class="max-w-3xl text-sm leading-6 text-zinc-400"></p>
+
+    <div class="flex shrink-0 items-center gap-2 self-center">
+      <button
+        type="button"
+        data-viewer-zoom-out
+        aria-label={t.projects.viewer.zoomOut}
+        class:list={control}
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-4 fill-none stroke-current stroke-[1.75]">
+          <path d="M3 8h10" stroke-linecap="round" />
+        </svg>
+      </button>
+      <output
+        data-viewer-level
+        aria-label={t.projects.viewer.level}
+        class="w-14 text-center font-mono text-xs text-zinc-400 tabular-nums">100 %</output
+      >
+      <button
+        type="button"
+        data-viewer-zoom-in
+        aria-label={t.projects.viewer.zoomIn}
+        class:list={control}
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" class="size-4 fill-none stroke-current stroke-[1.75]">
+          <path d="M3 8h10M8 3v10" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /*
+   * Le `<dialog>` couvre toute la fenêtre, sans le cadre ni le fond du
+   * navigateur : le voile est un élément à lui (`-backdrop`), que le script
+   * fait apparaître en fondu. `::backdrop` ne s'anime pas partout.
+   */
+  .image-viewer {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    height: 100%;
+    inset: 0;
+    margin: 0;
+    max-height: none;
+    max-width: none;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    padding: 0;
+    width: 100%;
+  }
+
+  .image-viewer[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .image-viewer::backdrop {
+    background: transparent;
+  }
+
+  .image-viewer-backdrop {
+    backdrop-filter: blur(6px);
+    background: color-mix(in oklab, var(--color-zinc-950) 94%, transparent);
+    inset: 0;
+    position: absolute;
+  }
+
+  /*
+   * La scène, où l'image est ajustée (sa taille est posée par le script) et où
+   * se font les gestes. Elle ne coupe pas l'image : agrandie, celle-ci passe
+   * sous la barre et le bouton de fermeture, qui restent au-dessus.
+   */
+  .image-viewer-stage {
+    display: grid;
+    flex: 1;
+    margin: 4.5rem 1rem 0;
+    min-height: 0;
+    place-items: center;
+    position: relative;
+    touch-action: none;
+  }
+
+  .image-viewer-stage img {
+    border-radius: 12px;
+    cursor: zoom-in;
+    max-width: none;
+    transition: transform 0.28s cubic-bezier(0.33, 1, 0.68, 1);
+    user-select: none;
+    will-change: transform;
+  }
+
+  .image-viewer[data-zoomed] .image-viewer-stage img {
+    cursor: grab;
+  }
+
+  /* Pendant un glissement ou un pincement, l'image suit le doigt sans retard. */
+  .image-viewer[data-gesture] .image-viewer-stage img {
+    transition: none;
+  }
+
+  .image-viewer[data-zoomed][data-gesture] .image-viewer-stage img {
+    cursor: grabbing;
+  }
+
+  /* Un fond sous la barre : l'image agrandie passe dessous sans gêner la lecture. */
+  .image-viewer-bar {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(
+      to top,
+      var(--color-zinc-950) 40%,
+      color-mix(in oklab, var(--color-zinc-950) 0%, transparent)
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .image-viewer-stage img {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { onEachPage } from "../lib/enhance";
+  import { enhanceFigures, wireViewer } from "../lib/viewer";
+
+  /** Tout le câblage est dans src/lib/viewer.ts, où il est testé. */
+  onEachPage((signal) => {
+    const dialog = document.querySelector<HTMLDialogElement>("[data-viewer]");
+    const images = document.querySelectorAll<HTMLImageElement>(".prose figure > img");
+    if (!dialog || images.length === 0) return;
+
+    const part = <T extends HTMLElement>(name: string) =>
+      dialog.querySelector<T>(`[data-viewer-${name}]`)!;
+    const data = dialog.dataset;
+
+    wireViewer(
+      {
+        dialog,
+        backdrop: part("backdrop"),
+        stage: part("stage"),
+        image: part<HTMLImageElement>("image"),
+        caption: part("caption"),
+        zoomIn: part<HTMLButtonElement>("zoom-in"),
+        zoomOut: part<HTMLButtonElement>("zoom-out"),
+        close: part<HTMLButtonElement>("close"),
+        level: part("level"),
+        chrome: [...dialog.querySelectorAll<HTMLElement>("[data-viewer-chrome]")],
+      },
+      enhanceFigures(images, data.viewerOpen ?? ""),
+      window,
+      signal,
+      { lang: data.viewerLang ?? "fr" },
+    );
+  });
+</script>

@@ -6,6 +6,7 @@ import Badge from "../ui/Badge.astro";
 import Breadcrumb from "../ui/Breadcrumb.astro";
 import Button from "../ui/Button.astro";
 import Container from "../ui/Container.astro";
+import ImageViewer from "../ImageViewer.astro";
 import ProjectDemo from "../ProjectDemo.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -223,4 +224,7 @@ const meta = [team, year?.toString()].filter(Boolean);
       }
     </Container>
   </article>
+
+  {/* Agrandit les captures légendées du corps de la fiche, s'il y en a. */}
+  <ImageViewer />
 </BaseLayout>
