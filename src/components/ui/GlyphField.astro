@@ -128,21 +128,90 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
 
   const animationVoulue = () => root.dataset.glyph === "on";
 
+  /** Les couleurs de la palette, lues une fois par thème. */
+  let palette: string[] | undefined;
+
   function couleurs() {
-    const style = getComputedStyle(root);
-    return TEINTES.map((teinte) => style.getPropertyValue(`--glyph-${teinte}`).trim() || "#888");
+    if (!palette) {
+      const style = getComputedStyle(root);
+      palette = TEINTES.map((teinte) => style.getPropertyValue(`--glyph-${teinte}`).trim() || "#888");
+    }
+    return palette;
   }
 
+  /*
+   * Les atlas, partagés : les couvertures d'une page, ses boutons, ses échos
+   * ont la même taille de cellule et les mêmes couleurs. Une page de projets en
+   * rendait un par carte, à chaque navigation. Le thème les périme tous.
+   */
+  const atlasEnCache = new Map<string, CanvasImageSource>();
+
   function tuiles(pixels: number, toile: Toile) {
-    return imageDAtlas(pixels, [...couleurs(), ...(toile.logo?.couleurs() ?? [])]);
+    const teintes = [...couleurs(), ...(toile.logo?.couleurs() ?? [])];
+    const cle = `${pixels} ${teintes.join(" ")}`;
+    let image = atlasEnCache.get(cle);
+    if (!image) {
+      image = imageDAtlas(pixels, teintes);
+      atlasEnCache.set(cle, image);
+    }
+    return image;
+  }
+
+  function oublierAtlas() {
+    for (const image of atlasEnCache.values()) if ("close" in image) image.close();
+    atlasEnCache.clear();
+    palette = undefined;
+  }
+
+  /*
+   * Une surface loin de l'écran (couvertures du bas de la liste, logos du
+   * pied de page) n'est préparée que quand le navigateur a le temps, ou dès
+   * qu'elle approche : préparer toute une page d'un coup, juste après une
+   * navigation, faisait sauter des images au moment où la page apparaît.
+   */
+  const enAttente = new Map<Toile, HTMLImageElement>();
+  let attente = 0;
+  const quandLibre: (rappel: (delai?: IdleDeadline) => void) => number =
+    "requestIdleCallback" in window
+      ? (rappel) => requestIdleCallback(rappel, { timeout: 1500 })
+      : (rappel) => window.setTimeout(rappel, 120);
+
+  function differer(toile: Toile, source: HTMLImageElement) {
+    enAttente.set(toile, source);
+    attente ||= quandLibre(viderLAttente);
+  }
+
+  function viderLAttente(delai?: IdleDeadline) {
+    attente = 0;
+    for (const [toile, source] of enAttente) {
+      // Il en reste pour la prochaine pause.
+      if (delai && delai.timeRemaining() < 4 && !delai.didTimeout) break;
+      enAttente.delete(toile);
+      if (toiles.includes(toile)) construire(toile, source);
+      // Sans échéance, une surface par appel.
+      if (!delai) break;
+    }
+    if (enAttente.size > 0) attente = quandLibre(viderLAttente);
+  }
+
+  /** La surface est-elle à l'écran, ou à moins d'un écran de distance ? */
+  function proche(rect: DOMRect) {
+    return rect.bottom > -window.innerHeight && rect.top < 2 * window.innerHeight;
   }
 
   /** (Re)construit la grille d'une surface à sa taille actuelle, puis la peint. */
   async function preparer(toile: Toile) {
     const [source] = await Promise.all([toile.source(), police]);
+    if (!source) return;
+    enAttente.delete(toile);
+    if (toile.etat || proche(toile.canvas.parentElement!.getBoundingClientRect())) construire(toile, source);
+    else differer(toile, source);
+  }
+
+  function construire(toile: Toile, source: HTMLImageElement) {
     const boite = toile.canvas.parentElement!;
     const { width, height } = boite.getBoundingClientRect();
-    if (!source || width === 0 || height === 0) return;
+    if (width === 0 || height === 0) return;
 
     const ratio = window.devicePixelRatio || 1;
     const pixels = Math.max(1, Math.round(toile.cellule * ratio));
@@ -177,7 +246,8 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       tuiles: tuiles(pixels, toile),
       champ: toile.logo ? empreinte(donnees, colonnes, lignes) : champ(donnees, colonnes, lignes),
       codes: new Uint8Array(colonnes * lignes),
-      avant: new Uint8Array(colonnes * lignes).fill(255),
+      // Redimensionné, le canvas repart vierge : rien à effacer.
+      avant: new Uint8Array(colonnes * lignes),
       fige: false,
       marque: false,
     };
@@ -205,11 +275,11 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
 
   /** Repeint tout, de zéro : nouvelles couleurs ou nouvel état du réglage. */
   function repeindre(nouvellesCouleurs: boolean) {
+    if (nouvellesCouleurs) oublierAtlas();
     for (const toile of toiles) {
       const etat = toile.etat;
       if (!etat) continue;
       if (nouvellesCouleurs) {
-        if ("close" in etat.tuiles) etat.tuiles.close();
         etat.tuiles = tuiles(etat.pixels, toile);
         etat.avant.fill(255);
       }
@@ -316,6 +386,12 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
     });
     const vue = new IntersectionObserver(([entree]) => {
       toile.visible = entree.isIntersecting;
+      // Mise de côté, elle arrive à l'écran avant que le navigateur ait eu le temps.
+      const source = enAttente.get(toile);
+      if (toile.visible && source) {
+        enAttente.delete(toile);
+        construire(toile, source);
+      }
     });
 
     taille.observe(boite);
@@ -517,9 +593,20 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
     };
   }
 
-  // Le thème change les couleurs ; l'interrupteur, l'animation.
-  new MutationObserver((mutations) => {
-    repeindre(mutations.some((mutation) => mutation.attributeName === "data-theme"));
+  /*
+   * Le thème change les couleurs ; l'interrupteur, l'animation. À chaque
+   * navigation, le routeur retire puis remet les attributs de `<html>` : les
+   * mêmes valeurs reviennent, et rien n'est à repeindre. Les prendre pour un
+   * changement de thème repeignait toutes les surfaces au moment du swap.
+   */
+  let theme = root.dataset.theme;
+  let anime = root.dataset.glyph;
+  new MutationObserver(() => {
+    const nouvellesCouleurs = root.dataset.theme !== theme;
+    if (!nouvellesCouleurs && root.dataset.glyph === anime) return;
+    theme = root.dataset.theme;
+    anime = root.dataset.glyph;
+    repeindre(nouvellesCouleurs);
   }).observe(root, { attributes: true, attributeFilter: ["data-theme", "data-glyph"] });
 
   onEachPage((signal) => {

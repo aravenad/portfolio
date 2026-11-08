@@ -21,6 +21,7 @@ import {
   grille,
   imageDAtlas,
   lumiere,
+  lumieres,
   peindre,
   ton,
   trame,
@@ -125,6 +126,18 @@ describe("lumiere", () => {
     };
 
     expect(pic(0, 0)).toBeLessThan(pic(39, 39));
+  });
+
+  it("se calcule aussi pour toute une grille, à l'identique", () => {
+    const [colonnes, lignes] = [37, 23];
+    for (const temps of [0, 1.7, BALAYAGE / 2, 13.2]) {
+      const grilleEntiere = lumieres(colonnes, lignes, temps, new Float64Array(colonnes * lignes));
+      for (let y = 0; y < lignes; y++) {
+        for (let x = 0; x < colonnes; x++) {
+          expect(grilleEntiere[y * colonnes + x]).toBeCloseTo(lumiere(x, y, colonnes, lignes, temps), 9);
+        }
+      }
+    }
   });
 
   it("reste discrète : jamais plus d'un quart de luminance", () => {
@@ -312,11 +325,34 @@ describe("peindre", () => {
 
     // La seconde ligne seule : les cellules 2 et 3.
     expect(peindre(pinceau, {} as CanvasImageSource, codes, avant, 2, 8, 2, 4)).toBe(2);
-    expect(pinceau.effaces).toEqual([
-      [0, 8, 8, 8],
-      [8, 8, 8, 8],
-    ]);
+    // Les deux cellules voisines s'effacent d'un seul trait.
+    expect(pinceau.effaces).toEqual([[0, 8, 16, 8]]);
     expect([...avant]).toEqual([255, 255, 3, 4]);
+  });
+
+  it("n'efface rien sur un canvas vierge", () => {
+    const pinceau = fakePinceau();
+    const avant = new Uint8Array(4);
+    const codes = new Uint8Array([1, 0, 0, 2]);
+
+    expect(peindre(pinceau, {} as CanvasImageSource, codes, avant, 2, 8)).toBe(2);
+    expect(pinceau.effaces).toEqual([]);
+    expect(pinceau.copies).toHaveLength(2);
+  });
+
+  it("efface d'un trait chaque suite de cellules changées, ligne par ligne", () => {
+    const pinceau = fakePinceau();
+    const avant = new Uint8Array([1, 1, 1, 1, 1, 1, 1, 1]);
+    const codes = new Uint8Array([2, 2, 1, 2, 2, 2, 2, 2]);
+
+    expect(peindre(pinceau, {} as CanvasImageSource, codes, avant, 4, 8)).toBe(7);
+    // Ligne 1 : deux suites, coupées par la cellule inchangée. Ligne 2 : une.
+    expect(pinceau.effaces).toEqual([
+      [0, 0, 16, 8],
+      [24, 0, 8, 8],
+      [0, 8, 32, 8],
+    ]);
+    expect([...avant]).toEqual([...codes]);
   });
 });
 

@@ -142,6 +142,47 @@ export function lumiere(x: number, y: number, colonnes: number, lignes: number, 
 }
 
 /**
+ * Au-delà de cet écart au centre du reflet (en largeurs de reflet), son éclat
+ * tombe sous le milliardième de luminance : la trame ne calcule pas
+ * l'exponentielle.
+ */
+const PORTEE_REFLET = 4.5;
+
+/**
+ * `lumiere` pour toute une grille, dans `sortie`. Même calcul, sans le
+ * refaire cellule par cellule : la houle est le produit d'un sinus par colonne
+ * et d'un sinus par ligne, et le reflet n'est calculé que dans sa bande.
+ * Vingt-sept mille cellules douze fois par seconde, pour le fond seul.
+ */
+export function lumieres(colonnes: number, lignes: number, temps: number, sortie: Float64Array): Float64Array {
+  const centre = -0.25 + 1.5 * ((temps / BALAYAGE) % 1);
+  const phase = (2 * Math.PI * temps) / BALAYAGE;
+  const houleX = new Float64Array(colonnes);
+  for (let x = 0; x < colonnes; x++) houleX[x] = 0.05 * Math.sin(x * 0.23 + 2 * phase);
+
+  for (let y = 0; y < lignes; y++) {
+    const houleY = Math.sin(y * 0.31 - phase);
+    const decalage = 0.6 * (y / lignes);
+    const ligne = y * colonnes;
+    for (let x = 0; x < colonnes; x++) {
+      const ecart = ((x / colonnes + decalage) / 1.6 - centre) / 0.09;
+      const reflet = ecart > PORTEE_REFLET || ecart < -PORTEE_REFLET ? 0 : 0.18 * Math.exp(-(ecart ** 2));
+      sortie[ligne + x] = reflet + houleX[x] * houleY;
+    }
+  }
+
+  return sortie;
+}
+
+/** Un tampon de lumière par taille de grille, réutilisé d'une image à l'autre. */
+let tampon = new Float64Array(0);
+
+function eclats(colonnes: number, lignes: number, temps: number): Float64Array {
+  if (tampon.length < colonnes * lignes) tampon = new Float64Array(colonnes * lignes);
+  return lumieres(colonnes, lignes, temps, tampon);
+}
+
+/**
  * Le code d'une cellule : `teinte * 8 + glyphe`, ou 0 pour une cellule vide.
  * Un octet suffit, et deux images se comparent cellule par cellule.
  */
@@ -161,11 +202,12 @@ export function trame(
 ): Uint8Array {
   const { colonnes, lignes, luminance, saturation } = source;
   const marches = RAMPE.length - 1;
+  const lumiere = temps === null ? null : eclats(colonnes, lignes, temps);
 
   for (let y = 0; y < lignes; y++) {
     for (let x = 0; x < colonnes; x++) {
       const i = y * colonnes + x;
-      const eclat = temps === null ? 0 : lumiere(x, y, colonnes, lignes, temps);
+      const eclat = lumiere === null ? 0 : lumiere[i];
       const t = ton(luminance[i] + eclat, niveaux);
       const seuil = (BAYER4[y & 3][x & 3] + 0.5) / 16;
       const glyphe = clamp(Math.floor(t * marches + seuil), 0, marches);
@@ -235,12 +277,13 @@ export function trameLogo(
 ): Uint8Array {
   const { colonnes, lignes, encre, accent } = source;
   const marches = RAMPE.length - 1;
+  const lumiere = temps === null ? null : eclats(colonnes, lignes, temps);
 
   for (let y = 0; y < lignes; y++) {
     for (let x = 0; x < colonnes; x++) {
       const i = y * colonnes + x;
       const modele = 1 - 0.18 * (x / colonnes + y / lignes);
-      const eclat = temps === null ? 0 : 1.5 * lumiere(x, y, colonnes, lignes, temps);
+      const eclat = lumiere === null ? 0 : 1.5 * lumiere[i];
       const t = ton(encre[i] * (modele + eclat), NIVEAUX_LOGO);
       const seuil = (BAYER4[y & 3][x & 3] + 0.5) / 16;
       const glyphe = clamp(Math.floor(t * marches + seuil), 0, marches);
@@ -330,7 +373,11 @@ export function imageDAtlas(cellule: number, couleurs: readonly string[]): Canva
  * Peint les cellules de `codes` qui diffèrent de `avant`, puis met `avant` à
  * jour. D'une image à la suivante, seule une partie de la grille change : le
  * reste n'est pas repeint. Un `avant` rempli de 255, code impossible, force à
- * tout peindre.
+ * tout peindre ; rempli de 0, il dit le canvas vierge.
+ *
+ * Chaque appel au canvas compte : des dizaines de milliers par seconde pour le
+ * fond. Les cellules voisines qui changent sur une même ligne sont effacées
+ * d'un seul `clearRect`, et pas du tout si elles étaient déjà vides.
  *
  * `debut` et `fin` bornent les cellules parcourues, pour peindre par tranches.
  *
@@ -347,23 +394,39 @@ export function peindre(
   fin = codes.length,
 ): number {
   let repeintes = 0;
+  let i = debut;
 
-  for (let i = debut; i < fin; i++) {
-    const valeur = codes[i];
-    if (valeur === avant[i]) continue;
-
-    const x = (i % colonnes) * cellule;
-    const y = Math.floor(i / colonnes) * cellule;
-
-    pinceau.clearRect(x, y, cellule, cellule);
-    if (valeur !== 0) {
-      const glyphe = valeur % RAMPE.length;
-      const teinte = (valeur - glyphe) / RAMPE.length;
-      pinceau.drawImage(tuiles, glyphe * cellule, teinte * cellule, cellule, cellule, x, y, cellule, cellule);
+  while (i < fin) {
+    if (codes[i] === avant[i]) {
+      i++;
+      continue;
     }
 
-    avant[i] = valeur;
-    repeintes++;
+    // Une suite de cellules changées, sans passer à la ligne suivante.
+    const ligne = Math.floor(i / colonnes);
+    const finDeLigne = Math.min(fin, (ligne + 1) * colonnes);
+    let j = i;
+    let effacer = false;
+    while (j < finDeLigne && codes[j] !== avant[j]) {
+      if (avant[j] !== 0) effacer = true;
+      j++;
+    }
+
+    const y = ligne * cellule;
+    if (effacer) pinceau.clearRect((i - ligne * colonnes) * cellule, y, (j - i) * cellule, cellule);
+    for (let k = i; k < j; k++) {
+      const valeur = codes[k];
+      if (valeur !== 0) {
+        const glyphe = valeur % RAMPE.length;
+        const teinte = (valeur - glyphe) / RAMPE.length;
+        const x = (k - ligne * colonnes) * cellule;
+        pinceau.drawImage(tuiles, glyphe * cellule, teinte * cellule, cellule, cellule, x, y, cellule, cellule);
+      }
+      avant[k] = valeur;
+    }
+
+    repeintes += j - i;
+    i = j;
   }
 
   return repeintes;

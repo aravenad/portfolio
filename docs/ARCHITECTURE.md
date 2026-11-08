@@ -211,6 +211,12 @@ s'arrête hors écran. Les teintes sont les variables `--glyph-*` de
 panneau de réglages pose `<html data-glyph="off">` (clé `glyph`) : chaque
 surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 `prefers-reduced-motion`.
+Pour le coût : l'atlas de glyphes est partagé par toutes les surfaces de même
+taille et de mêmes teintes (vidé au changement de thème) ; une surface loin de
+la fenêtre n'est construite qu'au repos (`requestIdleCallback`), ou dès qu'elle
+approche ; les effacements d'une ligne sont fusionnés en un seul `clearRect` ;
+et l'observateur de `<html>` ignore la réécriture des attributs par le routeur
+quand ni le thème ni `data-glyph` n'ont changé.
 
 ### Thèmes
 
