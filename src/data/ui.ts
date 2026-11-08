@@ -170,6 +170,32 @@ const fr = {
       "en-cours": "En cours",
       "a-venir": "À venir",
     } satisfies Record<ProjectStatus, string>,
+    /**
+     * Les filtres de la liste (ProjectsList.astro, src/lib/project-filters.ts).
+     * Les compétences y prennent leur verbe seul : le libellé du PN ne tient
+     * pas dans une liste déroulante. `count` suit les règles de pluriel de la
+     * langue : en français, 0 et 1 sont au singulier.
+     */
+    filters: {
+      label: "Filtrer les projets",
+      status: "Statut",
+      competence: "Compétence",
+      tag: "Technologie",
+      anyStatus: "Tous les statuts",
+      anyCompetence: "Toutes les compétences",
+      anyTag: "Toutes les technologies",
+      reset: "Effacer les filtres",
+      count: { one: "{count} projet sur {total}", other: "{count} projets sur {total}" },
+      empty: "Aucun projet ne répond à tous ces filtres.",
+      competences: {
+        realiser: "Réaliser",
+        optimiser: "Optimiser",
+        administrer: "Administrer",
+        gerer: "Gérer",
+        conduire: "Conduire",
+        collaborer: "Collaborer",
+      } satisfies Record<Competence, string>,
+    },
   },
 
   contact: {
@@ -483,6 +509,26 @@ const en = {
       termine: "Completed",
       "en-cours": "In progress",
       "a-venir": "Upcoming",
+    },
+    filters: {
+      label: "Filter the projects",
+      status: "Status",
+      competence: "Skill",
+      tag: "Technology",
+      anyStatus: "Any status",
+      anyCompetence: "Any skill",
+      anyTag: "Any technology",
+      reset: "Clear the filters",
+      count: { one: "{count} project of {total}", other: "{count} projects of {total}" },
+      empty: "No project matches all these filters.",
+      competences: {
+        realiser: "Develop",
+        optimiser: "Optimise",
+        administrer: "Administer",
+        gerer: "Manage",
+        conduire: "Lead",
+        collaborer: "Collaborate",
+      } satisfies Record<Competence, string>,
     },
   },
 

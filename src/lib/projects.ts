@@ -19,7 +19,10 @@ export type Project = CollectionEntry<"projects"> | CollectionEntry<"projectsEn"
 export const PROJECTS_PER_PAGE = 6;
 
 export interface ProjectsPage {
+  /** Les projets de la page. */
   projects: Project[];
+  /** Tous les projets, dans l'ordre : les filtres de la liste cherchent dedans. */
+  all: Project[];
   currentPage: number;
   totalPages: number;
 }
@@ -45,6 +48,7 @@ export async function getProjectsPage(
 
   return {
     projects: projects.slice(start, start + PROJECTS_PER_PAGE),
+    all: projects,
     currentPage: page,
     totalPages,
   };

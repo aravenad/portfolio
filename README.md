@@ -8,7 +8,10 @@ en anglais), une feuille de style et environ 43 Ko de JavaScript (20 Ko compress
 Ce JavaScript se limite au routeur de transitions d'Astro, à la trame de glyphes
 du fond et à une dizaine de petits comportements (menu, navigation active,
 apparition au défilement, thème, plan du site, texte replié sur téléphone, démo
-jouable).
+jouable, filtres des projets).
+
+La liste des projets se filtre par statut, par compétence du PN et par
+technologie ; un lien filtré (`/projects/?competence=optimiser`) s'ouvre filtré.
 
 Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
 choix du visiteur, mémorisé d'une visite à l'autre.
@@ -47,7 +50,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 934 tests
+npm test         # 954 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```

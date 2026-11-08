@@ -357,7 +357,13 @@ describe("ProjectsPreview", () => {
 });
 
 describe("ProjectsList", () => {
-  const page = { projects: fixtureProjects.slice(0, 6), currentPage: 1, totalPages: 2 };
+  const page = {
+    projects: fixtureProjects.slice(0, 6),
+    all: fixtureProjects,
+    currentPage: 1,
+    totalPages: 2,
+  };
+  const shown = (body: Element) => body.querySelectorAll("[data-project-list] > li:not([hidden])");
 
   it("porte le h1 de la page projets", async () => {
     const { body } = await render(ProjectsList, { props: page });
@@ -366,7 +372,52 @@ describe("ProjectsList", () => {
 
   it("affiche une carte par projet de la page", async () => {
     const { body } = await render(ProjectsList, { props: page });
-    expect(body.querySelectorAll("ul > li h2")).toHaveLength(6);
+    expect(shown(body)).toHaveLength(6);
+    expect([...shown(body)].every((li) => li.querySelector("h2"))).toBe(true);
+  });
+
+  // Les filtres cherchent dans tous les projets : ceux des autres pages sont
+  // là, masqués, et marqués comme tels.
+  it("porte aussi les projets des autres pages, masqués", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    const off = body.querySelectorAll("[data-project-list] > li[hidden]");
+
+    expect(off).toHaveLength(1);
+    expect(off[0].hasAttribute("data-off-page")).toBe(true);
+    expect(off[0].querySelector("h2")?.textContent).toContain("Projet 7");
+    expect(body.querySelectorAll("li:not([hidden])[data-off-page]")).toHaveLength(0);
+  });
+
+  it("décrit chaque carte pour les filtres : statut, compétences, étiquettes", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    const [first, , third] = body.querySelectorAll<HTMLElement>("[data-project-list] > li");
+
+    expect(first.dataset.status).toBe("en-cours");
+    expect(first.dataset.tags).toBe("Java|SQL");
+    expect(first.dataset.competences).toBe("");
+    // Ses AC sont dans le désordre : les compétences suivent l'ordre du PN.
+    expect(third.dataset.competences).toBe("realiser collaborer");
+  });
+
+  it("ne propose que les choix présents dans les fiches", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    const options = (key: string) =>
+      [...body.querySelectorAll(`select[data-filter="${key}"] option`)].map((o) => o.textContent);
+
+    expect(options("status")).toEqual(["Tous les statuts", "Terminé", "En cours"]);
+    expect(options("competence")).toEqual(["Toutes les compétences", "Réaliser", "Collaborer"]);
+    expect(options("tag")).toEqual(["Toutes les technologies", "Java (4)", "PHP (3)", "SQL (4)"]);
+  });
+
+  // Sans script, des filtres qui ne filtrent rien n'ont pas à paraître.
+  it("masque les filtres et leur décompte jusqu'au script", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    const filters = body.querySelector("[data-project-filters]");
+
+    expect(filters?.hasAttribute("hidden")).toBe(true);
+    expect(filters?.getAttribute("role")).toBe("search");
+    expect(filters?.querySelector('[role="status"]')).not.toBeNull();
+    expect(body.querySelector("[data-filters-empty]")?.hasAttribute("hidden")).toBe(true);
   });
 
   // RGAA 9.1 : sous le h1 de la page, les cartes sont des h2, sans saut.
@@ -381,8 +432,9 @@ describe("ProjectsList", () => {
   });
 
   it("cache la pagination quand tout tient sur une page", async () => {
+    const three = fixtureProjects.slice(0, 3);
     const { body } = await render(ProjectsList, {
-      props: { projects: fixtureProjects.slice(0, 3), currentPage: 1, totalPages: 1 },
+      props: { projects: three, all: three, currentPage: 1, totalPages: 1 },
     });
 
     expect(body.querySelector("[data-pagination]")).toBeNull();

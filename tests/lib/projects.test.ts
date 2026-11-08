@@ -62,6 +62,8 @@ describe("getProjectsPage", () => {
     expect(first.projects).toHaveLength(PROJECTS_PER_PAGE);
     expect(first.totalPages).toBe(2);
     expect(first.currentPage).toBe(1);
+    // Les filtres de la liste cherchent dans tous les projets, page ou non.
+    expect(first.all).toHaveLength(PROJECTS_PER_PAGE + 2);
 
     const second = await getProjectsPage(2);
     expect(second.projects.map((p) => p.id)).toEqual([

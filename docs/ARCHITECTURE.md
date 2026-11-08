@@ -145,6 +145,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Bouton de retour en haut | `ui/BackToTop.astro` | `lib/back-to-top.ts` |
 | Copie de l'adresse e-mail à côté du lien `mailto:`, adresse affichée si la copie est refusée | `ui/CopyButton.astro` | `lib/copy.ts`, `e2e/contact.spec.ts` |
 | Glissement de la page active | `ui/Pagination.astro` | `lib/pagination.ts` |
+| Filtres de la liste des projets (statut, compétence, technologie), gardés dans l'adresse | `sections/ProjectsList.astro` | `lib/project-filters.ts`, `e2e/pages.spec.ts` |
 | Sommaire des fiches et curseur de lecture | `ui/TableOfContents.astro` | `lib/toc.ts` |
 | Bouton de thème, front de glyphes qui descend puis remonte | `layout/Header.astro` | `lib/theme.ts`, `lib/theme-front.ts` |
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
@@ -156,6 +157,14 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Démo jouable chargée au clic, arrêtable, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
 | Captures agrandies au clic, zoom (molette, pincement, clic, clavier) et retour animé vers la miniature | `ImageViewer.astro` | `lib/viewer.ts`, `e2e/viewer.spec.ts` |
 | Trame de glyphes du fond, de ses échos, des couvertures, des logos et du survol des boutons | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro`, `ui/GlyphLogo.astro`, `ui/Button.astro` | `lib/glyph.ts` |
+
+**Filtres des projets.** Chaque page de la liste porte toutes les fiches,
+celles des autres pages masquées (`data-off-page`) : sans script, rien ne
+change. Le script montre trois listes déroulantes, cherche dans tous les
+projets dès qu'un critère est choisi et masque alors la pagination. Les
+critères vont dans l'adresse (`?competence=optimiser`) par `replaceState`, pour
+qu'un lien filtré se partage. Les choix proposés sont ceux que les fiches
+contiennent.
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une

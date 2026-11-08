@@ -3,15 +3,65 @@ import ProjectCard from "../ProjectCard.astro";
 import Container from "../ui/Container.astro";
 import Pagination from "../ui/Pagination.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
+import { outlineButton } from "../ui/button-styles";
 import { useTranslations } from "../../data/ui";
+import { groupAc } from "../../lib/competences";
 import { getLang } from "../../lib/i18n";
+import { TAG_SEPARATOR } from "../../lib/project-filters";
 import { getProjectsPageHref, type ProjectsPage } from "../../lib/projects";
+import { COMPETENCES, type ProjectStatus } from "../../types";
 
 type Props = ProjectsPage;
 
-const { projects, currentPage, totalPages } = Astro.props;
+const { projects, all, currentPage, totalPages } = Astro.props;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
+const f = t.projects.filters;
+
+/*
+  Chaque page porte toutes les fiches : celles des autres pages sont masquées
+  (`data-off-page`), et les filtres les font apparaître. Sans script, la page
+  reste ses six cartes et sa pagination.
+*/
+const onPage = new Set(projects.map((project) => project.id));
+const competencesOf = (project: (typeof all)[number]) =>
+  groupAc(project.data.ac).map((group) => group.competence);
+
+// Les choix de chaque filtre : seulement ce que les fiches contiennent.
+const statuses = (Object.keys(t.projects.status) as ProjectStatus[]).filter((status) =>
+  all.some((project) => project.data.status === status),
+);
+const competences = COMPETENCES.filter((competence) =>
+  all.some((project) => competencesOf(project).includes(competence)),
+);
+const tagCounts = new Map<string, number>();
+for (const project of all)
+  for (const tag of project.data.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+const tags = [...tagCounts].sort(([a], [b]) => a.localeCompare(b, lang, { sensitivity: "base" }));
+
+const fields = [
+  {
+    key: "status",
+    label: f.status,
+    any: f.anyStatus,
+    options: statuses.map((status) => ({ value: status, label: t.projects.status[status] })),
+  },
+  {
+    key: "competence",
+    label: f.competence,
+    any: f.anyCompetence,
+    options: competences.map((competence) => ({
+      value: competence,
+      label: f.competences[competence],
+    })),
+  },
+  {
+    key: "tag",
+    label: f.tag,
+    any: f.anyTag,
+    options: tags.map(([tag, count]) => ({ value: tag, label: `${tag} (${count})` })),
+  },
+];
 ---
 
 <section class="py-16 sm:py-20" aria-labelledby="projects-title">
@@ -24,17 +74,86 @@ const t = useTranslations(lang);
       description={t.projects.listDescription}
     />
 
-    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project) => (
-        <li>
+    {/*
+      Les filtres, masqués sans script. Des listes déroulantes plutôt que des
+      étiquettes à cliquer : une trentaine de technologies, la plupart sur une
+      seule fiche, auraient fait un mur de pastilles. Le décompte est une zone
+      `role="status"`, lue aux lecteurs d'écran à chaque changement.
+    */}
+    <div
+      data-project-filters
+      data-count-one={f.count.one}
+      data-count-other={f.count.other}
+      data-total={all.length}
+      role="search"
+      aria-label={f.label}
+      hidden
+      class="mt-12"
+    >
+      <div class="grid gap-4 sm:grid-cols-3">
+        {fields.map((field) => (
+          <label class="flex flex-col gap-1.5 text-sm text-zinc-400">
+            {field.label}
+            <span class="relative">
+              <select
+                name={field.key}
+                data-filter={field.key}
+                class="w-full cursor-pointer appearance-none rounded-lg border border-zinc-700/80 bg-zinc-900 py-2.5 pr-10 pl-3 text-sm text-zinc-200 transition hover:border-zinc-600"
+              >
+                <option value="">{field.any}</option>
+                {field.options.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-zinc-500"
+              >
+                <path d="m4 6 4 4 4-4" />
+              </svg>
+            </span>
+          </label>
+        ))}
+      </div>
+
+      <div class="mt-4 flex min-h-10 flex-wrap items-center justify-between gap-4">
+        <p role="status" data-filters-count class="text-sm text-zinc-500"></p>
+        <button
+          type="button"
+          data-filters-reset
+          hidden
+          class:list={["rounded-lg px-4 py-2 text-sm text-zinc-200 transition", outlineButton]}
+        >
+          {f.reset}
+        </button>
+      </div>
+    </div>
+
+    <ul data-project-list class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {all.map((project) => (
+        <li
+          data-status={project.data.status}
+          data-competences={competencesOf(project).join(" ")}
+          data-tags={project.data.tags.join(TAG_SEPARATOR)}
+          data-off-page={onPage.has(project.id) ? undefined : ""}
+          hidden={!onPage.has(project.id)}
+        >
           <ProjectCard project={project} headingLevel={2} />
         </li>
       ))}
     </ul>
 
+    <p data-filters-empty hidden class="mt-12 text-center text-zinc-400">{f.empty}</p>
+
     {
       totalPages > 1 && (
-        <div class="mt-16 flex flex-col items-center gap-4">
+        <div data-projects-pagination class="mt-16 flex flex-col items-center gap-4">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -49,3 +168,85 @@ const t = useTranslations(lang);
     }
   </Container>
 </section>
+
+<script>
+  import { onEachPage } from "../../lib/enhance";
+  import {
+    FILTER_KEYS,
+    applyFilters,
+    countLabel,
+    filtersQuery,
+    isActive,
+    parseFilters,
+    type ProjectFilters,
+  } from "../../lib/project-filters";
+
+  /** Filtrage et décompte : voir src/lib/project-filters.ts, où ils sont testés. */
+  onEachPage((signal) => {
+    const root = document.querySelector<HTMLElement>("[data-project-filters]");
+    const list = document.querySelector<HTMLElement>("[data-project-list]");
+    const count = root?.querySelector<HTMLElement>("[data-filters-count]");
+    const reset = root?.querySelector<HTMLButtonElement>("[data-filters-reset]");
+    if (!root || !list || !count || !reset) return;
+
+    const items = [...list.querySelectorAll<HTMLElement>(":scope > li")];
+    const empty = document.querySelector<HTMLElement>("[data-filters-empty]");
+    const pagination = document.querySelector<HTMLElement>("[data-projects-pagination]");
+    const selects = Object.fromEntries(
+      FILTER_KEYS.map((key) => [
+        key,
+        root.querySelector<HTMLSelectElement>(`select[data-filter="${key}"]`)!,
+      ]),
+    ) as Record<keyof ProjectFilters, HTMLSelectElement>;
+    const total = Number(root.dataset.total);
+    const templates = { one: root.dataset.countOne ?? "", other: root.dataset.countOther ?? "" };
+
+    const read = (): ProjectFilters => ({
+      status: selects.status.value,
+      competence: selects.competence.value,
+      tag: selects.tag.value,
+    });
+
+    const show = (filters: ProjectFilters) => {
+      const active = isActive(filters);
+      const shown = applyFilters(items, filters);
+
+      count.textContent = active ? countLabel(shown, total, templates, document.documentElement.lang) : "";
+      reset.hidden = !active;
+      if (empty) empty.hidden = shown > 0;
+      if (pagination) pagination.hidden = active;
+    };
+
+    // Les filtres de l'adresse, s'il y en a ; une valeur inconnue est ignorée.
+    const initial = parseFilters(location.search);
+    for (const key of FILTER_KEYS) {
+      const select = selects[key];
+      select.value = initial[key];
+      if (select.value !== initial[key]) select.value = "";
+    }
+    root.hidden = false;
+    show(read());
+
+    const update = () => {
+      const filters = read();
+      show(filters);
+      // L'état du ClientRouter vit dans `history.state` : on le garde.
+      history.replaceState(
+        history.state,
+        "",
+        `${location.pathname}${filtersQuery(filters)}${location.hash}`,
+      );
+    };
+
+    root.addEventListener("change", update, { signal });
+    reset.addEventListener(
+      "click",
+      () => {
+        for (const select of Object.values(selects)) select.value = "";
+        update();
+        selects.status.focus();
+      },
+      { signal },
+    );
+  });
+</script>

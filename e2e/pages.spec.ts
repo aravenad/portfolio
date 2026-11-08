@@ -175,6 +175,54 @@ test("la pagination change de page et y place l'indicateur", async ({ page }) =>
     .toBeLessThanOrEqual(1);
 });
 
+test("les filtres cherchent dans toutes les pages et se gardent dans l'adresse", async ({ page }) => {
+  await page.goto("projects/");
+  const cards = page.locator("[data-project-list] > li:visible");
+  const pagination = page.locator("[data-projects-pagination]");
+  const count = page.locator("[data-filters-count]");
+  await expect(cards).toHaveCount(6);
+
+  // Huit projets terminés, répartis sur les deux pages : la page 1 les montre tous.
+  await page.getByLabel("Statut").selectOption("termine");
+  await expect(cards).toHaveCount(8);
+  await expect(count).toHaveText("8 projets sur 11");
+  await expect(pagination).toBeHidden();
+  await expect(page).toHaveURL(/\/projects\/\?status=termine$/);
+
+  // Deux critères ensemble : il faut répondre aux deux.
+  await page.getByLabel("Technologie").selectOption("Java");
+  await expect(cards).toHaveCount(2);
+
+  await page.getByRole("button", { name: "Effacer les filtres" }).click();
+  await expect(cards).toHaveCount(6);
+  await expect(count).toBeEmpty();
+  await expect(pagination).toBeVisible();
+  await expect(page).toHaveURL(/\/projects\/$/);
+  await expect(page.getByLabel("Statut")).toBeFocused();
+});
+
+test("un lien filtré s'ouvre filtré, même sur une autre page", async ({ page }) => {
+  // Le stage à venir est en tête de la page 1 ; la page 2 le trouve quand même.
+  await page.goto("projects/page/2/?status=a-venir&tag=inconnue");
+  const cards = page.locator("[data-project-list] > li:visible");
+
+  await expect(page.getByLabel("Statut")).toHaveValue("a-venir");
+  // Une valeur que la liste ne propose pas est ignorée plutôt que de tout vider.
+  await expect(page.getByLabel("Technologie")).toHaveValue("");
+  await expect(cards).toHaveCount(1);
+  await expect(cards.locator("h2")).toHaveText("Stage de développement");
+  await expect(page.locator("[data-filters-empty]")).toBeHidden();
+});
+
+test("les filtres disent quand rien ne répond", async ({ page }) => {
+  await page.goto("projects/?status=a-venir");
+
+  await page.getByLabel("Compétence").selectOption("administrer");
+  await expect(page.locator("[data-project-list] > li:visible")).toHaveCount(0);
+  await expect(page.locator("[data-filters-empty]")).toBeVisible();
+  await expect(page.locator("[data-filters-count]")).toHaveText("0 projet sur 11");
+});
+
 test("le sommaire des mentions légales mène à chaque partie, sous le header", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("legal");
