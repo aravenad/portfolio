@@ -1,6 +1,7 @@
 ---
 import Breadcrumb from "../ui/Breadcrumb.astro";
 import Container from "../ui/Container.astro";
+import SettingSwitch from "../ui/SettingSwitch.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
@@ -14,6 +15,9 @@ import { getLang } from "../../lib/i18n";
  * Ce qu'exige l'article 1-1 de la LCEN d'un éditeur non professionnel : le nom
  * et l'adresse de l'hébergeur. Le nom de l'éditeur et son e-mail vont au-delà,
  * par choix ; son adresse postale et son téléphone restent privés.
+ *
+ * La mesure d'audience (src/lib/analytics.ts) a sa propre partie, avec
+ * l'interrupteur qui permet de la refuser.
  */
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
@@ -26,6 +30,7 @@ const tocHeadings = [
   { slug: "legal-host", text: legal.host.title },
   { slug: "legal-domain", text: legal.domain.title },
   { slug: "legal-privacy", text: legal.privacy.title },
+  { slug: "legal-analytics", text: legal.privacy.analytics.title },
   { slug: "legal-credits", text: legal.credits.title },
 ].map((heading) => ({ ...heading, depth: 2 }));
 
@@ -110,6 +115,25 @@ const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 tra
             </div>
           </section>
 
+          <section aria-labelledby="legal-analytics">
+            <h2 id="legal-analytics" class={heading}>{legal.privacy.analytics.title}</h2>
+            <div class={body}>
+              {legal.privacy.analytics.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+              <p>
+                {legal.privacy.analytics.refusal}{" "}
+                <a href={site.analytics.privacy} rel="noreferrer" class={link}>{legal.privacy.analytics.policy}</a>.
+              </p>
+              {/*
+                Caché sans JavaScript : rien n'est alors compté, et l'interrupteur
+                ne pourrait rien enregistrer. Le script l'affiche avec son état.
+              */}
+              <div data-count-box hidden class="rounded-xl border border-zinc-800 p-1 text-zinc-300">
+                <SettingSwitch attribute="data-count-toggle" label={legal.privacy.analytics.toggle} />
+                <p class="px-3 pb-2 text-sm leading-6 text-zinc-500">{legal.privacy.analytics.toggleHint}</p>
+              </div>
+            </div>
+          </section>
+
           <section aria-labelledby="legal-credits">
             <h2 id="legal-credits" class={heading}>{legal.credits.title}</h2>
             <div class={body}>
@@ -121,3 +145,30 @@ const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 tra
     </Container>
   </article>
 </BaseLayout>
+
+<script>
+  /*
+   * L'interrupteur de la mesure d'audience : activé tant que le visiteur n'a
+   * pas refusé. Le refus se garde sous la clé de GoatCounter (`skipgc`), que
+   * le compteur de BaseLayout lit avant chaque page vue.
+   */
+  import { onEachPage } from "../../lib/enhance";
+  import { isCounted, saveCounted } from "../../lib/analytics";
+
+  onEachPage((signal) => {
+    const box = document.querySelector<HTMLElement>("[data-count-box]");
+    const button = box?.querySelector<HTMLButtonElement>("[data-count-toggle]");
+    if (!box || !button) return;
+
+    const store = () => localStorage;
+    const show = (counted: boolean) => button.setAttribute("aria-pressed", String(counted));
+
+    show(isCounted(store));
+    box.hidden = false;
+    button.addEventListener(
+      "click",
+      () => show(saveCounted(store, button.getAttribute("aria-pressed") !== "true")),
+      { signal },
+    );
+  });
+</script>

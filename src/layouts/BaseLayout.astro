@@ -467,5 +467,52 @@ const ogImage = image
         signal.addEventListener("abort", () => observer.disconnect());
       });
     </script>
+
+    <script>
+      import {
+        COUNT_DOMAIN,
+        COUNT_ENDPOINT,
+        SKIP_KEY,
+        countUrl,
+        externalReferrer,
+        shouldCount,
+      } from "../lib/analytics";
+
+      /**
+       * La mesure d'audience : une page vue par affichage, transitions du
+       * routeur comprises (voir src/lib/analytics.ts). Seule la première page
+       * d'une visite a une provenance : `document.referrer` ne change pas
+       * quand le routeur enchaîne les pages.
+       */
+      let referrer = externalReferrer(document.referrer, COUNT_DOMAIN);
+
+      document.addEventListener("astro:page-load", () => {
+        let skip: string | null = null;
+        try {
+          skip = localStorage.getItem(SKIP_KEY);
+        } catch {
+          // Stockage refusé : aucun refus n'a pu y être mémorisé.
+        }
+
+        const counted = shouldCount({
+          hostname: location.hostname,
+          domain: COUNT_DOMAIN,
+          skip,
+          doNotTrack: navigator.doNotTrack,
+          globalPrivacyControl: (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl,
+          webdriver: navigator.webdriver,
+        });
+        if (!counted) return;
+
+        new Image().src = countUrl(COUNT_ENDPOINT, {
+          path: location.pathname,
+          title: document.title,
+          referrer,
+          width: screen.width,
+          random: Math.random().toString(36).slice(2),
+        });
+        referrer = "";
+      });
+    </script>
   </body>
 </html>

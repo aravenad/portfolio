@@ -34,8 +34,10 @@ mail.
 
 Les mentions légales (`/legal`, liées depuis le pied de page) nomment l'éditeur,
 son contact, l'hébergeur (GitHub Pages) et le bureau d'enregistrement du domaine
-(Infomaniak), et disent ce que le site garde des visiteurs : rien hors du
-navigateur. Éditeur non professionnel, Damien n'y publie ni adresse
+(Infomaniak), et ce que le site garde des visiteurs : aucun cookie, et une
+mesure d'audience par GoatCounter, anonyme, que l'interrupteur de la page
+permet de refuser. Pour ne pas compter ses propres visites : cet interrupteur,
+ou `localStorage.skipgc = "t"` dans la console. Éditeur non professionnel, Damien n'y publie ni adresse
 postale ni téléphone, comme le permet l'article 1-1 de la LCEN.
 
 La page « Comment ce site est fait » (`/colophon`, liée depuis le pied de page)
@@ -56,7 +58,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 973 tests
+npm test         # 985 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 npm run budget   # tailles du build face à leurs plafonds, après build

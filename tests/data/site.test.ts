@@ -25,7 +25,7 @@ describe("informations du site", () => {
   });
 
   it("ne pointe vers l'extérieur qu'en HTTPS", () => {
-    for (const url of [site.github, site.linkedin, site.repository]) {
+    for (const url of [site.github, site.linkedin, site.repository, site.analytics.url, site.analytics.privacy]) {
       expect(new URL(url).protocol).toBe("https:");
     }
   });

@@ -47,6 +47,15 @@ export const site = {
     url: "https://www.infomaniak.com",
   },
   /**
+   * La mesure d'audience, que les mentions légales décrivent. Le code du
+   * compte et le domaine compté sont dans src/lib/analytics.ts.
+   */
+  analytics: {
+    name: "GoatCounter",
+    url: "https://www.goatcounter.com",
+    privacy: "https://www.goatcounter.com/help/privacy",
+  },
+  /**
    * Le dernier audit RGAA, que reprend la page Accessibilité. Mené avec Ara
    * (DINUM) ; le rapport public se met à jour avec l'audit. À revoir à chaque
    * nouvel audit : date, chiffres et version du référentiel.

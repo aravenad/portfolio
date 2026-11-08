@@ -240,7 +240,7 @@ const fr = {
     title: "Mentions légales",
     metaTitle: `Mentions légales | ${site.author}`,
     metaDescription:
-      "Mentions légales du portfolio de Damien Aravena Bravo : éditeur, contact, hébergeur et données personnelles.",
+      "Mentions légales du portfolio de Damien Aravena Bravo : éditeur, contact, hébergeur, données personnelles et mesure d'audience.",
     publisher: {
       title: "Éditeur",
       text: "Ce site est édité à titre personnel et non professionnel par Damien Aravena Bravo, étudiant en BUT Informatique, qui en est aussi le directeur de la publication.",
@@ -264,10 +264,23 @@ const fr = {
     privacy: {
       title: "Données personnelles",
       paragraphs: [
-        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et ne charge aucun service tiers : polices et images sont servies par le site lui-même.",
-        "Votre navigateur garde quelques réglages, qui n'en sortent jamais : vos choix du thème, de l'animation des titres et de celle du fond, ainsi que votre progression et vos réglages dans la démo d'Arrow Block si vous y jouez (stockage local), pour les retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
-        "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre. Vous pouvez demander à tout moment leur suppression, à la même adresse, et adresser une réclamation à la CNIL.",
+        "Ce site ne dépose aucun cookie et ne charge aucun script tiers : polices et images sont servies par le site lui-même.",
+        "Votre navigateur garde quelques réglages, qui n'en sortent jamais : vos choix du thème, de l'animation des titres et de celle du fond, votre refus d'être compté si vous l'avez exprimé, ainsi que votre progression et vos réglages dans la démo d'Arrow Block si vous y jouez (stockage local), pour les retrouver à la visite suivante, et, le temps de la visite, la dernière page consultée de la liste des projets (stockage de session), pour animer la pagination.",
+        "Les e-mails envoyés à l'éditeur ne servent qu'à vous répondre et sont supprimés une fois l'échange terminé.",
+        "Le responsable de ces traitements est l'éditeur. Vous pouvez exercer vos droits d'accès, de rectification, d'effacement, de limitation et d'opposition (articles 15 à 21 du RGPD) en lui écrivant à la même adresse, et adresser une réclamation à la CNIL (cnil.fr).",
       ],
+      analytics: {
+        title: "Mesure d'audience",
+        paragraphs: [
+          "Pour savoir combien de personnes lisent le site, et quelles pages, il compte les pages vues avec GoatCounter, un outil de mesure d'audience sans cookie. À chaque page, il lui transmet l'adresse de la page, son titre, le site d'où vous venez (sans ses paramètres) et la largeur de votre écran ; GoatCounter en déduit votre navigateur, votre système, votre langue et votre pays.",
+          "GoatCounter n'enregistre ni votre adresse IP, ni l'identité complète de votre navigateur, ni aucun identifiant. Pour ne compter qu'une fois une même visite, il les garde seulement en mémoire, au plus 8 heures, sans jamais les écrire sur disque. Les statistiques qui en sortent sont anonymes, ne servent qu'à l'éditeur, ne sont ni croisées avec d'autres données ni transmises à des tiers, et sont conservées au plus 25 mois.",
+          "Ce traitement repose sur l'intérêt légitime de l'éditeur à savoir si son site est lu (article 6.1.f du RGPD). Aucun traceur n'est déposé sur votre appareil pour cela : seul votre refus, si vous l'exprimez, y est gardé. GoatCounter, exploité par Martin Tournoij depuis l'Irlande, héberge les données chez Hetzner, en Finlande et en Allemagne : elles ne quittent pas l'Union européenne.",
+        ],
+        refusal: "Rien n'est envoyé si votre navigateur demande à ne pas être suivi (Do Not Track, Global Privacy Control), ni si vous désactivez l'interrupteur ci-dessous. Voir aussi la",
+        policy: "politique de confidentialité de GoatCounter",
+        toggle: "Compter mes visites",
+        toggleHint: "Votre choix reste dans ce navigateur.",
+      },
       hostLogs: "Comme tout hébergeur, GitHub enregistre l'adresse IP des visiteurs à des fins de sécurité. Voir sa",
       hostPolicy: "déclaration de confidentialité",
     },
@@ -570,7 +583,7 @@ const en = {
     title: "Legal notice",
     metaTitle: `Legal notice | ${site.author}`,
     metaDescription:
-      "Legal notice for Damien Aravena Bravo's portfolio: publisher, contact, host and personal data.",
+      "Legal notice for Damien Aravena Bravo's portfolio: publisher, contact, host, personal data and audience measurement.",
     publisher: {
       title: "Publisher",
       text: "This site is published in a personal, non-professional capacity by Damien Aravena Bravo, a computer science student (BUT), who is also its director of publication.",
@@ -594,10 +607,23 @@ const en = {
     privacy: {
       title: "Personal data",
       paragraphs: [
-        "This site sets no cookies, uses no analytics and loads no third-party service: fonts and images are served by the site itself.",
-        "Your browser keeps a few settings, which never leave it: your choices of theme, title animation and background animation, plus your progress and settings in the Arrow Block demo if you play it (local storage), so they are there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
-        "Emails sent to the publisher are only used to reply to you. You can ask for their deletion at any time, at the same address, and lodge a complaint with the CNIL, the French data protection authority.",
+        "This site sets no cookies and loads no third-party scripts: fonts and images are served by the site itself.",
+        "Your browser keeps a few settings, which never leave it: your choices of theme, title animation and background animation, your refusal to be counted if you gave it, plus your progress and settings in the Arrow Block demo if you play it (local storage), so they are there on your next visit, and, for the length of the visit, the last page of the project list you viewed (session storage), to animate the pagination.",
+        "Emails sent to the publisher are only used to reply to you and are deleted once the exchange is over.",
+        "The controller of this processing is the publisher. You can exercise your rights of access, rectification, erasure, restriction and objection (articles 15 to 21 of the GDPR) by writing to him at the same address, and lodge a complaint with the CNIL, the French data protection authority (cnil.fr).",
       ],
+      analytics: {
+        title: "Audience measurement",
+        paragraphs: [
+          "To know how many people read the site, and which pages, it counts page views with GoatCounter, a cookieless analytics tool. On each page, it sends it the page address, its title, the site you came from (without its parameters) and your screen width; GoatCounter derives your browser, operating system, language and country from them.",
+          "GoatCounter records neither your IP address, nor your browser's full identification, nor any identifier. To count the same visit only once, it only keeps them in memory, for 8 hours at most, and never writes them to disk. The resulting statistics are anonymous, only used by the publisher, neither combined with other data nor passed on to third parties, and kept for 25 months at most.",
+          "This processing is based on the publisher's legitimate interest in knowing whether the site is read (article 6.1.f of the GDPR). No tracker is stored on your device for it: only your refusal, if you give it, is kept there. GoatCounter, run by Martin Tournoij from Ireland, hosts the data with Hetzner, in Finland and Germany: it does not leave the European Union.",
+        ],
+        refusal: "Nothing is sent if your browser asks not to be tracked (Do Not Track, Global Privacy Control), or if you turn off the switch below. See also",
+        policy: "GoatCounter's privacy policy",
+        toggle: "Count my visits",
+        toggleHint: "Your choice stays in this browser.",
+      },
       hostLogs: "Like any host, GitHub logs visitors' IP addresses for security purposes. See its",
       hostPolicy: "privacy statement",
     },

@@ -18,10 +18,10 @@ import { gzipSync } from "node:zlib";
  * un commit qui dit pourquoi.
  */
 export const LIMITS = {
-  // Tout le JavaScript du site, toutes pages confondues (57,5 Ko, 25,2 Ko gzip).
+  // Tout le JavaScript du site, toutes pages confondues (59 Ko, 26,2 Ko gzip).
   js: 70 * 1024,
   jsGzip: 30 * 1024,
-  // La feuille de style, la même pour toutes les pages (13,8 Ko gzip).
+  // La feuille de style, la même pour toutes les pages (13,9 Ko gzip).
   cssGzip: 17 * 1024,
   // La page HTML la plus lourde, l'accueil (27,8 Ko gzip).
   htmlGzip: 34 * 1024,

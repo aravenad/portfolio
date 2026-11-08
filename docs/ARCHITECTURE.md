@@ -32,7 +32,7 @@ justifie : ce document n'en donne que la carte.
 | `src/components/layout/` | Header et footer ; le footer ouvre le plan du site par-dessus la page (`popover`) | Persistés entre les pages (`transition:persist`) |
 | `src/data/` | Contenu éditable en TypeScript ; `ui.ts` : tous les textes de l'interface | Chaque contenu a sa version anglaise à côté (`…En`), vérifiée par `tests/data/` |
 | `src/content/projects/` | Une fiche Markdown par projet ; `en/` : les mêmes en anglais | Schéma dans `src/content.config.ts`, vérifié au build |
-| `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination, CV public, données structurées | Sans DOM, couverte à 100 % |
+| `src/lib/` | Logique pure : URL, langues, thème, projets, navigation, sommaire, pagination, CV public, données structurées, mesure d'audience | Sans DOM, couverte à 100 % |
 | `src/styles/global.css` | Thème Tailwind, calques du fond, utilitaires, rendu Markdown | Seule feuille de style globale |
 | `src/assets/` | Images traitées par Vite (URL empreintée) | Celles que le CSS, le code ou les fiches importent |
 | `public/` | Fichiers servis tels quels (CV, favicon, images d'aperçu) ; `demos/` : les démos jouables, construites dans le dépôt de chaque projet | Nom stable : c'est lui qui fait l'URL. Ne jamais retoucher `demos/` à la main |
@@ -152,12 +152,23 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
+| Page vue comptée par GoatCounter, sur le vrai domaine seulement | `layouts/BaseLayout.astro` | `lib/analytics.ts`, `e2e/analytics.spec.ts` |
+| Refus d'être compté, depuis les mentions légales | `pages/LegalPage.astro` | `lib/analytics.ts`, `e2e/analytics.spec.ts` |
 | Plan du site (`popover` natif) refermé en suivant un de ses liens | `layout/Footer.astro` | Tests de composant, `e2e/footer.spec.ts` |
 | Texte replié sous lg (« Lire la suite » / « Réduire »), ouverture et fermeture animées | `ui/ReadMore.astro` | `e2e/mobile.spec.ts`, `e2e/pages.spec.ts` |
 | Couleur de marque des pastilles à l'appui (écouteur pour Safari iOS) | `sections/Skills.astro` | `e2e/mobile.spec.ts` |
 | Démo jouable chargée au clic, arrêtable, hauteur et niveaux réussis suivis par messages | `ProjectDemo.astro` | `lib/demo.ts`, `e2e/demo.spec.ts` |
 | Captures agrandies au clic, zoom (molette, pincement, clic, clavier) et retour animé vers la miniature | `ImageViewer.astro` | `lib/viewer.ts`, `e2e/viewer.spec.ts` |
 | Trame de glyphes du fond, de ses échos, des couvertures, des logos et du survol des boutons | `ui/GlyphField.astro`, `ui/GlyphEchoes.astro`, `ui/GlyphLogo.astro`, `ui/Button.astro` | `lib/glyph.ts` |
+
+**Mesure d'audience.** GoatCounter, sans cookie ni script tiers : à chaque
+page, BaseLayout demande lui-même l'image de 1 pixel de son API `/count`
+(adresse, titre, provenance externe sans ses paramètres, largeur d'écran). Rien ne part hors de
+`damien-aravena.fr` (dev, aperçu, tests), sous Do Not Track ou Global Privacy
+Control, ni après un refus (`localStorage`, clé `skipgc`, celle de GoatCounter).
+Le code du compte est dans `COUNT_ENDPOINT` (`src/lib/analytics.ts`).
+Les mentions légales en donnent ce que demande l'article 13 du RGPD : base
+légale, destinataire, hébergement dans l'UE, conservation de 25 mois au plus.
 
 **Filtres des projets.** Chaque page de la liste porte toutes les fiches,
 celles des autres pages masquées (`data-off-page`) : sans script, rien ne

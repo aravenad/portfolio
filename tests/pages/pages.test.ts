@@ -627,6 +627,35 @@ describe("mentions légales", () => {
     expect(meta(document, "description")).toContain("hébergeur");
   });
 
+  it("décrivent la mesure d'audience et permettent de la refuser", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+    const section = document.querySelector('[aria-labelledby="legal-analytics"]');
+    const text = section?.textContent ?? "";
+
+    expect(text).toContain("GoatCounter");
+    expect(text).toContain("sans cookie");
+    expect(text).toContain("Do Not Track");
+    expect(section?.querySelector(`a[href="${site.analytics.privacy}"]`)).toBeTruthy();
+    // Ce que l'article 13 du RGPD demande : base légale, destinataire, lieu
+    // d'hébergement, durée de conservation.
+    const plain = text.replace(/[  ]/g, " ");
+    expect(plain).toContain("article 6.1.f du RGPD");
+    expect(plain).toContain("Martin Tournoij");
+    expect(plain).toContain("Union européenne");
+    expect(plain).toContain("25 mois");
+    // Et les droits des personnes, pour tous les traitements du site.
+    const privacy = document.querySelector('[aria-labelledby="legal-privacy"]')?.textContent ?? "";
+    expect(privacy.replace(/[\u00a0\u202f]/g, " ")).toContain("articles 15 à 21 du RGPD");
+    // L'ancienne promesse, « aucun outil de mesure d'audience », a disparu.
+    expect(document.body.textContent).not.toContain("aucun outil de mesure");
+
+    // L'interrupteur attend le script : sans lui, rien n'est compté.
+    const box = section?.querySelector("[data-count-box]");
+    expect(box?.hasAttribute("hidden")).toBe(true);
+    expect(box?.querySelector("button[data-count-toggle]")?.getAttribute("aria-pressed")).toBe("false");
+    expect(box?.textContent).toContain("Compter mes visites");
+  });
+
   it("n'emploient aucune ancre de l'accueil, que la barre surveille", async () => {
     const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
 
@@ -645,6 +674,9 @@ describe("mentions légales", () => {
     expect(document.querySelector('a[href*="privacy-statement"]')?.getAttribute("href"))
       .toContain("docs.github.com/en/");
     expect(document.body.textContent).toContain("Switzerland");
+    expect(document.querySelector('[aria-labelledby="legal-analytics"]')?.textContent).toContain(
+      "Count my visits",
+    );
   });
 });
 
@@ -709,7 +741,7 @@ describe("sommaire des pages d'information", () => {
     const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
     const ids = [...document.querySelectorAll("article h2")].map((h2) => `#${h2.id}`);
 
-    expect(ids).toHaveLength(6);
+    expect(ids).toHaveLength(7);
     expect(toc(document)).toEqual(ids);
   });
 

@@ -127,10 +127,10 @@ export const colophon: Colophon = withFrenchSpacing({
         rows: [
           {
             item: "JavaScript, tout le site",
-            from: "57,5 Ko (25,2 Ko compressé)",
+            from: "59 Ko (26,2 Ko compressé)",
             to: "70 Ko (30 Ko compressé)",
           },
-          { item: "Feuille de style, compressée", from: "13,8 Ko", to: "17 Ko" },
+          { item: "Feuille de style, compressée", from: "13,9 Ko", to: "17 Ko" },
           { item: "Page la plus lourde, compressée", from: "27,8 Ko", to: "34 Ko" },
           { item: "Plus grosse image", from: "417 Ko", to: "500 Ko" },
         ],
@@ -227,10 +227,10 @@ export const colophonEn = {
         rows: [
           {
             item: "JavaScript, whole site",
-            from: "57.5 KB (25.2 KB compressed)",
+            from: "59 KB (26.2 KB compressed)",
             to: "70 KB (30 KB compressed)",
           },
-          { item: "Stylesheet, compressed", from: "13.8 KB", to: "17 KB" },
+          { item: "Stylesheet, compressed", from: "13.9 KB", to: "17 KB" },
           { item: "Heaviest page, compressed", from: "27.8 KB", to: "34 KB" },
           { item: "Largest image", from: "417 KB", to: "500 KB" },
         ],
