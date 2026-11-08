@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "og": "node tools/og-projects/render.mjs"
+    "og": "node tools/og-projects/render.mjs",
+    "budget": "node tools/budget/check.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.4.6",

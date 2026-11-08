@@ -377,7 +377,7 @@ test ───┤            ├──> deploy
 | Job | Fait | Échoue si |
 | :--- | :--- | :--- |
 | `test` | `npm ci`, `npm audit --omit=dev --audit-level=high`, `npm run coverage` | Faille haute ou critique dans une dépendance de production, test rouge, couverture sous 80 % |
-| `build` | `withastro/action` : installe, construit, dépose `dist/` comme artefact Pages | Erreur de build, dont une fiche projet invalide |
+| `build` | `withastro/action` : installe, construit, dépose `dist/` comme artefact Pages ; puis le budget de performance (`tools/budget/`) | Erreur de build, dont une fiche projet invalide ; site construit au-dessus d'un plafond de taille |
 | `e2e` | `npm ci`, installe Chromium, `npm run test:e2e` (construit et sert le site lui-même) | Test de bout en bout rouge ; une relance est tentée avant d'échouer. Les traces des essais ratés, même rattrapés, sont publiées (`playwright-traces`, 7 jours) |
 | `deploy` | `actions/deploy-pages` publie l'artefact de `build`, une fois `e2e` passé | Jamais lancé sur une pull request |
 
@@ -410,6 +410,14 @@ test ───┤            ├──> deploy
 | `og.html` | Source de l'image d'aperçu `public/og-v5.png` (§6) |
 | `og-projects/` | La page des cartes d'aperçu des fiches et leur rendu, `npm run og` (§6) |
 | `chrome-fade/` | Source et script de rendu du masque de fondu du fond |
+| `budget/` | Le budget de performance, `npm run budget` après un build, et en CI |
+
+**Budget de performance.** `budget/budget.mjs` mesure `dist/` : JavaScript
+total (brut et gzip), CSS gzip, page HTML la plus lourde et plus grosse image
+servie (les JPEG, cartes d'aperçu, sont exclus). Chaque poste a un plafond,
+15 à 20 % au-dessus de sa taille de novembre 2026 ; un dépassement fait
+échouer le job `build`, donc le déploiement. Relever un plafond se fait dans
+un commit qui dit pourquoi.
 
 Le dossier `tools/` ne contient dans le dépôt que ces sources. L'ancien fond
 (`background-archive/`, commit `7b8785d`) et l'étude du fond (`metal-study/`)

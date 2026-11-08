@@ -110,6 +110,12 @@ jobs:
         # exige >= 22.12.0, les deux conviennent.
         uses: withastro/action@a8b97df764791eb61fbf3338ef713b0e61ae05c5 # v6
 
+      - name: Budget
+        # Le site construit tient dans ses plafonds de taille (JS, CSS, HTML,
+        # images) : un gain de performance ne s'érode pas sans qu'on le voie.
+        # Voir tools/budget/budget.mjs.
+        run: node tools/budget/check.mjs
+
   deploy:
     needs: [build, e2e]
     # Une pull request est vérifiée et construite, mais jamais publiée.
