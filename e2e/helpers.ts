@@ -93,11 +93,25 @@ export const topOf = (page: Page, id: string) =>
  * défilement vers l'ancre visée. À utiliser pour tout clic dans la barre dont
  * le test observe le défilement.
  *
- * La cible est d'abord attendue immobile — juste après une navigation, les
- * contrôles de la barre glissent encore vers leur place — puis à portée : le
- * point visé doit lui appartenir, et non à `<html>` ou à un élément posé dessus.
+ * La cible est d'abord attendue immobile, puis à portée : le point visé doit lui
+ * appartenir, et non à `<html>` ou à un élément posé dessus.
+ *
+ * Immobile, c'est sans transition en cours sur elle ni sur ses parents : juste
+ * après un défilement ou une navigation, les contrôles de la barre glissent
+ * vers leur place (0,8 s). Deux mesures identiques ne suffisent pas : prises
+ * avant l'image qui lance le glissement, elles concordent, et si la page est
+ * ensuite occupée (trames construites à l'approche de l'écran), le clic
+ * n'est traité qu'une fois le lien parti de sous le pointeur. On laisse donc
+ * aussi passer une image et un moment de repos avant de regarder.
  */
 export async function clickInPlace(page: Page, locator: Locator): Promise<void> {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestIdleCallback(resolve, { timeout: 2000 })),
+      ),
+  );
+
   let box = await locator.boundingBox();
 
   await expect
@@ -108,7 +122,19 @@ export async function clickInPlace(page: Page, locator: Locator): Promise<void> 
 
       const { x, y, width, height } = box;
       return locator.evaluate(
-        (element, [px, py]) => element.contains(document.elementFromPoint(px, py)),
+        (element, [px, py]) => {
+          for (let node: Element | null = element; node; node = node.parentElement) {
+            const moving = node
+              .getAnimations()
+              .some(
+                (animation) =>
+                  animation.playState === "running" &&
+                  animation.effect?.getComputedTiming().iterations !== Infinity,
+              );
+            if (moving) return false;
+          }
+          return element.contains(document.elementFromPoint(px, py));
+        },
         [x + width / 2, y + height / 2],
       );
     })

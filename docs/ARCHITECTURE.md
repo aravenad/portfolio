@@ -288,7 +288,8 @@ Deux niveaux, qui se complètent :
   téléphone pour `mobile.spec.ts`, dont les contrôles de mise en page tournent
   à 360 px : le Pixel 7 (412 px) ne voyait pas les défauts des écrans étroits. Chaque test échoue aussi sur une erreur de console, sauf celles qu'un fichier
   déclare attendues (`test.use({ expectedErrors })`), comme le statut 404 de la
-  page introuvable.
+  page introuvable. Les clics dans la barre passent par `clickInPlace`
+  (`e2e/helpers.ts`), qui attend la cible immobile, ses transitions finies.
   Première fois : `npx playwright install --only-shell chromium`.
 
 Côté Vitest :
@@ -350,7 +351,7 @@ test ───┤            ├──> deploy
 | :--- | :--- | :--- |
 | `test` | `npm ci`, `npm audit --omit=dev --audit-level=high`, `npm run coverage` | Faille haute ou critique dans une dépendance de production, test rouge, couverture sous 80 % |
 | `build` | `withastro/action` : installe, construit, dépose `dist/` comme artefact Pages | Erreur de build, dont une fiche projet invalide |
-| `e2e` | `npm ci`, installe Chromium, `npm run test:e2e` (construit et sert le site lui-même) | Test de bout en bout rouge ; une relance est tentée avant d'échouer |
+| `e2e` | `npm ci`, installe Chromium, `npm run test:e2e` (construit et sert le site lui-même) | Test de bout en bout rouge ; une relance est tentée avant d'échouer. Les traces des essais ratés, même rattrapés, sont publiées (`playwright-traces`, 7 jours) |
 | `deploy` | `actions/deploy-pages` publie l'artefact de `build`, une fois `e2e` passé | Jamais lancé sur une pull request |
 
 - **Un échec n'abîme rien** : tant que `deploy` ne s'est pas exécuté, le site en
