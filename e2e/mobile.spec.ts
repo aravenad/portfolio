@@ -280,6 +280,16 @@ test.describe("accueil allégé", () => {
 
     const java = page.locator(".skill-chip", { hasText: /^Java$/ });
     await java.scrollIntoViewIfNeeded();
+
+    // Arrivées près de l'écran, les trames encore en attente se construisent
+    // aussitôt. Sur la CI, plus lente, un tap pendant ce travail pouvait être
+    // annulé : la couleur s'amorçait puis repartait. On touche une page au repos.
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestIdleCallback(resolve, { timeout: 2000 })),
+        ),
+    );
     await java.tap();
 
     // Le bleu Java de skills.ts (#007396).
