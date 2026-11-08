@@ -114,7 +114,7 @@ dans le Markdown des fiches, pour qu'un signe ne parte jamais seul à la ligne
 Créer un fichier dans `src/content/projects/`, et sa traduction **sous le même
 nom** dans `src/content/projects/en/`. Le nom du fichier devient l'URL
 (`/projects/mon-projet` et `/en/projects/mon-projet`), le corps est du Markdown
-libre. `order`, `status`, `year`, `featured`, `cover` et `competences` doivent
+libre. `order`, `status`, `year`, `featured`, `cover`, `sae` et `ac` doivent
 être identiques dans les deux versions.
 
 ```md
@@ -133,7 +133,8 @@ demo: # facultatif : démo jouable, construite dans public/demos/<nom>/
   caption: "But et commandes, sous la démo."
 role: # ce que j'ai fait moi-même dans l'équipe
   - "Conception du diagramme de classes"
-competences: [realiser, collaborer] # compétences du BUT mobilisées
+sae: ["1.04"] # facultatif : la ou les SAÉ du projet, codes du PN
+ac: [AC14.01, AC14.03] # apprentissages critiques du PN mobilisés
 learned: # techniques et savoir-faire acquis
   - "Écrire les tests avant le code"
 ---
@@ -158,11 +159,13 @@ nette jusqu'à sa taille réelle.
 ![Page d'accueil : la recherche et le questionnaire.](../../assets/projects/mon-projet/accueil-fr.webp "L'accueil du site.")
 ```
 
-`role`, `competences` et `learned` sont les rubriques de la grille du PPP. Elles
+`role`, `ac` et `learned` sont les rubriques de la grille du PPP. Elles
 s'affichent à la suite du corps, avec leur entrée dans le sommaire, et seulement
 une fois renseignées : une fiche peut être publiée avant d'être complète. Les
-compétences sont celles du Programme National, dans son ordre : `realiser`,
-`optimiser`, `administrer`, `gerer`, `conduire`, `collaborer`.
+codes de SAÉ et d'AC, et leurs intitulés, sont ceux du Programme National
+(parcours A), dans `src/data/pn.ts` : un code inconnu arrête le build. La fiche
+déduit de chaque AC sa compétence et son niveau (`AC23.01` : niveau 2 de la
+troisième compétence, Administrer) et les range dans l'ordre du PN.
 
 ## Personnaliser
 

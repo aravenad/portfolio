@@ -1098,6 +1098,52 @@ html {
   margin-top: 0.75em;
 }
 
+/*
+ * Les compétences du PN, en fin de fiche (ProjectCompetences.astro). Les SAÉ
+ * vont une par ligne. Chaque niveau s'annonce en petit, collé à ses AC ; le
+ * code de chaque AC tient une colonne à part, en chasse fixe, pour que les
+ * intitulés s'alignent même quand ils passent à la ligne.
+ */
+.prose .pn-sae {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  color: var(--color-zinc-300);
+}
+
+.prose .pn-level {
+  font-size: 0.9375rem;
+  color: var(--color-zinc-500);
+}
+
+.prose .pn-level strong {
+  color: var(--color-zinc-300);
+  font-weight: 500;
+}
+
+.prose .pn-level + .pn-ac {
+  margin-top: 0.5em;
+}
+
+.prose .pn-ac {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose .pn-ac li {
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+  column-gap: 0.75rem;
+}
+
+.prose .pn-code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.75rem;
+  color: var(--color-zinc-500);
+  font-variant-numeric: tabular-nums;
+}
+
 .prose table {
   display: block;
   overflow-x: auto;

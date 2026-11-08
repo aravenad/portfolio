@@ -10,7 +10,8 @@ cover: erd
 featured: true
 role:
   - "All the work done together, from analyzing the sinking to the queries: ERD, relational schema, creation and population scripts, queries and report."
-competences: ["gerer"]
+sae: ["1.04"]
+ac: ["AC14.01", "AC14.03"]
 learned:
   - "Turning an entity-relationship diagram into a relational schema, justifying primary keys, foreign keys and cardinalities."
   - "Creating a PostgreSQL database from scripts: tables, integrity constraints, population and checks on the inserted data."

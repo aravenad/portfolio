@@ -17,7 +17,8 @@ role:
   - "The first recommendation service, which sent the questionnaire answers to the OpenAI API, and the average rating of the reviews."
   - "Online payment with PayPal and Stripe, left on a branch that was never merged, and SQL scripts for GDPR compliance."
   - "In 2026, a solo rework of the whole project: every page wired to the API, security, recommendation, content, English version and online demo."
-competences: ["realiser", "gerer", "conduire", "collaborer"]
+sae: ["3.Real.01"]
+ac: ["AC21.01", "AC21.02", "AC21.03", "AC22.01", "AC23.01", "AC23.02", "AC24.03", "AC24.04", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
 learned:
   - "Splitting a React site from a Laravel API that has the final say on prices, remaining seats and data validation."
   - "Securing an API: short-lived Sanctum tokens, rate limiting, Argon2id password hashing, a content security policy."

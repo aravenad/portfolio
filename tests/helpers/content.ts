@@ -1,4 +1,5 @@
-import type { Competence, Cover } from "../../src/types";
+import type { AcCode, SaeCode } from "../../src/data/pn";
+import type { Cover } from "../../src/types";
 import Content from "./Content.astro";
 
 export interface FixtureProject {
@@ -16,7 +17,8 @@ export interface FixtureProject {
     links: { site?: string; repo?: string };
     demo?: { src: string; caption: string };
     role: string[];
-    competences: Competence[];
+    sae: SaeCode[];
+    ac: AcCode[];
     learned: string[];
   };
 }
@@ -49,7 +51,10 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
     // Seul le troisième remplit les rubriques du PPP : les autres prouvent
     // qu'une fiche incomplète n'en montre rien.
     role: index === 2 ? ["Conception de la base", "Tests unitaires"] : [],
-    competences: index === 2 ? ["realiser", "collaborer"] : [],
+    // Ses AC sont dans le désordre, et deux compétences sur deux niveaux : la
+    // fiche doit les ranger dans l'ordre du PN.
+    sae: index === 2 ? ["2.06"] : [],
+    ac: index === 2 ? ["AC26.03", "AC11.01", "AC16.04", "AC21.04"] : [],
     learned: index === 2 ? ["Écrire des tests avant le code"] : [],
   },
 }));

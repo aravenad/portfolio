@@ -16,7 +16,8 @@ role:
   - "Automatic lexicon generation, with my teammate."
   - "Optimization: binary search with my teammate, then stop words stored in a HashSet and scores computed with a HashMap."
   - "In 2026, a solo rework of the project: fixes, tests, lexicons tuned by cross-validation and a comparison with other methods."
-competences: ["realiser", "optimiser"]
+sae: ["1.02"]
+ac: ["AC12.01", "AC12.02", "AC12.03"]
 learned:
   - "Measuring a program’s running time and reducing the complexity of its algorithms: binary search, hash tables, a suitable sort."
   - "Splitting work across several threads, and waiting for them to finish before using their result."

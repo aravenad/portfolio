@@ -17,7 +17,8 @@ role:
   - "User interfaces, with a teammate: main window and workspace menu, concert schedule, stock and ticket screens, validated input fields."
   - "Took part in the persona, the logo, the Lean Canvas and the pitches in French and English."
   - "In 2026, a solo rework of the whole application: code audit, fixes, use cases completed, tests and usability."
-competences: ["realiser", "optimiser", "conduire", "collaborer"]
+sae: ["2.01", "2.02", "2.05", "2.06"]
+ac: ["AC11.01", "AC11.02", "AC11.03", "AC11.04", "AC12.01", "AC12.02", "AC12.03", "AC15.01", "AC15.02", "AC15.03", "AC16.01", "AC16.02", "AC16.03", "AC16.04"]
 learned:
   - "Modeling software in UML before coding it: detailed use cases, class, sequence and object diagrams."
   - "Building a desktop application in Java and JavaFX with an MVC architecture."

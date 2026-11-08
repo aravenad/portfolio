@@ -17,7 +17,8 @@ role:
   - "Mockup of the home page in Whimsical."
   - "HTML structure of the whole site, which I moved ahead on my own so the group could focus on the CSS, then work on the CSS."
   - "In 2026, a solo rework of the whole site: content, responsive layout and a much lighter page weight."
-competences: ["conduire", "collaborer"]
+sae: ["1.05", "1.06"]
+ac: ["AC15.01", "AC15.03", "AC16.01", "AC16.04"]
 learned:
   - "Sorting through a mass of information and explaining it to a non-specialist audience."
   - "Going from a client’s need to a mockup, then to a site that matches it."

@@ -17,7 +17,7 @@ role:
   - "Development of the web version, its level generator and its solver."
   - "Android packaging with Capacitor, then a full rewrite in Flutter."
   - "Testing and performance measurements on a phone."
-competences: ["realiser", "optimiser", "conduire"]
+ac: ["AC21.02", "AC21.03", "AC21.04", "AC22.02", "AC31.01", "AC31.02", "AC32.02", "AC32.03"]
 learned:
   - "Working with a coding AI: framing its task, checking what it produces, keeping control of the decisions."
   - "Writing 3D rendering without an engine: projection, face sorting, lighting and textures done by hand."

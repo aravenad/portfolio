@@ -16,7 +16,8 @@ role:
   - "Génération automatique des lexiques, avec mon binôme."
   - "Optimisation : recherche dichotomique avec mon binôme, puis mots vides rangés dans un HashSet et calcul des scores par HashMap."
   - "En 2026, reprise seul du projet : corrections, tests, réglage des lexiques par validation croisée et comparaison avec d’autres méthodes."
-competences: ["realiser", "optimiser"]
+sae: ["1.02"]
+ac: ["AC12.01", "AC12.02", "AC12.03"]
 learned:
   - "Mesurer le temps d’exécution d’un programme et réduire la complexité de ses algorithmes : recherche dichotomique, tables de hachage, tri adapté."
   - "Répartir un traitement entre plusieurs threads, et attendre qu’ils aient fini avant d’utiliser leur résultat."

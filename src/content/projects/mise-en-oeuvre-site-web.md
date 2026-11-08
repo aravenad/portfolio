@@ -17,7 +17,8 @@ role:
   - "Maquette de la page d’accueil sur Whimsical."
   - "Structure HTML de l’ensemble du site, que j’ai avancée de mon côté pour laisser le groupe se concentrer sur le CSS, puis participation au CSS."
   - "En 2026, reprise seul de tout le site : contenu, mise en page responsive et allègement."
-competences: ["conduire", "collaborer"]
+sae: ["1.05", "1.06"]
+ac: ["AC15.01", "AC15.03", "AC16.01", "AC16.04"]
 learned:
   - "Trier une masse d’informations et l’expliquer à un public non initié."
   - "Passer d’un besoin client à une maquette, puis à un site fidèle à cette maquette."

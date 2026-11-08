@@ -223,13 +223,35 @@ describe("fiche d'un projet", () => {
     ].map((link) => link.textContent?.trim());
 
     expect(prose.querySelector("#mon-role + ul")?.textContent).toContain("Tests unitaires");
-    expect(prose.querySelector("#competences-mobilisees + ul")?.textContent).toContain(
-      "Travailler dans une équipe informatique",
+    expect(prose.querySelector("#competences-mobilisees + .pn-sae")?.textContent).toContain(
+      "SAÉ 2.06 · Organisation d'un travail d'équipe",
     );
     expect(prose.querySelector("#ce-que-j-ai-appris + ul")?.textContent).toContain(
       "Écrire des tests avant le code",
     );
     expect(links.slice(-3)).toEqual(["Mon rôle", "Compétences mobilisées", "Ce que j'ai appris"]);
+  });
+
+  it("range les AC de la fiche par compétence et par niveau, avec les intitulés du PN", async () => {
+    const props = await propsFor("projet-3");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-3"),
+      props,
+    });
+    const prose = document.querySelector(".prose")!;
+    const text = (selector: string) =>
+      [...prose.querySelectorAll(selector)].map((node) => node.textContent?.replace(/\s+/g, " ").trim());
+
+    // Les AC de la fixture sont dans le désordre : la fiche suit celui du PN.
+    expect(text("#competences-mobilisees ~ h3")).toEqual(["Réaliser un développement d'application", "Travailler dans une équipe informatique"]);
+    expect(text(".pn-level")).toEqual([
+      "Niveau 1 · Développer des applications informatiques simples",
+      "Niveau 2 · Partir des exigences et aller jusqu'à une application complète",
+      "Niveau 1 · Identifier ses aptitudes pour travailler dans une équipe",
+      "Niveau 2 · Situer son rôle et ses missions au sein d'une équipe informatique",
+    ]);
+    expect(text(".pn-code")).toEqual(["AC11.01", "AC21.04", "AC16.04", "AC26.03"]);
+    expect(text(".pn-ac li")[0]).toBe("AC11.01 Implémenter des conceptions simples");
   });
 
   it("propose le site en ligne et le dépôt en boutons sous l'en-tête", async () => {

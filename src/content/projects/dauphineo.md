@@ -17,7 +17,8 @@ role:
   - "Premier service de recommandation, qui interrogeait l’API d’OpenAI à partir des réponses au questionnaire, et calcul de la note moyenne des avis."
   - "Paiement en ligne avec PayPal et Stripe, resté sur une branche non fusionnée, et scripts SQL pour la conformité au RGPD."
   - "En 2026, reprise seul de tout le projet : pages reliées à l’API, sécurité, recommandation, contenu, version anglaise et démonstration en ligne."
-competences: ["realiser", "gerer", "conduire", "collaborer"]
+sae: ["3.Real.01"]
+ac: ["AC21.01", "AC21.02", "AC21.03", "AC22.01", "AC23.01", "AC23.02", "AC24.03", "AC24.04", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
 learned:
   - "Séparer un site React d’une API Laravel qui fait foi pour le prix, les places restantes et la validation des données."
   - "Sécuriser une API : jetons Sanctum à durée limitée, limitation des essais, mots de passe hachés en Argon2id, politique de sécurité du contenu."

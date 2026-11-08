@@ -2,9 +2,9 @@
 export type ProjectStatus = "termine" | "en-cours" | "a-venir";
 
 /**
- * Les six compétences du BUT Informatique, dans l'ordre du Programme National.
- * Une fiche cite celles que le projet mobilise ; leurs intitulés sont dans
- * src/data/ui.ts.
+ * Les six compétences du BUT Informatique, dans l'ordre du Programme National :
+ * le quatrième chiffre d'un code d'AC y renvoie (src/data/pn.ts). Leurs
+ * intitulés sont dans src/data/ui.ts.
  */
 export const COMPETENCES = [
   "realiser",

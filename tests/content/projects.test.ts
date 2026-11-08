@@ -159,10 +159,10 @@ describe("fiches de projet en anglais", () => {
       expect(result.success, JSON.stringify(result.error)).toBe(true);
     });
 
-    it("garde l'ordre, le statut, l'année, la mise en avant, la couverture et les compétences de la version française", () => {
+    it("garde l'ordre, le statut, l'année, la mise en avant, la couverture, la SAÉ et les AC de la version française", () => {
       const original = fiches.find((fiche) => fiche.slug === slug)!.data;
 
-      for (const key of ["order", "status", "year", "featured", "cover", "competences"]) {
+      for (const key of ["order", "status", "year", "featured", "cover", "sae", "ac"]) {
         expect(data[key], key).toEqual(original[key]);
       }
     });

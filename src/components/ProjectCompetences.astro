@@ -1,0 +1,56 @@
+---
+import { usePn, type AcCode, type SaeCode } from "../data/pn";
+import { useTranslations } from "../data/ui";
+import { groupAc } from "../lib/competences";
+import type { Lang } from "../lib/i18n";
+
+interface Props {
+  sae: SaeCode[];
+  ac: AcCode[];
+  lang: Lang;
+}
+
+/**
+ * La rubrique « Compétences mobilisées » d'une fiche, sous son titre, rendue
+ * dans le `.prose` de ProjectDetail.astro : la ou les SAÉ du projet, puis
+ * chaque compétence, ses niveaux et leurs AC, avec les intitulés du PN.
+ */
+const { sae, ac, lang } = Astro.props;
+const t = useTranslations(lang);
+const pn = usePn(lang);
+const groups = groupAc(ac);
+---
+
+{
+  sae.length > 0 && (
+    <p class="pn-sae">
+      {sae.map((code) => (
+        <span>{pn.sae(code)}</span>
+      ))}
+    </p>
+  )
+}
+
+{
+  groups.map(({ competence, levels }) => (
+    <>
+      <h3>{t.projects.competences[competence]}</h3>
+      {levels.map(({ level, codes }) => (
+        <>
+          <p class="pn-level">
+            <strong>{pn.level(level)}</strong> · {pn.levels[competence][level - 1]}
+          </p>
+          <ul class="pn-ac">
+            {codes.map((code) => (
+              <li>
+                {/* L'espace sépare le code de l'intitulé pour les lecteurs d'écran ; la grille l'ignore. */}
+                <span class="pn-code">{code}</span>{" "}
+                <span>{pn.ac[code]}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
+    </>
+  ))
+}

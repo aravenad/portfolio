@@ -10,7 +10,8 @@ cover: erd
 featured: true
 role:
   - "Tout le travail mené à deux, de l’analyse du naufrage aux requêtes : SEA, schéma relationnel, scripts de création et de peuplement, requêtes et rapport."
-competences: ["gerer"]
+sae: ["1.04"]
+ac: ["AC14.01", "AC14.03"]
 learned:
   - "Passer d’un schéma entités-associations à un schéma relationnel, en justifiant clés primaires, clés étrangères et cardinalités."
   - "Créer une base PostgreSQL par scripts : tables, contraintes d’intégrité, peuplement et contrôle des données insérées."

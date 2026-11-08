@@ -7,6 +7,7 @@ import Breadcrumb from "../ui/Breadcrumb.astro";
 import Button from "../ui/Button.astro";
 import Container from "../ui/Container.astro";
 import ImageViewer from "../ImageViewer.astro";
+import ProjectCompetences from "../ProjectCompetences.astro";
 import ProjectDemo from "../ProjectDemo.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -27,7 +28,7 @@ interface Props {
  * (`getProjectPaths`).
  */
 const { project, previous, next } = Astro.props;
-const { title, summary, tags, status, team, year, links, demo, role, competences, learned } =
+const { title, summary, tags, status, team, year, links, demo, role, sae, ac, learned } =
   project.data;
 const { Content, headings } = await render(project);
 const lang = getLang(Astro.url.pathname);
@@ -38,14 +39,15 @@ const t = useTranslations(lang);
  * suite du corps. Une rubrique vide n'est pas rendue : la fiche reste
  * publiable tant qu'elle n'est pas complète. Ses titres rejoignent ceux du
  * Markdown dans le sommaire.
+ *
+ * Les compétences ne sont pas une simple liste : ProjectCompetences les range
+ * par compétence et par niveau, d'après les codes des AC. Sans AC, la rubrique
+ * n'apparaît pas, même si la fiche donne sa SAÉ.
  */
 const sections = [
-  { ...t.projects.sections.role, items: role },
-  {
-    ...t.projects.sections.competences,
-    items: competences.map((competence) => t.projects.competences[competence]),
-  },
-  { ...t.projects.sections.learned, items: learned },
+  { ...t.projects.sections.role, items: role, pn: false },
+  { ...t.projects.sections.competences, items: ac, pn: true },
+  { ...t.projects.sections.learned, items: learned, pn: false },
 ].filter((section) => section.items.length > 0);
 
 const tocHeadings = [
@@ -166,11 +168,15 @@ const meta = [team, year?.toString()].filter(Boolean);
             sections.map((section) => (
               <>
                 <h2 id={section.slug}>{section.title}</h2>
-                <ul>
-                  {section.items.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
+                {section.pn ? (
+                  <ProjectCompetences sae={sae} ac={ac} lang={lang} />
+                ) : (
+                  <ul>
+                    {section.items.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </>
             ))
           }

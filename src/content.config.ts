@@ -1,8 +1,9 @@
 import { glob } from "astro/loaders";
 import { defineCollection, z } from "astro:content";
 
+import { AC_CODES, SAE_CODES } from "./data/pn";
 import { frenchSpacing } from "./lib/typography";
-import { COMPETENCES, COVERS } from "./types";
+import { COVERS } from "./types";
 
 /**
  * Les fiches projet : un fichier Markdown par projet, en français dans
@@ -67,8 +68,14 @@ const schema = z.object({
    */
   /** Ce que j'ai fait moi-même, dans un projet d'équipe. */
   role: z.array(text()).default([]),
-  /** Compétences du BUT mobilisées, dans l'ordre de COMPETENCES. */
-  competences: z.array(z.enum(COMPETENCES)).default([]),
+  /**
+   * Compétences mobilisées, au sens du Programme National (src/data/pn.ts) :
+   * la ou les SAÉ dont le projet relève, s'il en relève, et les apprentissages
+   * critiques qu'il prouve. Les compétences et les niveaux se lisent dans les
+   * codes des AC (src/lib/competences.ts) : la fiche ne les répète pas.
+   */
+  sae: z.array(z.enum(SAE_CODES)).default([]),
+  ac: z.array(z.enum(AC_CODES)).default([]),
   /** Techniques et savoir-faire acquis. */
   learned: z.array(text()).default([]),
 });

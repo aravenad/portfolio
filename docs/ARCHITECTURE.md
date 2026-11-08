@@ -67,8 +67,11 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   Pas de capture d'écran : les projets sont trop anciens pour en avoir, et une
   capture jurerait avec la direction artistique.
 - **Une fiche suit la grille du PPP** : le corps Markdown (contexte, objectifs,
-  réalisation, résultats), puis `role`, `competences` et `learned`, rendus par
-  `ProjectDetail.astro` seulement s'ils sont renseignés.
+  réalisation, résultats), puis `role`, les compétences du PN et `learned`,
+  rendus par `ProjectDetail.astro` seulement s'ils sont renseignés. La fiche
+  n'écrit que ses codes de SAÉ et d'AC ; `src/data/pn.ts` en donne les
+  intitulés, `src/lib/competences.ts` range les AC par compétence et niveau, et
+  `ProjectCompetences.astro` les affiche.
 - **Une fiche peut avoir une démo jouable** (`demo`, voir plus bas), montrée
   sous l'en-tête de la fiche par `ProjectDemo.astro`.
 - **Le site vit à la racine de son domaine** (`damien-aravena.fr`, sans
