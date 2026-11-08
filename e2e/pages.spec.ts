@@ -160,7 +160,7 @@ test("la pagination change de page et y place l'indicateur", async ({ page }) =>
 
   await afterNavigation(page, () => pagination.locator('a[data-page="2"]').click());
 
-  await expect(page).toHaveURL(/\/projects\/page\/2$/);
+  await expect(page).toHaveURL(/\/projects\/page\/2\/$/);
   const current = pagination.locator('[aria-current="page"]');
   await expect(current).toHaveAttribute("data-page", "2");
 

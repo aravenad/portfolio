@@ -33,25 +33,35 @@ describe("getLang", () => {
 
 describe("localizedUrl", () => {
   it("laisse le français sans préfixe", () => {
-    expect(localizedUrl("/projects", "fr")).toBe("/portfolio/projects");
+    expect(localizedUrl("/projects", "fr")).toBe("/portfolio/projects/");
     expect(localizedUrl("/", "fr")).toBe("/portfolio/");
   });
 
   it("préfixe l'anglais, ancres de l'accueil comprises", () => {
-    expect(localizedUrl("/projects", "en")).toBe("/portfolio/en/projects");
+    expect(localizedUrl("/projects", "en")).toBe("/portfolio/en/projects/");
     expect(localizedUrl("/", "en")).toBe("/portfolio/en/");
     expect(localizedUrl("/#contact", "en")).toBe("/portfolio/en/#contact");
   });
 
   it("accepte un chemin sans barre initiale", () => {
-    expect(localizedUrl("projects", "en")).toBe("/portfolio/en/projects");
+    expect(localizedUrl("projects", "en")).toBe("/portfolio/en/projects/");
+  });
+
+  it("termine chaque page par une barre, pour éviter la redirection du serveur", () => {
+    expect(localizedUrl("/projects/page/2", "fr")).toBe("/portfolio/projects/page/2/");
+    expect(localizedUrl("/projects/", "fr")).toBe("/portfolio/projects/");
+    expect(localizedUrl("/projects?vue=liste#haut", "en")).toBe("/portfolio/en/projects/?vue=liste#haut");
+  });
+
+  it("laisse les fichiers tels quels", () => {
+    expect(localizedUrl("/cv.pdf", "fr")).toBe("/portfolio/cv.pdf");
   });
 });
 
 describe("switchLangPath", () => {
   it("mène à la même page dans l'autre langue", () => {
-    expect(switchLangPath("/portfolio/projects/page/2", "en")).toBe("/portfolio/en/projects/page/2");
-    expect(switchLangPath("/portfolio/en/projects/page/2", "fr")).toBe("/portfolio/projects/page/2");
+    expect(switchLangPath("/portfolio/projects/page/2", "en")).toBe("/portfolio/en/projects/page/2/");
+    expect(switchLangPath("/portfolio/en/projects/page/2", "fr")).toBe("/portfolio/projects/page/2/");
   });
 
   it("relie les deux accueils", () => {
@@ -61,8 +71,8 @@ describe("switchLangPath", () => {
   });
 
   it("rend la page elle-même quand la langue ne change pas", () => {
-    expect(switchLangPath("/portfolio/en/projects", "en")).toBe("/portfolio/en/projects");
-    expect(switchLangPath("/portfolio/projects", "fr")).toBe("/portfolio/projects");
+    expect(switchLangPath("/portfolio/en/projects", "en")).toBe("/portfolio/en/projects/");
+    expect(switchLangPath("/portfolio/projects", "fr")).toBe("/portfolio/projects/");
   });
 });
 

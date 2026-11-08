@@ -298,7 +298,7 @@ describe("sélecteur de langue", () => {
     const { document } = await render(Header, at("/portfolio/projects/page/2"));
     const link = document.querySelector("[data-lang-switch]");
 
-    expect(link?.getAttribute("href")).toBe("/portfolio/en/projects/page/2");
+    expect(link?.getAttribute("href")).toBe("/portfolio/en/projects/page/2/");
     expect(link?.getAttribute("hreflang")).toBe("en");
     expect(link?.getAttribute("lang")).toBe("en");
     expect(link?.textContent?.trim()).toBe("EN");

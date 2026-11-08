@@ -74,6 +74,8 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
 - **Le site vit à la racine de son domaine** (`damien-aravena.fr`, sans
   `base`). Tout lien interne passe quand même par `localizedUrl(chemin, langue)`
   (`src/lib/i18n.ts`), qui ajoute la base s'il y en a une et, en anglais, `/en`.
+  Il termine aussi chaque page par `/` (pas les fichiers) : GitHub Pages
+  redirige sinon chaque clic d'une 301.
   Un `href="/…"` écrit à la main ferait changer de langue, et casserait tout
   retour dans un sous-dossier : les tests unitaires rendent donc les pages sous
   une base `/portfolio` fictive, pour qu'un tel lien y échoue.

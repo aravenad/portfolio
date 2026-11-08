@@ -236,7 +236,7 @@ describe("ProjectCard", () => {
 
   it("mène à la fiche du projet, base comprise", async () => {
     const { body } = await render(ProjectCard, { props: { project: project() } });
-    expect(body.querySelector("a")?.getAttribute("href")).toBe("/portfolio/projects/mon-projet");
+    expect(body.querySelector("a")?.getAttribute("href")).toBe("/portfolio/projects/mon-projet/");
   });
 
   it("affiche le titre et le résumé", async () => {

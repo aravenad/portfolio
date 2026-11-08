@@ -109,7 +109,7 @@ test("le fil d'Ariane passe dans la barre une fois défilé sous elle, et y mèn
 
   const projects = trail.getByRole("link", { name: "Projets" });
   await afterNavigation(page, () => clickInPlace(page, projects));
-  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page).toHaveURL(/\/projects\/$/);
 
   // Le header a persisté : il porte maintenant le fil de la liste, caché en haut.
   await expect(header).not.toHaveAttribute("data-trail");

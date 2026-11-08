@@ -277,9 +277,9 @@ describe("Footer", () => {
     ]);
 
     expect(row).toEqual([
-      ["Plan du site", "/portfolio/sitemap"],
-      ["Mentions légales", "/portfolio/legal"],
-      ["Accessibilité", "/portfolio/accessibility"],
+      ["Plan du site", "/portfolio/sitemap/"],
+      ["Mentions légales", "/portfolio/legal/"],
+      ["Accessibilité", "/portfolio/accessibility/"],
     ]);
   });
 
@@ -287,7 +287,7 @@ describe("Footer", () => {
     const { body } = await render(Footer, at("/portfolio/en/projects"));
     const hrefs = [...body.querySelectorAll("footer > div p a")].map((a) => a.getAttribute("href"));
 
-    expect(hrefs).toEqual(["/portfolio/en/sitemap", "/portfolio/en/legal", "/portfolio/en/accessibility"]);
+    expect(hrefs).toEqual(["/portfolio/en/sitemap/", "/portfolio/en/legal/", "/portfolio/en/accessibility/"]);
   });
 
   it("n'ouvre plus de plan par-dessus la page : c'en est une", async () => {

@@ -207,7 +207,7 @@ describe("Career", () => {
     const first = body.querySelector("ul > li")!;
 
     expect(first.querySelector("h4")?.textContent).toContain("À venir");
-    expect(first.querySelector('a[href="/portfolio/projects/stage-2027"]')?.textContent)
+    expect(first.querySelector('a[href="/portfolio/projects/stage-2027/"]')?.textContent)
       .toContain("Voir la fiche");
   });
 
@@ -308,7 +308,7 @@ describe("ProjectsPreview", () => {
 
   it("renvoie vers la liste complète quand il reste des projets à voir", async () => {
     const { body } = await render(ProjectsPreview);
-    expect(body.querySelector('a[href="/portfolio/projects"]')?.textContent)
+    expect(body.querySelector('a[href="/portfolio/projects/"]')?.textContent)
       .toContain("Voir tous les projets");
   });
 });

@@ -50,7 +50,7 @@ test("l'arrêt survit au rechargement et à la navigation", async ({ page }) => 
 
   // Comme pour le thème : le routeur recopierait les attributs de la page entrante.
   await afterNavigation(page, () => navLink(page, "Projets").click());
-  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page).toHaveURL(/\/projects\/$/);
   await expect(html(page)).toHaveAttribute("data-shine", "off");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "false");
 });

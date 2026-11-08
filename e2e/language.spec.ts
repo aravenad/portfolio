@@ -27,7 +27,7 @@ for (const path of ["projects", "projects/page/2", "projects/developpement-appli
 
     await afterNavigation(page, () => langLink(page).click());
 
-    await expect(page).toHaveURL(new RegExp(`/en/${path}$`));
+    await expect(page).toHaveURL(new RegExp(`/en/${path}/$`));
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 }

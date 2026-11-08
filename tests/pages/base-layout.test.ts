@@ -257,9 +257,9 @@ describe("BaseLayout, langues et thème", () => {
     );
 
     expect(alternates).toEqual({
-      fr: `${SITE_ORIGIN}/portfolio/projects`,
-      en: `${SITE_ORIGIN}/portfolio/en/projects`,
-      "x-default": `${SITE_ORIGIN}/portfolio/projects`,
+      fr: `${SITE_ORIGIN}/portfolio/projects/`,
+      en: `${SITE_ORIGIN}/portfolio/en/projects/`,
+      "x-default": `${SITE_ORIGIN}/portfolio/projects/`,
     });
   });
 

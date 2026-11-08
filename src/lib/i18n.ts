@@ -31,14 +31,27 @@ export function getLang(pathname: string): Lang {
 }
 
 /**
- * `url()` dans une langue donnée : « /projects » devient « /portfolio/projects »
- * en français et « /portfolio/en/projects » en anglais. Les ancres de l'accueil
+ * Une page porte la barre finale de son dossier : « /projects » devient
+ * « /projects/ ». Publiée sous forme de dossiers, la page sans barre coûte une
+ * redirection 301 au serveur, à chaque clic et à chaque préchargement. Les
+ * fichiers (« /cv.pdf ») et les ancres ne bougent pas.
+ */
+function withTrailingSlash(path: string): string {
+  const [, chemin, suite] = /^([^?#]*)(.*)$/.exec(path)!;
+  const dernier = chemin.slice(chemin.lastIndexOf("/") + 1);
+
+  return chemin.endsWith("/") || dernier.includes(".") ? path : `${chemin}/${suite}`;
+}
+
+/**
+ * `url()` dans une langue donnée : « /projects » devient « /portfolio/projects/ »
+ * en français et « /portfolio/en/projects/ » en anglais. Les ancres de l'accueil
  * suivent la même règle (« /#contact » → « /portfolio/en/#contact »).
  */
 export function localizedUrl(path: string, lang: Lang): string {
   const clean = path.startsWith("/") ? path : `/${path}`;
 
-  return url(lang === defaultLang ? clean : `/${lang}${clean}`);
+  return url(withTrailingSlash(lang === defaultLang ? clean : `/${lang}${clean}`));
 }
 
 /**

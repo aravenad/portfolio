@@ -373,8 +373,8 @@ describe("fiche d'un projet", () => {
     const links = [...document.querySelectorAll('nav[aria-label*="précédent"] a')];
 
     expect(links.map((link) => link.getAttribute("href"))).toEqual([
-      "/portfolio/projects/projet-3",
-      "/portfolio/projects/projet-5",
+      "/portfolio/projects/projet-3/",
+      "/portfolio/projects/projet-5/",
     ]);
   });
 
@@ -400,7 +400,7 @@ describe("fiche d'un projet", () => {
     const links = [...document.querySelectorAll('nav[aria-label*="précédent"] a')];
 
     expect(links).toHaveLength(1);
-    expect(links[0].getAttribute("href")).toBe("/portfolio/projects/projet-2");
+    expect(links[0].getAttribute("href")).toBe("/portfolio/projects/projet-2/");
   });
 
   it("n'invente pas de voisin après le dernier projet", async () => {
@@ -463,7 +463,7 @@ describe("version anglaise", () => {
     expect(document.querySelector('nav[aria-label="Breadcrumb"]')?.textContent).toContain("Home");
     expect(document.querySelector("[data-pagination]")?.textContent).toContain("Next");
     expect(document.querySelector('[data-page="2"]')?.getAttribute("href"))
-      .toBe("/portfolio/en/projects/page/2");
+      .toBe("/portfolio/en/projects/page/2/");
   });
 
   it("numérote la deuxième page en anglais", async () => {
@@ -688,12 +688,12 @@ describe("plan du site", () => {
     for (const id of ["about", "skills", "career", "contact"]) {
       expect(hrefs, id).toContain(`/portfolio/#${id}`);
     }
-    expect(hrefs).toContain("/portfolio/projects");
+    expect(hrefs).toContain("/portfolio/projects/");
     for (const project of fixtureProjects) {
-      expect(hrefs, project.id).toContain(`/portfolio/projects/${project.id}`);
+      expect(hrefs, project.id).toContain(`/portfolio/projects/${project.id}/`);
     }
-    expect(hrefs).toContain("/portfolio/legal");
-    expect(hrefs).toContain("/portfolio/accessibility");
+    expect(hrefs).toContain("/portfolio/legal/");
+    expect(hrefs).toContain("/portfolio/accessibility/");
     expect(hrefs).toContain(`mailto:${site.email}`);
     expect(document.querySelector("article a[download]")).toBeTruthy();
   });

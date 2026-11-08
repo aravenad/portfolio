@@ -49,7 +49,7 @@ test("le thème choisi survit au rechargement et à la navigation", async ({ pag
   // Le routeur recopie les attributs de <html> depuis la page entrante, qui
   // n'a pas de thème : sans le report, on repasserait en sombre ici.
   await afterNavigation(page, () => navLink(page, "Projets").click());
-  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page).toHaveURL(/\/projects\/$/);
   await expect(html(page)).toHaveAttribute("data-theme", "light");
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
 });

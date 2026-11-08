@@ -16,7 +16,7 @@ test("le plan du site mène à sa page, d'où l'on rejoint un projet", async ({ 
     page.locator("footer").getByRole("link", { name: "Plan du site", exact: true }).click(),
   );
 
-  await expect(page).toHaveURL(/\/sitemap$/);
+  await expect(page).toHaveURL(/\/sitemap\/$/);
   await expect(page.locator("h1")).toHaveText("Plan du site");
 
   const project = page.locator('article a[href*="/projects/"]').first();
@@ -44,7 +44,7 @@ test.describe("en partant du bas de la page", () => {
         page.locator("footer").getByRole("link", { name, exact: true }).click(),
       );
 
-      await expect(page).toHaveURL(new RegExp(`/${path}$`));
+      await expect(page).toHaveURL(new RegExp(`/${path}/$`));
       // Assez pour qu'un défilement doux vers le bas ait eu le temps de partir.
       await page.waitForTimeout(500);
       expect(await page.evaluate(() => window.scrollY)).toBe(0);

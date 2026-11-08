@@ -90,17 +90,17 @@ describe("getProjectsPage", () => {
 
 describe("getProjectsPageHref", () => {
   it("garde la première page sur /projects", () => {
-    expect(getProjectsPageHref(1)).toBe("/portfolio/projects");
+    expect(getProjectsPageHref(1)).toBe("/portfolio/projects/");
   });
 
   it("numérote les suivantes", () => {
-    expect(getProjectsPageHref(2)).toBe("/portfolio/projects/page/2");
+    expect(getProjectsPageHref(2)).toBe("/portfolio/projects/page/2/");
   });
 
   it("traite 0 et les négatifs comme la première page", () => {
     // Pagination passe `currentPage - 1` sans le borner.
-    expect(getProjectsPageHref(0)).toBe("/portfolio/projects");
-    expect(getProjectsPageHref(-1)).toBe("/portfolio/projects");
+    expect(getProjectsPageHref(0)).toBe("/portfolio/projects/");
+    expect(getProjectsPageHref(-1)).toBe("/portfolio/projects/");
   });
 });
 
@@ -134,10 +134,10 @@ describe("langue", () => {
   it("préfixe les URL anglaises", () => {
     entries.value = projects(1);
 
-    expect(getProjectsPageHref(1, "en")).toBe("/portfolio/en/projects");
-    expect(getProjectsPageHref(2, "en")).toBe("/portfolio/en/projects/page/2");
-    expect(getProjectHref(project("p1", 1) as never, "en")).toBe("/portfolio/en/projects/p1");
-    expect(getProjectHref(project("p1", 1) as never)).toBe("/portfolio/projects/p1");
+    expect(getProjectsPageHref(1, "en")).toBe("/portfolio/en/projects/");
+    expect(getProjectsPageHref(2, "en")).toBe("/portfolio/en/projects/page/2/");
+    expect(getProjectHref(project("p1", 1) as never, "en")).toBe("/portfolio/en/projects/p1/");
+    expect(getProjectHref(project("p1", 1) as never)).toBe("/portfolio/projects/p1/");
   });
 });
 
