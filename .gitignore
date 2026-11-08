@@ -57,3 +57,7 @@ tools/background-archive/
 # sorties générées : PDF exportés et aperçus de contrôle
 output/
 tmp/
+
+# exports PDF de la charte graphique : la source est l'artefact Claude, on les
+# régénère à chaque révision plutôt que d'alourdir l'historique du dépôt public
+docs/charte-graphique-portfolio*.pdf
