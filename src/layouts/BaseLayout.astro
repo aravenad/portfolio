@@ -41,11 +41,16 @@ interface Props {
    * dans d'autres langues à déclarer.
    */
   noindex?: boolean;
+  /**
+   * L'image d'aperçu propre à la page (la carte d'une fiche, src/lib/og.ts).
+   * À défaut, celle du site.
+   */
+  image?: { src: string; width: number; height: number; alt: string };
 }
 
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
-const { title, description = t.meta.description, noindex = false } = Astro.props;
+const { title, description = t.meta.description, noindex = false, image } = Astro.props;
 
 /** L'accueil, dans l'une ou l'autre langue : il montre davantage la matière. */
 const trimmed = (path: string) => path.replace(/\/+$/, "");
@@ -76,7 +81,9 @@ const alternates = languages.map((code) => ({
  * ailleurs que dans l'inspecteur et n'est pas conservée. v3 reste dans public/ :
  * les publications déjà partagées continuent de pointer dessus.
  */
-const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
+const ogImage = image
+  ? { ...image, src: new URL(image.src, Astro.site) }
+  : { src: new URL(url("/og-v5.png"), Astro.site), width: 2400, height: 1260, alt: t.meta.ogImageAlt };
 ---
 
 <!doctype html>
@@ -136,13 +143,10 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
     {!noindex && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImageURL} />
-    <meta property="og:image:width" content="2400" />
-    <meta property="og:image:height" content="1260" />
-    <meta
-      property="og:image:alt"
-      content={t.meta.ogImageAlt}
-    />
+    <meta property="og:image" content={ogImage.src} />
+    <meta property="og:image:width" content={ogImage.width} />
+    <meta property="og:image:height" content={ogImage.height} />
+    <meta property="og:image:alt" content={ogImage.alt} />
 
     <meta name="twitter:card" content="summary_large_image" />
 

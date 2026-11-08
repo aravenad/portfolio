@@ -1,0 +1,137 @@
+---
+/*
+ * La carte d'aperçu d'un projet, à 1200 × 630 : ce que LinkedIn et les
+ * messageries montrent d'un lien vers sa fiche. Rendue par render.mjs, qui la
+ * capture en JPEG dans src/assets/og/ ; cette page n'existe que sous
+ * `astro dev` (intégration `ogCards` d'astro.config.mjs), jamais dans le site
+ * publié.
+ *
+ * C'est une carte projet agrandie : la couverture du site (ProjectCover, sa
+ * trame de glyphes et son dessin au trait), puis le titre chromé et une ligne
+ * qui dit de qui et de quoi il s'agit. Les règles de tools/og.html valent ici
+ * aussi, la carte étant regardée à ~520 px de large après réencodage JPEG :
+ *
+ * - la matière ne passe pas derrière le texte : la couverture est une bande en
+ *   haut, dont le fondu s'éteint avant le titre ;
+ * - pas de résumé : deux cents caractères, réduits à cette taille, ne se
+ *   liraient plus. Le titre et l'équipe suffisent à donner envie d'ouvrir.
+ */
+import type { GetStaticPaths } from "astro";
+import { ClientRouter } from "astro:transitions";
+import ProjectCover from "../../src/components/ProjectCover.astro";
+import GlyphField from "../../src/components/ui/GlyphField.astro";
+import { site } from "../../src/data/site";
+import { getProjects, type Project } from "../../src/lib/projects";
+import { languages, type Lang } from "../../src/lib/i18n";
+import "../../src/styles/global.css";
+
+export const getStaticPaths = (async () =>
+  (
+    await Promise.all(
+      languages.map(async (lang) =>
+        (await getProjects(lang)).map((project) => ({
+          params: { lang, slug: project.id },
+          props: { project, lang },
+        })),
+      ),
+    )
+  ).flat()) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  lang: Lang;
+}
+
+const { project, lang } = Astro.props;
+const { title, cover, team, year } = project.data;
+const meta = [site.author, team, year?.toString()].filter(Boolean).join(" · ");
+---
+
+<!doctype html>
+<html lang={lang} data-theme="dark" data-glyph="off">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    {/* Sans lui, `astro:page-load` ne part pas et la trame ne se peint pas. */}
+    <ClientRouter />
+  </head>
+  <body data-og-card>
+    <GlyphField />
+    <ProjectCover cover={cover} class="og-cover" />
+    <div class="og-text">
+      <div class="og-rule"></div>
+      <h1>{title}</h1>
+      <p>{meta}</p>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /* Le fond animé du site n'a rien à faire sous le titre (règle 1). */
+  [data-og-card] .glyph-field {
+    display: none;
+  }
+
+  body[data-og-card] {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #09090b;
+    color: #fafafa;
+    font-family: "Noto Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* La bande de couverture : celle d'une carte, sur toute la largeur. */
+  .og-cover {
+    flex: none;
+    height: 300px;
+  }
+
+  .og-cover svg {
+    stroke-width: 1.25;
+  }
+
+  .og-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    padding: 0 88px 28px;
+  }
+
+  .og-rule {
+    width: 120px;
+    height: 4px;
+    border-radius: 2px;
+    background-image: linear-gradient(90deg, #ffffff, #a1a1aa, #52525b);
+  }
+
+  .og-text h1 {
+    margin: 0;
+    font-size: 76px;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    background-image: linear-gradient(
+      172deg,
+      #ffffff 0%,
+      #ffffff 46%,
+      #a1a1aa 63%,
+      #f4f4f5 78%,
+      #d4d4d8 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .og-text p {
+    margin: 0;
+    font-size: 32px;
+    color: #a1a1aa;
+  }
+</style>

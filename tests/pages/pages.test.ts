@@ -2,7 +2,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("astro:content", async () => (await import("../helpers/content")).contentModule);
 
+/*
+ * Les fiches de test n'ont pas de carte d'aperçu rendue : celle-ci se simule
+ * au besoin, la vraie recherche restant le comportement par défaut.
+ */
+vi.mock("../../src/lib/og", async (importOriginal) => {
+  const og = await importOriginal<typeof import("../../src/lib/og")>();
+  return { projectCard: vi.fn(og.projectCard) };
+});
+
 import { site } from "../../src/data/site";
+import { projectCard } from "../../src/lib/og";
 import { fixtureProjects } from "../helpers/content";
 import { SITE_ORIGIN, meta, renderPage } from "../helpers/render";
 
@@ -169,6 +179,34 @@ describe("fiche d'un projet", () => {
     expect(document.title).toBe("Projet 2 | Damien Aravena Bravo");
     expect(meta(document, "description")).toBe("Résumé du projet 2.");
     expect(document.querySelector("h1")?.textContent?.trim()).toBe("Projet 2");
+  });
+
+  it("partage sa propre carte d'aperçu, titrée comme elle", async () => {
+    vi.mocked(projectCard).mockReturnValueOnce({
+      src: "/portfolio/_astro/projet-2.Ab12.jpg",
+      width: 2400,
+      height: 1260,
+      format: "jpg",
+    });
+    const props = await propsFor("projet-2");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-2"),
+      props,
+    });
+
+    expect(projectCard).toHaveBeenCalledWith("fr", "projet-2");
+    expect(meta(document, "og:image")).toBe(`${SITE_ORIGIN}/portfolio/_astro/projet-2.Ab12.jpg`);
+    expect(meta(document, "og:image:alt")).toMatch(/^Projet 2 · Damien Aravena Bravo/);
+  });
+
+  it("garde l'image du site tant que sa carte n'est pas rendue", async () => {
+    const props = await propsFor("projet-2");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-2"),
+      props,
+    });
+
+    expect(meta(document, "og:image")).toMatch(/og-v\d+\.png$/);
   });
 
   it("affiche les étiquettes, le statut et le contexte", async () => {

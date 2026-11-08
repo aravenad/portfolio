@@ -47,7 +47,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 892 tests
+npm test         # 934 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -62,7 +62,7 @@ l'un des deux échoue. Rien n'est publié non plus si les tests de bout en bout
 
 ```text
 src/
-├── assets/          images traitées par Vite (le fond, les captures des fiches)
+├── assets/          images traitées par Vite (le fond, les captures et cartes d'aperçu des fiches)
 ├── components/
 │   ├── ui/          primitives réutilisables (Button, Card, Pagination…)
 │   ├── layout/      Header et Footer
@@ -147,6 +147,11 @@ learned: # techniques et savoir-faire acquis
 Le schéma est validé au build par `src/content.config.ts` : un champ manquant ou
 mal typé arrête la compilation.
 
+Lancer ensuite `npm run og` : il rend la carte d'aperçu de la fiche, ce que
+LinkedIn montre d'un lien vers elle (couverture, titre, équipe, année), dans
+`src/assets/og/`. À refaire quand l'un de ces champs change ; les tests
+signalent une carte manquante ou orpheline.
+
 Une capture d'écran se place dans `src/assets/projects/<nom>/`, en WebP, et
 s'insère seule sur sa ligne avec un chemin relatif. Le texte entre crochets
 la décrit pour qui ne la voit pas ; le titre entre guillemets s'affiche dessous
@@ -185,8 +190,8 @@ noir, matière métallique en haut de page, tramée en glyphes ASCII animés
 est le négatif sur papier : fond crème, matière en plis gris, lettrage graphite.
 Elle tient dans `src/styles/global.css` (palette, calques, utilitaires),
 `src/assets/` (la matière, sa copie réduite pour la trame, et son masque de
-fondu) et `tools/og.html` (l'image
-d'aperçu). Pour les modifier, voir §6 de l'architecture.
+fondu), `tools/og.html` (l'image d'aperçu) et `tools/og-projects/` (celles des
+fiches). Pour les modifier, voir §6 de l'architecture.
 
 ## Tests
 

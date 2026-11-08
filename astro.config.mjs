@@ -28,6 +28,7 @@ export default defineConfig({
 
   integrations: [
     icon(),
+    ogCards(),
     // Plan du site pour les moteurs de recherche, publié en
     // /sitemap-index.xml et annoncé par /robots.txt (src/pages/robots.txt.ts).
     // Chaque page y renvoie à sa version dans l'autre langue, comme les
@@ -63,6 +64,28 @@ export default defineConfig({
     plugins: [tailwindcss(), publicDirectoryIndex()]
   }
 });
+
+/**
+ * Les cartes d'aperçu des projets (tools/og-projects/Card.astro), servies sous
+ * `/__og/<langue>/<fiche>/` par `astro dev` seulement : render.mjs les capture
+ * en JPEG, et le site publié n'en garde que les images.
+ *
+ * @returns {import('astro').AstroIntegration}
+ */
+function ogCards() {
+  return {
+    name: 'og-cards',
+    hooks: {
+      'astro:config:setup': ({ command, injectRoute }) => {
+        if (command !== 'dev') return;
+        injectRoute({
+          pattern: '/__og/[lang]/[slug]',
+          entrypoint: './tools/og-projects/Card.astro',
+        });
+      },
+    },
+  };
+}
 
 /**
  * Sert `public/` sous `astro dev` comme GitHub Pages et `astro preview` :

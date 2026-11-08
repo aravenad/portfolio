@@ -100,6 +100,22 @@ describe("BaseLayout", () => {
       expect(meta(document, "twitter:card")).toBe("summary_large_image");
     });
 
+    it("prend l'image propre à la page quand elle en donne une", async () => {
+      const { document } = await renderPage(BaseLayout, {
+        ...options("/portfolio/projects/dauphineo"),
+        props: {
+          title: "Dauphinéo",
+          image: { src: "/portfolio/_astro/dauphineo.Ab12.jpg", width: 2400, height: 1260, alt: "Dauphinéo" },
+        },
+      });
+
+      // Absolue elle aussi, et sous son nom empreinté par Vite.
+      expect(meta(document, "og:image")).toBe(`${SITE_ORIGIN}/portfolio/_astro/dauphineo.Ab12.jpg`);
+      expect(meta(document, "og:image:width")).toBe("2400");
+      expect(meta(document, "og:image:height")).toBe("1260");
+      expect(meta(document, "og:image:alt")).toBe("Dauphinéo");
+    });
+
     it("fait suivre l'URL de la page dans la carte", async () => {
       const { document } = await renderPage(BaseLayout, options("/portfolio/projects"));
       expect(meta(document, "og:url")).toBe(`${SITE_ORIGIN}/portfolio/projects`);

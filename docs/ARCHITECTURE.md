@@ -110,6 +110,12 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   L'accueil décrit aussi la personne en données structurées (`Person`,
   JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
   GitHub et LinkedIn, tirés des données du site.
+- **L'aperçu d'un lien** (LinkedIn, messageries) montre `public/og-v5.png`,
+  sauf sur une fiche, qui a sa propre carte : sa couverture tramée, son titre
+  chromé, l'auteur, l'équipe et l'année (`src/assets/og/<langue>/<fiche>.jpg`,
+  trouvée par `src/lib/og.ts` et passée au gabarit par la prop `image`). Vite
+  lui donne une empreinte dans son nom : refaite, elle change d'URL, et
+  LinkedIn la retélécharge sans renommage manuel.
 - **La page 404** (`NotFoundPage.astro`) existe dans les deux langues, mais
   GitHub Pages ne sert que `404.html`, à la racine. Celle-ci rejoint donc la
   version anglaise (`/en/404/`), avant d'être peinte, pour une adresse sous
@@ -315,7 +321,7 @@ Côté Vitest :
 
 | Je veux… | Je fais… |
 | :--- | :--- |
-| **Ajouter un projet** | Deux fichiers de même nom : `src/content/projects/mon-projet.md` et sa traduction dans `src/content/projects/en/`, avec l'en-tête décrit dans le README. Le nom devient l'URL. |
+| **Ajouter un projet** | Deux fichiers de même nom : `src/content/projects/mon-projet.md` et sa traduction dans `src/content/projects/en/`, avec l'en-tête décrit dans le README. Le nom devient l'URL. Puis `npm run og` pour sa carte d'aperçu : les tests la réclament. |
 | **Ajouter une compétence** | Une entrée dans `src/data/skills.ts` (technique : une seule liste ; transversale : `softSkills` et `softSkillsEn`, au même rang). Les tuiles techniques vont par quatre, une rangée de la grille : les tests refusent une rangée incomplète. Une couleur de marque trop sombre fait échouer les tests : l'éclaircir, comme indiqué en tête du fichier. Une couleur quasi blanche, ou trop pâle pour la tuile claire comme le jaune de JavaScript, demande en plus `colorLight` pour le thème clair. |
 | **Ajouter une expérience** | Une entrée dans `experiences` (ou `education`) et sa traduction au même rang dans `experiencesEn` (ou `educationEn`), dans `src/data/career.ts`. Les formats de période sont décrits en tête du fichier et vérifiés par les tests. |
 | **Modifier un texte de l'interface** | `src/data/ui.ts`, dans les deux langues. |
@@ -324,7 +330,7 @@ Côté Vitest :
 | **Ajouter une langue** | L'ajouter à `languages` (`src/lib/i18n.ts`), lui donner un dictionnaire dans `ui.ts`, ses contenus (`…De`…), une collection dans `content.config.ts`, et ses fichiers dans `src/pages/<code>/`. Le sélecteur du header, prévu pour deux langues, devient alors une liste. |
 | **Ajouter un comportement JS** | La règle dans `src/lib/` avec son test, le câblage dans le `<script>` du composant via `onEachPage((signal) => …)`, et un test de ce que voit le visiteur dans `e2e/`. |
 | **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind, sauf `zinc-500`, redéfini dans `@theme` ; un gris de texte sous 4,5:1 fait échouer les tests. |
-| **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. |
+| **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. Les cartes des fiches, elles, se refont par `npm run og` (titre, équipe, année ou couverture changés, ou retouche de `tools/og-projects/Card.astro`). |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
 | **Changer de domaine** | Mettre à jour `site` dans `astro.config.mjs` et `SITE_ORIGIN` dans `tests/helpers/render.ts`, le domaine personnalisé dans les réglages Pages du dépôt, puis les DNS chez le registraire (Infomaniak). Pour revenir sur `aravenad.github.io/portfolio`, remettre aussi `base: '/portfolio'` et le préfixe `/portfolio/` dans `e2e/` et `playwright.config.ts`. |
 
@@ -340,6 +346,13 @@ chrome --headless=new --hide-scrollbars --force-device-scale-factor=2 \
 La police est Noto Sans, celle du site : elle doit être installée sur la
 machine qui fait la capture (fonts.google.com), sinon Chrome en substitue une
 autre. Vérifier le rendu avant de le publier.
+
+Les cartes des fiches ne sont pas rendues par `astro build` : la trame de la
+couverture se peint dans un `<canvas>`, que seul un navigateur sait dessiner,
+et la CI n'en a pas. `npm run og` (`tools/og-projects/render.mjs`) lance son
+propre `astro dev`, le seul à servir la page des cartes (`/__og/<langue>/<fiche>/`,
+intégration `ogCards` d'`astro.config.mjs`), et la capture à 2× en JPEG dans le
+Chromium de Playwright. Les cartes sont versionnées comme `og-v5.png`.
 
 ## 7. Workflow de publication
 
@@ -386,6 +399,7 @@ test ───┤            ├──> deploy
 | Fichier | Sert à |
 | :--- | :--- |
 | `og.html` | Source de l'image d'aperçu `public/og-v5.png` (§6) |
+| `og-projects/` | La page des cartes d'aperçu des fiches et leur rendu, `npm run og` (§6) |
 | `chrome-fade/` | Source et script de rendu du masque de fondu du fond |
 
 Le dossier `tools/` ne contient dans le dépôt que ces sources. L'ancien fond

@@ -14,6 +14,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { getLang } from "../../lib/i18n";
+import { projectCard } from "../../lib/og";
 import { getProjectHref, type Project } from "../../lib/projects";
 
 interface Props {
@@ -56,9 +57,21 @@ const tocHeadings = [
 ];
 
 const meta = [team, year?.toString()].filter(Boolean);
+
+/*
+ * La carte d'aperçu de la fiche, pour un lien partagé sur LinkedIn. Son texte
+ * de remplacement dit ce qu'elle montre : le titre, l'auteur, l'équipe, l'année.
+ */
+const card = projectCard(lang, project.id);
+const image = card && {
+  src: card.src,
+  width: card.width,
+  height: card.height,
+  alt: [title, site.author, ...meta].join(" · "),
+};
 ---
 
-<BaseLayout title={`${title} | ${site.author}`} description={summary}>
+<BaseLayout title={`${title} | ${site.author}`} description={summary} image={image}>
   <Container class="pt-10">
     <Breadcrumb
       items={[{ label: t.breadcrumb.projects, href: "/projects" }, { label: title }]}
