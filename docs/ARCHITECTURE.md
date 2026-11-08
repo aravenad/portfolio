@@ -118,6 +118,8 @@ Conséquence : le `<script>` d'un composant ne s'exécute qu'une fois, au premie
 chargement. Tout comportement doit donc passer par `onEachPage()`
 (`src/lib/enhance.ts`), qui le rejoue à chaque page et fournit un `AbortSignal`
 à poser sur chaque écouteur, pour qu'aucun ne survive à la page suivante.
+Les liens d'icônes du `<head>` portent `transition:persist` : sans cela, le
+routeur les remplace et le navigateur les retélécharge à chaque page.
 
 Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 

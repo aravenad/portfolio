@@ -156,10 +156,12 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       recherche Google veut un carré multiple de 48 px, que le SVG, sans taille
       propre, ne lui garantit pas. `sizes` explicite, sinon Chrome préfère le
       .ico au SVG. L'icône Apple sert à l'écran d'accueil iOS.
+      Gardées d'une page à l'autre : remplacées par le routeur, elles étaient
+      téléchargées de nouveau à chaque navigation.
     */}
-    <link rel="icon" href={url("/favicon.ico")} sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} />
-    <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
+    <link rel="icon" href={url("/favicon.ico")} sizes="48x48" transition:persist="icone-ico" />
+    <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} transition:persist="icone-svg" />
+    <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} transition:persist="icone-apple" />
 
     <title>{title}</title>
 
