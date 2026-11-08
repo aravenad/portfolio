@@ -1,7 +1,8 @@
 ---
 title: "Setting up network services"
 summary: "Writing an installation guide in English for a Debian 12 server running Apache, PostgreSQL and PHP, validated from the host machine."
-tags: ["Linux", "Apache", "PostgreSQL", "PHP"]
+tags: ["Linux", "Debian", "QEMU/KVM", "Apache", "PHP", "PostgreSQL"]
+kind: "systems"
 status: "termine"
 team: "Solo"
 year: 2025

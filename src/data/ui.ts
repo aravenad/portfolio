@@ -1,5 +1,5 @@
 import type { Lang } from "../lib/i18n";
-import type { Competence, ProjectStatus } from "../types";
+import type { Competence, ProjectKind, ProjectStatus } from "../types";
 import { withFrenchSpacing } from "../lib/typography";
 import { site } from "./site";
 
@@ -170,6 +170,16 @@ const fr = {
       "en-cours": "En cours",
       "a-venir": "À venir",
     } satisfies Record<ProjectStatus, string>,
+    kinds: {
+      "web-app": "Application web",
+      website: "Site web",
+      "desktop-app": "Application de bureau",
+      game: "Jeu",
+      database: "Base de données",
+      algorithms: "Algorithmique",
+      systems: "Système et réseau",
+      internship: "Stage",
+    } satisfies Record<ProjectKind, string>,
     /**
      * Les filtres de la liste (ProjectsList.astro, src/lib/project-filters.ts).
      * Les compétences y prennent leur verbe seul : le libellé du PN ne tient
@@ -179,9 +189,11 @@ const fr = {
     filters: {
       label: "Filtrer les projets",
       status: "Statut",
+      kind: "Type",
       competence: "Compétence",
       tag: "Technologie",
       anyStatus: "Tous les statuts",
+      anyKind: "Tous les types",
       anyCompetence: "Toutes les compétences",
       anyTag: "Toutes les technologies",
       reset: "Effacer les filtres",
@@ -524,12 +536,24 @@ const en = {
       "en-cours": "In progress",
       "a-venir": "Upcoming",
     },
+    kinds: {
+      "web-app": "Web application",
+      website: "Website",
+      "desktop-app": "Desktop application",
+      game: "Game",
+      database: "Database",
+      algorithms: "Algorithms",
+      systems: "Systems and networks",
+      internship: "Internship",
+    },
     filters: {
       label: "Filter the projects",
       status: "Status",
+      kind: "Type",
       competence: "Skill",
       tag: "Technology",
       anyStatus: "Any status",
+      anyKind: "Any type",
       anyCompetence: "Any skill",
       anyTag: "Any technology",
       reset: "Clear the filters",

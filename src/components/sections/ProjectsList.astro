@@ -9,7 +9,7 @@ import { groupAc } from "../../lib/competences";
 import { getLang } from "../../lib/i18n";
 import { TAG_SEPARATOR } from "../../lib/project-filters";
 import { getProjectsPageHref, type ProjectsPage } from "../../lib/projects";
-import { COMPETENCES, type ProjectStatus } from "../../types";
+import { COMPETENCES, KINDS, type ProjectStatus } from "../../types";
 
 type Props = ProjectsPage;
 
@@ -31,6 +31,9 @@ const competencesOf = (project: (typeof all)[number]) =>
 const statuses = (Object.keys(t.projects.status) as ProjectStatus[]).filter((status) =>
   all.some((project) => project.data.status === status),
 );
+const kinds = KINDS.map(
+  (kind) => [kind, all.filter((project) => project.data.kind === kind).length] as const,
+).filter(([, count]) => count > 0);
 const competences = COMPETENCES.filter((competence) =>
   all.some((project) => competencesOf(project).includes(competence)),
 );
@@ -45,6 +48,15 @@ const fields = [
     label: f.status,
     any: f.anyStatus,
     options: statuses.map((status) => ({ value: status, label: t.projects.status[status] })),
+  },
+  {
+    key: "kind",
+    label: f.kind,
+    any: f.anyKind,
+    options: kinds.map(([kind, count]) => ({
+      value: kind,
+      label: `${t.projects.kinds[kind]} (${count})`,
+    })),
   },
   {
     key: "competence",
@@ -76,7 +88,7 @@ const fields = [
 
     {/*
       Les filtres, masqués sans script. Des listes déroulantes plutôt que des
-      étiquettes à cliquer : une trentaine de technologies, la plupart sur une
+      étiquettes à cliquer : une quarantaine de technologies, la plupart sur une
       seule fiche, auraient fait un mur de pastilles. Le décompte est une zone
       `role="status"`, lue aux lecteurs d'écran à chaque changement.
     */}
@@ -90,7 +102,7 @@ const fields = [
       hidden
       class="mt-12"
     >
-      <div class="grid gap-4 sm:grid-cols-3">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {fields.map((field) => (
           <label class="flex flex-col gap-1.5 text-sm text-zinc-400">
             {field.label}
@@ -139,6 +151,7 @@ const fields = [
       {all.map((project) => (
         <li
           data-status={project.data.status}
+          data-kind={project.data.kind}
           data-competences={competencesOf(project).join(" ")}
           data-tags={project.data.tags.join(TAG_SEPARATOR)}
           data-off-page={onPage.has(project.id) ? undefined : ""}
@@ -203,6 +216,7 @@ const fields = [
 
     const read = (): ProjectFilters => ({
       status: selects.status.value,
+      kind: selects.kind.value,
       competence: selects.competence.value,
       tag: selects.tag.value,
     });

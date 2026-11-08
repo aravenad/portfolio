@@ -388,11 +388,12 @@ describe("ProjectsList", () => {
     expect(body.querySelectorAll("li:not([hidden])[data-off-page]")).toHaveLength(0);
   });
 
-  it("décrit chaque carte pour les filtres : statut, compétences, étiquettes", async () => {
+  it("décrit chaque carte pour les filtres : statut, type, compétences, étiquettes", async () => {
     const { body } = await render(ProjectsList, { props: page });
     const [first, , third] = body.querySelectorAll<HTMLElement>("[data-project-list] > li");
 
     expect(first.dataset.status).toBe("en-cours");
+    expect(first.dataset.kind).toBe("web-app");
     expect(first.dataset.tags).toBe("Java|SQL");
     expect(first.dataset.competences).toBe("");
     // Ses AC sont dans le désordre : les compétences suivent l'ordre du PN.
@@ -405,6 +406,7 @@ describe("ProjectsList", () => {
       [...body.querySelectorAll(`select[data-filter="${key}"] option`)].map((o) => o.textContent);
 
     expect(options("status")).toEqual(["Tous les statuts", "Terminé", "En cours"]);
+    expect(options("kind")).toEqual(["Tous les types", "Application web (3)", "Base de données (4)"]);
     expect(options("competence")).toEqual(["Toutes les compétences", "Réaliser", "Collaborer"]);
     expect(options("tag")).toEqual(["Toutes les technologies", "Java (4)", "PHP (3)", "SQL (4)"]);
   });

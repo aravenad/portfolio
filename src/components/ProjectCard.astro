@@ -20,7 +20,7 @@ interface Props {
 
 const { project, showTags = true, headingLevel = 3 } = Astro.props;
 const Heading = `h${headingLevel}` as const;
-const { title, summary, tags, status, cover } = project.data;
+const { title, summary, tags, kind, status, cover } = project.data;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
 ---
@@ -40,6 +40,9 @@ const t = useTranslations(lang);
   />
 
   <div class="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
+    {/* Le type du projet, au-dessus du titre ; masqué sur téléphone, comme les étiquettes. */}
+    <p class="mb-2 hidden text-xs text-zinc-500 sm:block">{t.projects.kinds[kind]}</p>
+
     <Heading class="font-medium text-zinc-100 transition group-hover:text-white">
       {title}
     </Heading>

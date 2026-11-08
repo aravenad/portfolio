@@ -2,6 +2,24 @@
 export type ProjectStatus = "termine" | "en-cours" | "a-venir";
 
 /**
+ * Ce qu'est un projet, à côté de ses technologies : une application web, un
+ * jeu, une base de données… Un seul par fiche, identique dans les deux
+ * langues ; ses libellés sont dans src/data/ui.ts.
+ */
+export const KINDS = [
+  "web-app",
+  "website",
+  "desktop-app",
+  "game",
+  "database",
+  "algorithms",
+  "systems",
+  "internship",
+] as const;
+
+export type ProjectKind = (typeof KINDS)[number];
+
+/**
  * Les six compétences du BUT Informatique, dans l'ordre du Programme National :
  * le quatrième chiffre d'un code d'AC y renvoie (src/data/pn.ts). Leurs
  * intitulés sont dans src/data/ui.ts.

@@ -1,5 +1,5 @@
 import type { AcCode, SaeCode } from "../../src/data/pn";
-import type { Cover } from "../../src/types";
+import type { Cover, ProjectKind } from "../../src/types";
 import Content from "./Content.astro";
 
 export interface FixtureProject {
@@ -8,6 +8,7 @@ export interface FixtureProject {
     title: string;
     summary: string;
     tags: string[];
+    kind: ProjectKind;
     status: "termine" | "en-cours" | "a-venir";
     team?: string;
     year?: number;
@@ -33,6 +34,9 @@ export const fixtureProjects: FixtureProject[] = Array.from({ length: 7 }, (_, i
     title: `Projet ${index + 1}`,
     summary: `Résumé du projet ${index + 1}.`,
     tags: index % 2 === 0 ? ["Java", "SQL"] : ["PHP"],
+    // Trois applications web, quatre bases de données : le filtre par type
+    // doit compter chacun.
+    kind: index % 3 === 0 ? "web-app" : "database",
     status: index === 0 ? "en-cours" : "termine",
     team: index === 0 ? "En binôme" : undefined,
     year: 2026 - index,

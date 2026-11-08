@@ -29,7 +29,7 @@ interface Props {
  * (`getProjectPaths`).
  */
 const { project, previous, next } = Astro.props;
-const { title, summary, tags, status, team, year, links, demo, role, sae, ac, learned } =
+const { title, summary, tags, kind, status, team, year, links, demo, role, sae, ac, learned } =
   project.data;
 const { Content, headings } = await render(project);
 const lang = getLang(Astro.url.pathname);
@@ -85,9 +85,13 @@ const image = card && {
 
         <p class="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">{summary}</p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2">
-          {tags.map((tag) => <Badge>{tag}</Badge>)}
-        </div>
+        {
+          tags.length > 0 && (
+            <div class="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2">
+              {tags.map((tag) => <Badge>{tag}</Badge>)}
+            </div>
+          )
+        }
 
         <p class="mt-5 flex flex-wrap items-center gap-x-2 text-sm text-zinc-500">
           <span
@@ -99,14 +103,14 @@ const image = card && {
           </span>
 
           {
-            meta.length > 0 && (
+            [t.projects.kinds[kind], ...meta].map((item) => (
               <>
                 <span aria-hidden="true" class="text-zinc-700">
                   ·
                 </span>
-                <span>{meta.join(" · ")}</span>
+                <span>{item}</span>
               </>
-            )
+            ))
           }
         </p>
 

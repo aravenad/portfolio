@@ -28,7 +28,7 @@ const {
 
 /** Projet minimal : seuls `order` et `featured` comptent pour ces fonctions. */
 function project(id: string, order: number, featured = false) {
-  return { id, data: { title: id, summary: "", tags: [], status: "termine", order, featured } };
+  return { id, data: { title: id, summary: "", tags: [], kind: "web-app", status: "termine", order, featured } };
 }
 
 /** `n` projets d'ordre croissant, nommés p1, p2… */

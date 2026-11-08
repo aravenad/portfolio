@@ -1,7 +1,8 @@
 ---
 title: "Développement d'une application"
 summary: "Application de bureau en Java pour organiser un festival de musique, menée comme chef de projet d'une équipe de six, reprise et terminée en 2026."
-tags: ["Java", "JavaFX", "UML", "Tests unitaires", "Gestion de projet"]
+tags: ["Java", "JavaFX", "CalendarFX", "UML", "SpotBugs", "PMD"]
+kind: "desktop-app"
 status: "termine"
 team: "En équipe de 6"
 year: 2024

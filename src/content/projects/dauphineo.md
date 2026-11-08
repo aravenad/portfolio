@@ -1,7 +1,8 @@
 ---
 title: "Dauphinéo"
 summary: "Site de réservation de visites guidées dans les sites patrimoniaux du Dauphiné, mené comme chef de projet d'une équipe de sept, repris et publié en 2026."
-tags: ["React", "TypeScript", "Laravel", "PostgreSQL", "Gestion de projet"]
+tags: ["React", "TypeScript", "MUI", "Laravel", "PostgreSQL", "Pest", "GitHub Actions"]
+kind: "web-app"
 status: "termine"
 team: "En équipe de 7"
 year: 2024

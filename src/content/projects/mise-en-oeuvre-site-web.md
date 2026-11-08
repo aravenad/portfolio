@@ -1,7 +1,8 @@
 ---
 title: "Mise en œuvre d'un site web"
 summary: "Recueil de besoins puis réalisation d'un site sobre présentant Capgemini à des élèves de troisième, repris et enrichi en 2026."
-tags: ["HTML", "CSS", "Responsive", "Écoconception", "Recueil de besoins"]
+tags: ["HTML", "CSS", "Git", "GitHub"]
+kind: "website"
 status: "termine"
 team: "En équipe de 4"
 year: 2024

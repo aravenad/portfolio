@@ -11,8 +11,8 @@ du fond et à une dizaine de petits comportements (menu, navigation active,
 apparition au défilement, thème, plan du site, texte replié sur téléphone, démo
 jouable, filtres des projets).
 
-La liste des projets se filtre par statut, par compétence du PN et par
-technologie ; un lien filtré (`/projects/?competence=optimiser`) s'ouvre filtré.
+La liste des projets se filtre par statut, par type, par compétence du PN et
+par technologie ; un lien filtré (`/projects/?competence=optimiser`) s'ouvre filtré.
 
 Français par défaut, anglais sous `/en/`. Thème sombre par défaut, clair au
 choix du visiteur, mémorisé d'une visite à l'autre.
@@ -58,7 +58,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 985 tests
+npm test         # 986 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 npm run budget   # tailles du build face à leurs plafonds, après build
@@ -126,14 +126,15 @@ dans le Markdown des fiches, pour qu'un signe ne parte jamais seul à la ligne
 Créer un fichier dans `src/content/projects/`, et sa traduction **sous le même
 nom** dans `src/content/projects/en/`. Le nom du fichier devient l'URL
 (`/projects/mon-projet` et `/en/projects/mon-projet`), le corps est du Markdown
-libre. `order`, `status`, `year`, `featured`, `cover`, `sae` et `ac` doivent
-être identiques dans les deux versions.
+libre. `order`, `status`, `kind`, `tags`, `year`, `featured`, `cover`, `sae` et
+`ac` doivent être identiques dans les deux versions.
 
 ```md
 ---
 title: "Titre du projet"
 summary: "Une phrase affichée sur la carte."
-tags: ["Java", "SQL"]
+tags: ["Java", "SQL"] # technologies seulement ; le savoir-faire va dans role et learned
+kind: web-app # web-app | website | desktop-app | game | database | algorithms | systems | internship
 status: "termine" # termine | en-cours | a-venir
 team: "En binôme"
 year: 2026

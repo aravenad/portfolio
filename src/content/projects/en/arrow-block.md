@@ -1,7 +1,8 @@
 ---
 title: "Arrow Block"
 summary: "A 3D puzzle game for phones: 240 levels checked by a solver, a web version in three.js, then a Flutter app with a home-made 3D engine."
-tags: ["JavaScript", "three.js", "Flutter", "Dart", "Android"]
+tags: ["JavaScript", "three.js", "Capacitor", "Flutter", "Dart", "Android"]
+kind: "game"
 status: "en-cours"
 team: "Personal project"
 year: 2026

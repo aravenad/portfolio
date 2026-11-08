@@ -172,11 +172,13 @@ légale, destinataire, hébergement dans l'UE, conservation de 25 mois au plus.
 
 **Filtres des projets.** Chaque page de la liste porte toutes les fiches,
 celles des autres pages masquées (`data-off-page`) : sans script, rien ne
-change. Le script montre trois listes déroulantes, cherche dans tous les
+change. Le script montre quatre listes déroulantes (statut, type, compétence,
+technologie), cherche dans tous les
 projets dès qu'un critère est choisi et masque alors la pagination. Les
 critères vont dans l'adresse (`?competence=optimiser`) par `replaceState`, pour
 qu'un lien filtré se partage. Les choix proposés sont ceux que les fiches
-contiennent.
+contiennent. Le type (`kind`, une valeur de `KINDS`) dit ce qu'est le projet ;
+`tags` ne liste que des technologies.
 
 **Démo jouable.** Le champ `demo` d'une fiche (`src`, dossier sous
 `/demos/`, et `caption`, but du jeu et commandes) affiche sous l'en-tête une

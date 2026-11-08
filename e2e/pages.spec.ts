@@ -195,6 +195,13 @@ test("les filtres cherchent dans toutes les pages et se gardent dans l'adresse",
   await page.getByLabel("Technologie").selectOption("Java");
   await expect(cards).toHaveCount(2);
 
+  // Les applications web terminées : Dauphinéo seul, la SAÉ 3.01 est en cours.
+  await page.getByLabel("Technologie").selectOption("");
+  await page.getByRole("combobox", { name: "Type", exact: true }).selectOption("web-app");
+  await expect(cards).toHaveCount(1);
+  await expect(cards.locator("h2")).toHaveText("Dauphinéo");
+  await expect(page).toHaveURL(/\/projects\/\?status=termine&kind=web-app$/);
+
   await page.getByRole("button", { name: "Effacer les filtres" }).click();
   await expect(cards).toHaveCount(6);
   await expect(count).toBeEmpty();

@@ -212,7 +212,7 @@ describe("fiche d'un projet", () => {
     expect(meta(document, "og:image")).toMatch(/og-v\d+\.png$/);
   });
 
-  it("affiche les étiquettes, le statut et le contexte", async () => {
+  it("affiche les étiquettes, le statut, le type et le contexte", async () => {
     const props = await propsFor("projet-1");
     const { document } = await renderPage(ProjectDetail, {
       request: request("/portfolio/projects/projet-1"),
@@ -222,6 +222,7 @@ describe("fiche d'un projet", () => {
 
     expect(header.textContent).toContain("Java");
     expect(header.textContent).toContain("En cours");
+    expect(header.textContent).toContain("Application web");
     expect(header.textContent).toContain("En binôme");
   });
 

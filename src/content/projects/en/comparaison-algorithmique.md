@@ -1,7 +1,8 @@
 ---
 title: "Algorithm comparison"
 summary: "Automatic classification of news dispatches using weighted lexicons, built in pairs, then reworked in 2026 to make its evaluation sound and compare it with other machine learning methods."
-tags: ["Java", "Algorithms", "Optimization", "Machine learning", "Unit testing"]
+tags: ["Java", "Maven", "JUnit", "GitHub Actions"]
+kind: "algorithms"
 status: "termine"
 team: "In pairs"
 year: 2024

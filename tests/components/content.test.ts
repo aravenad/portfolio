@@ -227,6 +227,7 @@ describe("ProjectCard", () => {
       title: "Mon projet",
       summary: "Une phrase de résumé.",
       tags: ["Java", "SQL"],
+      kind: "web-app",
       status: "termine",
       order: 1,
       featured: false,
@@ -259,6 +260,11 @@ describe("ProjectCard", () => {
 
     expect(avec.body.textContent).toContain("Java");
     expect(sans.body.textContent).not.toContain("Java");
+  });
+
+  it("dit ce qu'est le projet, au-dessus du titre", async () => {
+    const { body } = await render(ProjectCard, { props: { project: project({ kind: "game" }) } });
+    expect(body.textContent).toContain("Jeu");
   });
 
   it("n'ouvre pas de rangée d'étiquettes quand il n'y en a aucune", async () => {

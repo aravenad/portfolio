@@ -1,7 +1,8 @@
 ---
 title: "Comparaison algorithmique"
 summary: "Classement automatique de dépêches de presse par lexiques pondérés, réalisé en binôme puis repris en 2026 pour fiabiliser son évaluation et le comparer à d’autres méthodes d’apprentissage."
-tags: ["Java", "Algorithmique", "Optimisation", "Apprentissage automatique", "Tests unitaires"]
+tags: ["Java", "Maven", "JUnit", "GitHub Actions"]
+kind: "algorithms"
 status: "termine"
 team: "En binôme"
 year: 2024

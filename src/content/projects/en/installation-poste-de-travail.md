@@ -1,7 +1,8 @@
 ---
 title: "Setting up a workstation"
 summary: "Complete installation and configuration of a Debian development workstation, from the system to the tools."
-tags: ["Linux", "Debian", "System"]
+tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
+kind: "systems"
 status: "termine"
 team: "Solo"
 year: 2024

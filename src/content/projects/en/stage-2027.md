@@ -1,7 +1,8 @@
 ---
 title: "Development internship"
 summary: "A 10 to 12-week internship in spring 2027, to complete the second year of my BUT. Company and assignments to come."
-tags: ["Internship", "Development"]
+tags: []
+kind: "internship"
 status: "a-venir"
 year: 2027
 order: 1

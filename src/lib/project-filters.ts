@@ -1,6 +1,6 @@
 /**
- * Les filtres de la liste des projets : par statut, par compétence du PN et
- * par étiquette (technologie).
+ * Les filtres de la liste des projets : par statut, par type de projet, par
+ * compétence du PN et par étiquette (technologie).
  *
  * Chaque page de la liste porte toutes les fiches, celles des autres pages
  * masquées (`data-off-page`). Sans filtre, la page montre donc ses six cartes
@@ -15,18 +15,19 @@
 /** Les filtres d'une liste. Une valeur vide : pas de filtre sur ce critère. */
 export interface ProjectFilters {
   status: string;
+  kind: string;
   competence: string;
   tag: string;
 }
 
-export const FILTER_KEYS = ["status", "competence", "tag"] as const satisfies readonly (keyof ProjectFilters)[];
+export const FILTER_KEYS = ["status", "kind", "competence", "tag"] as const satisfies readonly (keyof ProjectFilters)[];
 
 /** Séparateur des étiquettes dans `data-tags` : aucune n'en contient. */
 export const TAG_SEPARATOR = "|";
 
 /**
  * Ce que le filtrage lit et écrit d'une carte de la liste : son `li`, qui
- * porte `data-status`, `data-competences` (séparées par des espaces),
+ * porte `data-status`, `data-kind`, `data-competences` (séparées par des espaces),
  * `data-tags` (par `TAG_SEPARATOR`) et `data-off-page` hors de la page.
  */
 export type FilterItem = Pick<HTMLElement, "dataset"> & { hidden: boolean };
@@ -36,6 +37,7 @@ export function parseFilters(search: string): ProjectFilters {
   const params = new URLSearchParams(search);
   return {
     status: params.get("status") ?? "",
+    kind: params.get("kind") ?? "",
     competence: params.get("competence") ?? "",
     tag: params.get("tag") ?? "",
   };
@@ -56,10 +58,11 @@ export function isActive(filters: ProjectFilters): boolean {
 
 /** Une carte répond-elle à tous les critères choisis ? */
 export function matches(item: FilterItem, filters: ProjectFilters): boolean {
-  const { status = "", competences = "", tags = "" } = item.dataset;
+  const { status = "", kind = "", competences = "", tags = "" } = item.dataset;
 
   return (
     (!filters.status || status === filters.status) &&
+    (!filters.kind || kind === filters.kind) &&
     (!filters.competence || competences.split(" ").includes(filters.competence)) &&
     (!filters.tag || tags.split(TAG_SEPARATOR).includes(filters.tag))
   );

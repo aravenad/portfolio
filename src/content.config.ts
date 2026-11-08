@@ -3,7 +3,7 @@ import { defineCollection, z } from "astro:content";
 
 import { AC_CODES, SAE_CODES } from "./data/pn";
 import { frenchSpacing } from "./lib/typography";
-import { COVERS } from "./types";
+import { COVERS, KINDS } from "./types";
 
 /**
  * Les fiches projet : un fichier Markdown par projet, en français dans
@@ -29,7 +29,14 @@ const schema = z.object({
   title: text(),
   /** Résumé affiché sur les cartes. */
   summary: text(),
+  /**
+   * Les technologies du projet, et elles seules : langages, frameworks,
+   * bibliothèques, outils. Ce qu'est le projet va dans `kind`, ce qu'il a
+   * appris (gestion de projet, RGPD…) dans `role` et `learned`.
+   */
   tags: z.array(z.string()).default([]),
+  /** Ce qu'est le projet (voir `KINDS`), identique dans les deux langues. */
+  kind: z.enum(KINDS),
   status: z.enum(["termine", "en-cours", "a-venir"]),
   /** Contexte de réalisation : seul, en binôme, en équipe. */
   team: text().optional(),

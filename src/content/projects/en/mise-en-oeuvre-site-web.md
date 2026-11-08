@@ -1,7 +1,8 @@
 ---
 title: "Building a website"
 summary: "Requirements gathering, then a simple website presenting Capgemini to middle school students, reworked and expanded in 2026."
-tags: ["HTML", "CSS", "Responsive design", "Eco-design", "Requirements gathering"]
+tags: ["HTML", "CSS", "Git", "GitHub"]
+kind: "website"
 status: "termine"
 team: "Team of 4"
 year: 2024

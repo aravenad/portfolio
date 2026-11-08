@@ -1,7 +1,8 @@
 ---
 title: "Stage de développement"
 summary: "Stage de 10 à 12 semaines au printemps 2027, pour valider ma 2e année de BUT. Entreprise et missions à venir."
-tags: ["Stage", "Développement"]
+tags: []
+kind: "internship"
 status: "a-venir"
 year: 2027
 order: 1

@@ -11,7 +11,7 @@ import {
   type ProjectFilters,
 } from "../../src/lib/project-filters";
 
-const none: ProjectFilters = { status: "", competence: "", tag: "" };
+const none: ProjectFilters = { status: "", kind: "", competence: "", tag: "" };
 
 /** Une carte de la liste, réduite à ce que le filtrage lit. */
 function item(dataset: Record<string, string>, hidden = false): FilterItem {
@@ -19,9 +19,10 @@ function item(dataset: Record<string, string>, hidden = false): FilterItem {
 }
 
 describe("parseFilters / filtersQuery", () => {
-  it("lit les trois critères de l'adresse et ignore le reste", () => {
-    expect(parseFilters("?competence=optimiser&tag=Java&page=2")).toEqual({
+  it("lit les quatre critères de l'adresse et ignore le reste", () => {
+    expect(parseFilters("?kind=web-app&competence=optimiser&tag=Java&page=2")).toEqual({
       status: "",
+      kind: "web-app",
       competence: "optimiser",
       tag: "Java",
     });
@@ -32,8 +33,8 @@ describe("parseFilters / filtersQuery", () => {
   });
 
   it("écrit seulement les critères choisis, encodés", () => {
-    expect(filtersQuery({ status: "termine", competence: "", tag: "C#" })).toBe(
-      "?status=termine&tag=C%23",
+    expect(filtersQuery({ status: "termine", kind: "game", competence: "", tag: "C#" })).toBe(
+      "?status=termine&kind=game&tag=C%23",
     );
   });
 
@@ -42,7 +43,7 @@ describe("parseFilters / filtersQuery", () => {
   });
 
   it("relit ce qu'elle a écrit", () => {
-    const filters = { status: "en-cours", competence: "gerer", tag: "Gestion de projet" };
+    const filters = { status: "en-cours", kind: "web-app", competence: "gerer", tag: "R Markdown" };
     expect(parseFilters(filtersQuery(filters))).toEqual(filters);
   });
 });
@@ -57,27 +58,32 @@ describe("isActive", () => {
 describe("matches", () => {
   const card = item({
     status: "termine",
+    kind: "web-app",
     competences: "realiser optimiser",
-    tags: "Java|Gestion de projet",
+    tags: "Java|R Markdown",
   });
 
   it("garde une carte qui répond à chaque critère", () => {
-    expect(matches(card, { status: "termine", competence: "optimiser", tag: "Java" })).toBe(true);
+    expect(
+      matches(card, { status: "termine", kind: "web-app", competence: "optimiser", tag: "Java" }),
+    ).toBe(true);
   });
 
   it("écarte une carte qui manque un seul critère", () => {
     expect(matches(card, { ...none, status: "en-cours" })).toBe(false);
+    expect(matches(card, { ...none, kind: "game" })).toBe(false);
     expect(matches(card, { ...none, competence: "gerer" })).toBe(false);
     expect(matches(card, { ...none, tag: "PHP" })).toBe(false);
   });
 
   it("compare les étiquettes entières, espaces compris", () => {
-    expect(matches(card, { ...none, tag: "Gestion de projet" })).toBe(true);
-    expect(matches(card, { ...none, tag: "Gestion" })).toBe(false);
+    expect(matches(card, { ...none, tag: "R Markdown" })).toBe(true);
+    expect(matches(card, { ...none, tag: "R" })).toBe(false);
   });
 
   it("écarte une carte sans compétence ni étiquette dès qu'on en demande une", () => {
     const bare = item({ status: "termine" });
+    expect(matches(bare, { ...none, kind: "web-app" })).toBe(false);
     expect(matches(bare, { ...none, competence: "realiser" })).toBe(false);
     expect(matches(bare, { ...none, tag: "Java" })).toBe(false);
     expect(matches(bare, none)).toBe(true);

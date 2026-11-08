@@ -1,7 +1,8 @@
 ---
 title: "Installation d'un poste de travail"
 summary: "Installation et configuration complète d'un poste de développement sous Debian, du système aux outils."
-tags: ["Linux", "Debian", "Système"]
+tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
+kind: "systems"
 status: "termine"
 team: "Seul"
 year: 2024

@@ -82,8 +82,9 @@ describe("fiches de projet", () => {
       expect(data.summary as string).toMatch(/[.!?]$/);
     });
 
-    it("annonce au moins une technologie", () => {
-      expect((data.tags as string[]).length).toBeGreaterThan(0);
+    it("annonce au moins une technologie, sauf un projet à venir", () => {
+      // Les technologies d'un stage pas encore commencé ne sont pas connues.
+      if (data.status !== "a-venir") expect((data.tags as string[]).length).toBeGreaterThan(0);
     });
 
     it("n'annonce pas deux fois la même technologie", () => {
@@ -159,10 +160,10 @@ describe("fiches de projet en anglais", () => {
       expect(result.success, JSON.stringify(result.error)).toBe(true);
     });
 
-    it("garde l'ordre, le statut, l'année, la mise en avant, la couverture, la SAÉ et les AC de la version française", () => {
+    it("garde l'ordre, le statut, le type, l'année, la mise en avant, la couverture, la SAÉ et les AC de la version française", () => {
       const original = fiches.find((fiche) => fiche.slug === slug)!.data;
 
-      for (const key of ["order", "status", "year", "featured", "cover", "sae", "ac"]) {
+      for (const key of ["order", "status", "kind", "year", "featured", "cover", "sae", "ac"]) {
         expect(data[key], key).toEqual(original[key]);
       }
     });
@@ -174,9 +175,10 @@ describe("fiches de projet en anglais", () => {
       expect(src(data)).toBe(src(original));
     });
 
-    it("garde autant d'étiquettes que la version française", () => {
+    it("garde les technologies de la version française", () => {
+      // Des noms propres : ils ne se traduisent pas.
       const original = fiches.find((fiche) => fiche.slug === slug)!.data;
-      expect((data.tags as string[]).length).toBe((original.tags as string[]).length);
+      expect(data.tags).toEqual(original.tags);
     });
 
     it("garde autant de points dans son rôle et ses acquis que la version française", () => {
