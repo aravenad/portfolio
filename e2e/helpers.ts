@@ -13,13 +13,19 @@ declare global {
  *   changement de page par le routeur, l'URL change avant que les scripts ne
  *   soient recâblés par `onEachPage()` : attendre l'URL ne suffit pas ;
  * - un test qui échoue si la page a écrit une erreur dans la console ou levé
- *   une exception, même quand toutes les assertions passent.
+ *   une exception, même quand toutes les assertions passent. Seules sont
+ *   tolérées celles qu'un fichier déclare par `test.use({ expectedErrors })`,
+ *   comme le 404 du document que charge la page introuvable.
  */
-export const test = base.extend({
-  page: async ({ page }, use) => {
+export const test = base.extend<{ expectedErrors: RegExp[] }>({
+  expectedErrors: [[], { option: true }],
+  page: async ({ page, expectedErrors }, use) => {
     const errors: string[] = [];
     page.on("console", (message) => {
-      if (message.type() === "error") errors.push(message.text());
+      const text = message.text();
+      if (message.type() === "error" && !expectedErrors.some((pattern) => pattern.test(text))) {
+        errors.push(text);
+      }
     });
     page.on("pageerror", (error) => errors.push(error.message));
 

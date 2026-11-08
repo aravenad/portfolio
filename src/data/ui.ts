@@ -312,6 +312,18 @@ const fr = {
     cv: "CV (PDF)",
     about: "À propos du site",
   },
+  /**
+   * La page des adresses inconnues. GitHub Pages sert la même pour tout le
+   * site : voir src/pages/404.astro.
+   */
+  notFound: {
+    metaTitle: `Page introuvable | ${site.author}`,
+    metaDescription: "Cette page n'existe pas ou n'existe plus.",
+    title: "Page introuvable",
+    text: "Cette adresse ne mène nulle part : la page a peut-être été déplacée, ou l'adresse contient une faute de frappe.",
+    home: "Retour à l'accueil",
+    projects: "Voir les projets",
+  },
   footer: {
     rights: "Tous droits réservés.",
     sitemap: "Plan du site",
@@ -597,6 +609,14 @@ const en = {
     contact: "Contact",
     cv: "Résumé (PDF, French)",
     about: "About this site",
+  },
+  notFound: {
+    metaTitle: `Page not found | ${site.author}`,
+    metaDescription: "This page does not exist, or no longer does.",
+    title: "Page not found",
+    text: "This address leads nowhere: the page may have moved, or the address contains a typo.",
+    home: "Back to home",
+    projects: "See the projects",
   },
   footer: {
     rights: "All rights reserved.",

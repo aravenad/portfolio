@@ -1,0 +1,77 @@
+---
+import Button from "../ui/Button.astro";
+import Container from "../ui/Container.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { useTranslations } from "../../data/ui";
+import { getLang, localizedUrl } from "../../lib/i18n";
+
+/**
+ * La page des adresses inconnues, rendue par `404.astro` en français et en
+ * anglais.
+ *
+ * GitHub Pages ne sert qu'un fichier, `404.html` à la racine, quelle que soit
+ * l'adresse demandée : la version anglaise (`en/404/`) ne s'affiche jamais
+ * d'elle-même. La page française la rejoint donc, avant d'être peinte, quand
+ * l'adresse commence par `/en/`. L'anglaise remet ensuite l'adresse demandée
+ * dans la barre, pour qu'on puisse y corriger une faute.
+ */
+const lang = getLang(Astro.url.pathname);
+const { notFound } = useTranslations(lang);
+const englishPrefix = localizedUrl("/", "en");
+const englishPage = localizedUrl("/404", "en");
+---
+
+<BaseLayout title={notFound.metaTitle} description={notFound.metaDescription} noindex>
+  {lang === "fr" ? (
+    <script is:inline slot="head" define:vars={{ englishPrefix, englishPage }}>
+      if (location.pathname.startsWith(englishPrefix) && !location.pathname.startsWith(englishPage)) {
+        // Masquée : la page française ne doit pas apparaître le temps du saut.
+        document.documentElement.style.display = "none";
+        const from = location.pathname + location.search + location.hash;
+        location.replace(`${englishPage}?from=${encodeURIComponent(from)}`);
+      }
+    </script>
+  ) : (
+    <script is:inline slot="head" define:vars={{ englishPrefix }}>
+      const from = new URLSearchParams(location.search).get("from");
+      // Un chemin du site anglais seulement : `//autre.site` serait une adresse
+      // externe, que `replaceState` refuserait de toute façon.
+      if (from?.startsWith(englishPrefix) && !from.startsWith("//")) {
+        history.replaceState(history.state, "", from);
+      }
+    </script>
+  )}
+
+  <section class="flex min-h-[70svh] flex-col justify-center py-24 sm:py-32">
+    <Container>
+      {/* Le code, en grand, pour l'œil ; le titre dit la même chose en mots. */}
+      <p
+        class="page-enter text-chrome text-8xl font-bold tracking-tight sm:text-9xl"
+        aria-hidden="true"
+      >
+        404
+      </p>
+
+      <h1
+        class="page-enter mt-4 text-4xl font-bold tracking-tight sm:text-6xl"
+        style="--index: 1"
+      >
+        {notFound.title}
+      </h1>
+
+      <p class="page-enter mt-6 max-w-2xl text-lg leading-8 text-zinc-400" style="--index: 2">
+        {notFound.text}
+      </p>
+
+      <div
+        class="page-enter mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
+        style="--index: 3"
+      >
+        <Button href={localizedUrl("/", lang)}>{notFound.home}</Button>
+        <Button href={localizedUrl("/projects", lang)} variant="secondary">
+          {notFound.projects}
+        </Button>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>

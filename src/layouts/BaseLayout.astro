@@ -35,11 +35,17 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  /**
+   * Une page à tenir hors des moteurs de recherche : la 404, servie à toutes
+   * les adresses inconnues. Elle n'a alors ni adresse canonique ni versions
+   * dans d'autres langues à déclarer.
+   */
+  noindex?: boolean;
 }
 
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
-const { title, description = t.meta.description } = Astro.props;
+const { title, description = t.meta.description, noindex = false } = Astro.props;
 
 /** L'accueil, dans l'une ou l'autre langue : il montre davantage la matière. */
 const trimmed = (path: string) => path.replace(/\/+$/, "");
@@ -103,22 +109,31 @@ const ogImageURL = new URL(url("/og-v5.png"), Astro.site);
       content="base-uri 'self'; object-src 'none'; form-action 'none'"
     />
 
+    {/* Ce qu'une page doit exécuter avant d'être peinte (voir NotFoundPage). */}
+    <slot name="head" />
+
     <meta name="description" content={description} />
     <meta name="author" content={site.author} />
     <meta name="generator" content={Astro.generator} />
 
-    <link rel="canonical" href={canonicalURL} />
-    {alternates.map(({ code, href }) => <link rel="alternate" hreflang={code} href={href} />)}
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={alternates.find(({ code }) => code === defaultLang)?.href}
-    />
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <Fragment>
+        <link rel="canonical" href={canonicalURL} />
+        {alternates.map(({ code, href }) => <link rel="alternate" hreflang={code} href={href} />)}
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={alternates.find(({ code }) => code === defaultLang)?.href}
+        />
+      </Fragment>
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.title} />
     <meta property="og:locale" content={t.ogLocale} />
-    <meta property="og:url" content={canonicalURL} />
+    {!noindex && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageURL} />

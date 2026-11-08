@@ -107,6 +107,12 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   L'accueil décrit aussi la personne en données structurées (`Person`,
   JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
   GitHub et LinkedIn, tirés des données du site.
+- **La page 404** (`NotFoundPage.astro`) existe dans les deux langues, mais
+  GitHub Pages ne sert que `404.html`, à la racine. Celle-ci rejoint donc la
+  version anglaise (`/en/404/`), avant d'être peinte, pour une adresse sous
+  `/en/` ; l'anglaise remet l'adresse demandée dans la barre
+  (`history.replaceState`). Les deux sont en `noindex` (prop du gabarit), sans
+  canonique ni `hreflang`, et hors du sitemap.
 - Le CV n'existe qu'en français : la version anglaise le signale sur son bouton
   et dans le plan du site. Son adresse vit dans `src/lib/cv.ts`, seule source
   des deux liens : c'est la version publique, sans téléphone ni adresse mail.
@@ -265,9 +271,9 @@ quand ni le thème ni `data-glyph` n'ont changé.
 ## 5. Tests
 
 ```sh
-npm test          # 862 tests, quelques secondes
+npm test          # 872 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 87 tests de bout en bout, une quarantaine de secondes
+npm run test:e2e  # 89 tests de bout en bout, une quarantaine de secondes
 ```
 
 Deux niveaux, qui se complètent :
@@ -280,7 +286,9 @@ Deux niveaux, qui se complètent :
   langue et position de lecture, apparition au défilement, sommaire, retour en
   haut, pagination, plan du site, texte replié. Bureau pour tout, gabarit de
   téléphone pour `mobile.spec.ts`, dont les contrôles de mise en page tournent
-  à 360 px : le Pixel 7 (412 px) ne voyait pas les défauts des écrans étroits. Chaque test échoue aussi sur une erreur de console.
+  à 360 px : le Pixel 7 (412 px) ne voyait pas les défauts des écrans étroits. Chaque test échoue aussi sur une erreur de console, sauf celles qu'un fichier
+  déclare attendues (`test.use({ expectedErrors })`), comme le statut 404 de la
+  page introuvable.
   Première fois : `npx playwright install --only-shell chromium`.
 
 Côté Vitest :

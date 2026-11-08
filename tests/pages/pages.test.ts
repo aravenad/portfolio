@@ -20,6 +20,8 @@ const Accessibility = (await import("../../src/pages/accessibility.astro")).defa
 const AccessibilityEn = (await import("../../src/pages/en/accessibility.astro")).default;
 const Sitemap = (await import("../../src/pages/sitemap.astro")).default;
 const SitemapEn = (await import("../../src/pages/en/sitemap.astro")).default;
+const NotFound = (await import("../../src/pages/404.astro")).default;
+const NotFoundEn = (await import("../../src/pages/en/404.astro")).default;
 
 /**
  * Une route générée. Le type est écrit à la main : un `import()` dynamique d'un
@@ -718,6 +720,59 @@ describe("plan du site", () => {
     for (const href of internal) {
       expect(href).toMatch(/^\/portfolio\/en(\/|$)/);
     }
+  });
+});
+
+describe("page introuvable", () => {
+  /** Le texte des scripts du `<head>`, où vit l'aiguillage vers l'anglais. */
+  const headScripts = (document: Document) =>
+    [...document.head.querySelectorAll("script:not([type])")].map((s) => s.textContent ?? "").join("\n");
+
+  it("dit que la page n'existe pas et ramène à l'accueil ou aux projets", async () => {
+    const { document } = await renderPage(NotFound, { request: request("/portfolio/404") });
+    const hrefs = [...document.querySelectorAll("main a")].map((a) => a.getAttribute("href"));
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Page introuvable");
+    expect(document.title).toBe(`Page introuvable | ${site.author}`);
+    expect(hrefs).toEqual(["/portfolio/", "/portfolio/projects/"]);
+  });
+
+  it("reste hors des moteurs, sans adresse canonique ni versions traduites", async () => {
+    const { document } = await renderPage(NotFound, { request: request("/portfolio/404") });
+
+    expect(meta(document, "robots")).toBe("noindex");
+    expect(document.querySelector('link[rel="canonical"]')).toBeNull();
+    expect(document.querySelector('link[rel="alternate"]')).toBeNull();
+    expect(document.querySelector('meta[property="og:url"]')).toBeNull();
+  });
+
+  it("envoie les adresses anglaises vers la version anglaise, en gardant l'adresse demandée", async () => {
+    // GitHub Pages ne sert que la 404 française, à la racine.
+    const { document } = await renderPage(NotFound, { request: request("/portfolio/404") });
+    const script = headScripts(document);
+
+    expect(script).toContain('"/portfolio/en/404/"');
+    expect(script).toContain("location.replace");
+    expect(script).toContain("?from=");
+  });
+
+  it("existe en anglais, qui remet l'adresse demandée dans la barre", async () => {
+    const { document } = await renderPage(NotFoundEn, { request: request("/portfolio/en/404") });
+    const hrefs = [...document.querySelectorAll("main a")].map((a) => a.getAttribute("href"));
+
+    expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Page not found");
+    expect(hrefs).toEqual(["/portfolio/en/", "/portfolio/en/projects/"]);
+    expect(meta(document, "robots")).toBe("noindex");
+    expect(headScripts(document)).toContain("history.replaceState");
+    expect(headScripts(document)).not.toContain("location.replace");
+  });
+
+  it("ne change rien au référencement des autres pages", async () => {
+    const { document } = await renderPage(Legal, { request: request("/portfolio/legal") });
+
+    expect(meta(document, "robots")).toBeUndefined();
+    expect(document.querySelector('link[rel="canonical"]')).toBeTruthy();
   });
 });
 

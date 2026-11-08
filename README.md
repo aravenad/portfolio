@@ -32,6 +32,9 @@ son contact, l'hébergeur (GitHub Pages) et le bureau d'enregistrement du domain
 navigateur. Éditeur non professionnel, Damien n'y publie ni adresse
 postale ni téléphone, comme le permet l'article 1-1 de la LCEN.
 
+Une adresse inconnue affiche une page 404 aux couleurs du site, en anglais
+sous `/en/`, qui ramène à l'accueil ou aux projets.
+
 Architecture, fonctionnement, évolutions et workflow de publication :
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -42,7 +45,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 862 tests
+npm test         # 872 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -97,6 +100,7 @@ dans le Markdown des fiches, pour qu'un signe ne parte jamais seul à la ligne
 | Textes de l'interface (titres, boutons, accueil, contact…) | `src/data/ui.ts` (`fr`) | `src/data/ui.ts` (`en`) |
 | Coordonnées, nom affiché dans la barre (`brand`) | `src/data/site.ts` | commun |
 | Mentions légales : textes / hébergeur et domaine (`host`, `registrar`) | `legal` dans `src/data/ui.ts` / `src/data/site.ts` | `legal` (`en`) / commun |
+| Page 404 | `notFound` dans `src/data/ui.ts` | `notFound` (`en`) |
 | Navigation | `navLinks` dans `src/data/site.ts` | `navLinksEn` |
 | Compétences techniques | `technicalSkills` dans `src/data/skills.ts` | commun |
 | Compétences transversales | `softSkills` | `softSkillsEn` |
