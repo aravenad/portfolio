@@ -55,22 +55,36 @@ test("le thème choisi survit au rechargement et à la navigation", async ({ pag
 });
 
 /**
- * Luminosité moyenne des glyphes peints sur la trame du fond, dans la partie
- * visible : claire en sombre, foncée en clair. `null` si rien n'est peint.
+ * Part des pixels pleins de la trame du fond, dans sa partie visible, qui
+ * portent une teinte de la palette du thème actif (`--glyph-*`). Les tuiles
+ * sont copiées sans mise à l'échelle : un pixel plein a la couleur exacte de
+ * sa teinte. Une moyenne de luminosité ne suffirait pas : elle dépend du
+ * rendu des polices, qui varie d'un système à l'autre.
  */
-const encre = (page: import("@playwright/test").Page) =>
+const accord = (page: import("@playwright/test").Page) =>
   page.evaluate(() => {
+    const style = getComputedStyle(document.documentElement);
+    const sonde = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
+    const palette = ["nuit", "abysse", "cobalt", "azur", "ciel", "givre", "cendre"].map((teinte) => {
+      sonde.clearRect(0, 0, 1, 1);
+      sonde.fillStyle = style.getPropertyValue(`--glyph-${teinte}`).trim();
+      sonde.fillRect(0, 0, 1, 1);
+      return [...sonde.getImageData(0, 0, 1, 1).data.slice(0, 3)];
+    });
+
     const canvas = document.querySelector<HTMLCanvasElement>("[data-glyph-field] canvas")!;
     const hauteur = Math.min(canvas.height, Math.round(innerHeight * devicePixelRatio));
     const { data } = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, hauteur);
-    let somme = 0;
-    let nombre = 0;
+    let pleins = 0;
+    let justes = 0;
     for (let i = 0; i < data.length; i += 4) {
-      if (data[i + 3] < 128) continue;
-      somme += data[i] + data[i + 1] + data[i + 2];
-      nombre++;
+      if (data[i + 3] < 255) continue;
+      pleins++;
+      const proche = ([r, g, b]: number[]) =>
+        Math.abs(data[i] - r) + Math.abs(data[i + 1] - g) + Math.abs(data[i + 2] - b) <= 6;
+      if (palette.some(proche)) justes++;
     }
-    return nombre ? somme / nombre / 3 : null;
+    return pleins ? justes / pleins : 0;
   });
 
 /**
@@ -104,7 +118,8 @@ test("un front de glyphes imprime le nouveau thème, puis tout est rangé", asyn
   await page.goto("");
   await openSettings(page);
   const feuilles = await page.evaluate(() => document.adoptedStyleSheets.length);
-  await expect.poll(() => encre(page)).toBeGreaterThan(128);
+  // Au départ, la trame est peinte aux couleurs du sombre.
+  await expect.poll(() => accord(page)).toBeGreaterThan(0.9);
   await noter(page);
 
   await toggle(page).click();
@@ -116,7 +131,7 @@ test("un front de glyphes imprime le nouveau thème, puis tout est rangé", asyn
   expect(await page.evaluate(() => document.adoptedStyleSheets.length)).toBe(feuilles);
 
   // La trame, figée pendant la course, a été repeinte aux couleurs du clair.
-  await expect.poll(() => encre(page)).toBeLessThan(128);
+  await expect.poll(() => accord(page)).toBeGreaterThan(0.9);
 });
 
 test("sous prefers-reduced-motion, le thème change par un simple fondu", async ({ page }) => {
