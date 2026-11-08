@@ -113,9 +113,10 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   `/en/` ; l'anglaise remet l'adresse demandée dans la barre
   (`history.replaceState`). Les deux sont en `noindex` (prop du gabarit), sans
   canonique ni `hreflang`, et hors du sitemap.
-- Le CV n'existe qu'en français : la version anglaise le signale sur son bouton
-  et dans le plan du site. Son adresse vit dans `src/lib/cv.ts`, seule source
-  des deux liens : c'est la version publique, sans téléphone ni adresse mail.
+- Le CV existe dans les deux langues : `publicCv(lang)` (`src/lib/cv.ts`) donne
+  le fichier et le nom de téléchargement de chacune (« CV » / « Resume »). C'est
+  la seule source des liens, et elle ne sert que la version publique, sans
+  téléphone ni adresse mail.
 
 ## 4. Dans le navigateur
 
@@ -133,6 +134,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | :--- | :--- | :--- |
 | Menu mobile, barre qui se détend, lien actif au défilement | `layout/Header.astro` | `lib/nav.ts` |
 | Bouton de retour en haut | `ui/BackToTop.astro` | `lib/back-to-top.ts` |
+| Copie de l'adresse e-mail à côté du lien `mailto:`, adresse affichée si la copie est refusée | `ui/CopyButton.astro` | `lib/copy.ts`, `e2e/contact.spec.ts` |
 | Glissement de la page active | `ui/Pagination.astro` | `lib/pagination.ts` |
 | Sommaire des fiches et curseur de lecture | `ui/TableOfContents.astro` | `lib/toc.ts` |
 | Bouton de thème, front de glyphes qui descend puis remonte | `layout/Header.astro` | `lib/theme.ts`, `lib/theme-front.ts` |
@@ -271,9 +273,9 @@ quand ni le thème ni `data-glyph` n'ont changé.
 ## 5. Tests
 
 ```sh
-npm test          # 872 tests, quelques secondes
+npm test          # 892 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 89 tests de bout en bout, une quarantaine de secondes
+npm run test:e2e  # 94 tests de bout en bout, une quarantaine de secondes
 ```
 
 Deux niveaux, qui se complètent :
@@ -389,6 +391,7 @@ ne vivent qu'en local.
 
 Le CV n'est pas fabriqué ici. Ses sources, ses variantes et les candidatures
 vivent dans `candidatures/`, exclu du dépôt parce qu'il porte le téléphone et
-l'adresse mail. Le site n'en reçoit que l'export public, copié à la main dans
-`public/cv-damien-aravena-bravo-public.pdf` : un nouveau CV public, c'est ce
-seul fichier à remplacer, sous le même nom.
+l'adresse mail. Le site n'en reçoit que les exports publics, copiés à la main
+dans `public/cv-damien-aravena-bravo-public.pdf` et
+`public/cv-damien-aravena-bravo-public-en.pdf` : un nouveau CV public, c'est ce
+fichier à remplacer, sous le même nom. Les tests vérifient que les deux existent.

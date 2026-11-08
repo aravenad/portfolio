@@ -15,8 +15,9 @@ import { getLang } from "../../lib/i18n";
  * recherche, formation, métier visé, mobilité). Le nom complet n'apparaît nulle part
  * ailleurs dans la page : le hero ne garde que le prénom.
  */
-const t = useTranslations(getLang(Astro.url.pathname));
-const cv = publicCv();
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+const cv = publicCv(lang);
 ---
 
 <Section id="about" aria-labelledby="about-title">

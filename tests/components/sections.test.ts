@@ -14,7 +14,7 @@ import { site } from "../../src/data/site";
 import { softSkills, technicalSkills } from "../../src/data/skills";
 import { ui } from "../../src/data/ui";
 import { fixtureProjects } from "../helpers/content";
-import { render } from "../helpers/render";
+import { at, render } from "../helpers/render";
 
 beforeEach(() => {
   vi.stubEnv("BASE_URL", "/portfolio/");
@@ -103,6 +103,14 @@ describe("About", () => {
       .toBe(ui.fr.hero.contact);
     expect(links.find((a) => a.hasAttribute("download"))?.getAttribute("href"))
       .toBe("/portfolio/cv-damien-aravena-bravo-public.pdf");
+  });
+
+  it("renvoie vers le CV anglais sur le site anglais", async () => {
+    const { body } = await render(About, at("/portfolio/en/"));
+    const cv = body.querySelector("a[download]");
+
+    expect(cv?.getAttribute("href")).toBe("/portfolio/cv-damien-aravena-bravo-public-en.pdf");
+    expect(cv?.getAttribute("download")).toBe("Resume-Damien-Aravena-Bravo.pdf");
   });
 
   it("prépare le repli mobile sans masquer le texte sans script", async () => {
@@ -293,10 +301,45 @@ describe("Contact", () => {
      * Ce test ne peut pas lire le PDF, mais il verrouille le nom — et le nom
      * est ce qui distingue les deux.
      */
-    const { body } = await render(Contact);
-    const href = body.querySelector('a[href$=".pdf"]')?.getAttribute("href") ?? "";
+    for (const path of ["/portfolio/", "/portfolio/en/"]) {
+      const { body } = await render(Contact, at(path));
+      const href = body.querySelector('a[href$=".pdf"]')?.getAttribute("href") ?? "";
 
-    expect(href).toContain("-public.pdf");
+      expect(href, path).toMatch(/-public(-en)?\.pdf$/);
+    }
+  });
+
+  it("propose le CV anglais sur le site anglais", async () => {
+    const { body } = await render(Contact, at("/portfolio/en/"));
+    const cv = body.querySelector('a[href$=".pdf"]');
+
+    expect(cv?.textContent?.trim()).toBe(ui.en.contact.cv);
+    expect(cv?.getAttribute("href")).toBe("/portfolio/cv-damien-aravena-bravo-public-en.pdf");
+    expect(cv?.getAttribute("download")).toBe("Resume-Damien-Aravena-Bravo.pdf");
+  });
+
+  it("place la copie de l'adresse à côté du lien mailto, masquée sans script", async () => {
+    // Le lien `mailto:` n'ouvre rien sans client mail configuré.
+    const { body } = await render(Contact);
+    const mailto = body.querySelector('a[href^="mailto:"]');
+    const copy = body.querySelector("[data-copy]");
+    const button = copy?.querySelector("button");
+
+    expect(copy?.parentElement).toBe(mailto?.parentElement);
+    expect(copy?.getAttribute("data-copy")).toBe(site.email);
+    expect(copy?.hasAttribute("hidden")).toBe(true);
+    expect(button?.getAttribute("type")).toBe("button");
+    expect(button?.getAttribute("aria-label")).toBe(ui.fr.contact.copy);
+    expect(copy?.querySelector('[role="status"]')).toBeTruthy();
+  });
+
+  it("annonce la copie dans la langue de la page", async () => {
+    const { body } = await render(Contact, at("/portfolio/en/"));
+    const copy = body.querySelector("[data-copy]");
+
+    expect(copy?.querySelector("button")?.getAttribute("aria-label")).toBe(ui.en.contact.copy);
+    expect(copy?.getAttribute("data-copied-label")).toBe(ui.en.contact.copied);
+    expect(copy?.getAttribute("data-failed-label")).toBe(ui.en.contact.copyFailed);
   });
 });
 

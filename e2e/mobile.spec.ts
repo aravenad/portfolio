@@ -354,3 +354,16 @@ test("la démo jouable tient dans la largeur et se lance au toucher", async ({ p
   expect(stage.x + stage.width).toBeLessThanOrEqual(width);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
 });
+
+test("l'adresse affichée quand la copie est refusée tient dans l'écran", async ({ page }) => {
+  // Le bouton touche le bord droit : la bulle s'ouvre donc vers la gauche.
+  await page.evaluate(() => {
+    navigator.clipboard.writeText = () => Promise.reject(new DOMException("", "NotAllowedError"));
+  });
+
+  await page.getByRole("button", { name: "Copier l'adresse e-mail" }).click();
+
+  const status = page.locator("#contact [data-copy-status]");
+  await expect(status).toContainText("@");
+  await expect(status).toBeInViewport({ ratio: 1 });
+});

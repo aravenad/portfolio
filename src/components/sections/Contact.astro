@@ -1,5 +1,6 @@
 ---
 import Button from "../ui/Button.astro";
+import CopyButton from "../ui/CopyButton.astro";
 import GlyphLogo from "../ui/GlyphLogo.astro";
 import Section from "../ui/Section.astro";
 import SectionHeading from "../ui/SectionHeading.astro";
@@ -10,13 +11,15 @@ import { publicCv } from "../../lib/cv";
 import { brandStyle } from "../../lib/skills";
 import { getLang } from "../../lib/i18n";
 
-const t = useTranslations(getLang(Astro.url.pathname));
-/** Le CV public, et lui seul : voir src/lib/cv.ts. */
-const cv = publicCv();
+const lang = getLang(Astro.url.pathname);
+const t = useTranslations(lang);
+/** Le CV public, et lui seul, dans la langue de la page : voir src/lib/cv.ts. */
+const cv = publicCv(lang);
 
 /*
  * Deux actions, puis deux profils. L'e-mail et le CV gardent des boutons à
- * libellé : ce sont eux qu'un recruteur vient chercher. LinkedIn et GitHub
+ * libellé (l'e-mail suivi du bouton qui copie l'adresse, pour qui n'a pas de
+ * client mail) : ce sont eux qu'un recruteur vient chercher. LinkedIn et GitHub
  * passent en icônes, que tout le monde reconnaît : quatre boutons à libellé
  * alourdissaient la ligne. Leur nom reste dans `aria-label`, et dans `title`
  * pour qui survole.
@@ -56,7 +59,15 @@ const profiles = [
     flux, elles se répartissaient au hasard entre deux rangées.
   */}
   <div class="mt-12 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-    <Button href={`mailto:${site.email}`}>{t.contact.email}</Button>
+    <div class="flex gap-3">
+      <Button href={`mailto:${site.email}`} class="flex-1 sm:flex-none">{t.contact.email}</Button>
+      <CopyButton
+        text={site.email}
+        label={t.contact.copy}
+        copied={t.contact.copied}
+        failed={t.contact.copyFailed}
+      />
+    </div>
 
     <Button href={cv.href} download={cv.filename} variant="secondary">
       {t.contact.cv}

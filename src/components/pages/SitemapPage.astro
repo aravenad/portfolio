@@ -24,7 +24,7 @@ const t = useTranslations(lang);
 const { sitemap } = t;
 const sections = lang === "en" ? navLinksEn : navLinks;
 const projects = await getProjects(lang);
-const cv = publicCv();
+const cv = publicCv(lang);
 
 const outbound = (href: string) => (href.startsWith("http") ? "noreferrer" : undefined);
 

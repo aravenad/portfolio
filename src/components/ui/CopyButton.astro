@@ -1,0 +1,81 @@
+---
+import { Icon } from "astro-icon/components";
+import { outlineButton } from "./button-styles";
+
+interface Props {
+  /** Le texte copié. */
+  text: string;
+  /** Le nom du bouton, lu par les lecteurs d'écran et affiché au survol. */
+  label: string;
+  /** L'annonce une fois copié. */
+  copied: string;
+  /** Ce qui précède le texte quand la copie est refusée. */
+  failed: string;
+}
+
+const { text, label, copied, failed } = Astro.props;
+---
+
+{/*
+  Un bouton carré à icône, comme les profils de Contact : un troisième bouton à
+  libellé alourdirait la ligne. Masqué sans script, où il ne ferait rien.
+
+  La bulle au-dessus est aussi la zone `role="status"` : ce qu'elle affiche est
+  lu aux lecteurs d'écran. Vide, elle disparaît. Quand la copie est refusée,
+  elle montre l'adresse et devient sélectionnable. Elle s'ouvre vers la droite,
+  sur le bouton du CV ; sur téléphone, où le bouton touche le bord droit, vers
+  la gauche.
+*/}
+<span
+  data-copy={text}
+  data-copied-label={copied}
+  data-failed-label={failed}
+  hidden
+  class="group relative inline-flex shrink-0"
+>
+  <button
+    type="button"
+    aria-label={label}
+    title={label}
+    class:list={[
+      "inline-flex size-12 items-center justify-center rounded-lg text-zinc-300 transition hover:text-zinc-100",
+      outlineButton,
+    ]}
+  >
+    <Icon name="copy" aria-hidden="true" class="size-5 group-data-copied:hidden" />
+    <Icon name="check" aria-hidden="true" class="hidden size-5 group-data-copied:block" />
+  </button>
+
+  <span
+    role="status"
+    data-copy-status
+    class="pointer-events-none absolute right-0 bottom-full mb-2 w-max sm:right-auto sm:left-0 max-w-[min(20rem,80vw)] rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-sm text-zinc-100 shadow-lg empty:hidden group-data-failed:pointer-events-auto"
+  ></span>
+</span>
+
+<script>
+  import { wireCopy } from "../../lib/copy";
+  import { onEachPage } from "../../lib/enhance";
+
+  /** Copie et annonce : voir src/lib/copy.ts, où elles sont testées. */
+  onEachPage((signal) => {
+    for (const root of document.querySelectorAll<HTMLElement>("[data-copy]")) {
+      const button = root.querySelector("button");
+      const status = root.querySelector<HTMLElement>("[data-copy-status]");
+      if (!button || !status) continue;
+
+      wireCopy(
+        root,
+        button,
+        status,
+        navigator.clipboard,
+        {
+          text: root.dataset.copy ?? "",
+          copied: root.dataset.copiedLabel ?? "",
+          failed: root.dataset.failedLabel ?? "",
+        },
+        signal,
+      );
+    }
+  });
+</script>

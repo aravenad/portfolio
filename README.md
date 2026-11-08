@@ -24,7 +24,9 @@ Pensé aussi pour le téléphone, où un recruteur ouvre souvent le lien en prem
 - les boutons d'action s'empilent en pleine largeur.
 
 Sur grand écran, l'espace libre sous la fiche d'À propos propose de prendre
-contact ou de télécharger le CV.
+contact ou de télécharger le CV. Le CV est servi dans la langue de la page, et un
+bouton à côté du lien `mailto:` copie l'adresse, pour les postes sans client
+mail.
 
 Les mentions légales (`/legal`, liées depuis le pied de page) nomment l'éditeur,
 son contact, l'hébergeur (GitHub Pages) et le bureau d'enregistrement du domaine
@@ -45,7 +47,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 872 tests
+npm test         # 892 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 ```
@@ -70,7 +72,7 @@ src/
 ├── content/projects/  une fiche Markdown par projet (en/ : en anglais)
 ├── content.config.ts  schéma des fiches, vérifié au build
 ├── data/            contenu éditable : site, compétences, parcours, textes (ui.ts)
-├── icons/           logos absents de Simple Icons, chargés par astro-icon
+├── icons/           logos absents de Simple Icons et icônes d'interface, chargés par astro-icon
 ├── layouts/         BaseLayout
 ├── lib/             langues, thème, projets, pagination, CV, données structurées, helpers
 ├── pages/           routes (en/ : les mêmes en anglais)

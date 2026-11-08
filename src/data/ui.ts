@@ -177,6 +177,14 @@ const fr = {
     description:
       "Je recherche un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écris-moi.",
     email: "Envoyer un e-mail",
+    /*
+     * Pour qui n'a pas de client mail configuré : le lien `mailto:` n'ouvre
+     * alors rien. `copy` nomme le bouton, `copied` l'annonce une fois l'adresse
+     * copiée, et `copyFailed` précède l'adresse quand la copie est refusée.
+     */
+    copy: "Copier l'adresse e-mail",
+    copied: "Adresse copiée",
+    copyFailed: "Copie impossible, l'adresse :",
     cv: "Télécharger mon CV",
     github: "Voir mon GitHub",
     linkedin: "Voir mon LinkedIn",
@@ -483,8 +491,10 @@ const en = {
     description:
       "I am looking for a 10 to 12-week internship, from April 19 to June 25, 2027, extendable until July 9, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also travel to the surrounding area. A question, an opportunity? Write to me.",
     email: "Send an email",
-    // Le CV n'existe qu'en français : le dire avant le téléchargement.
-    cv: "Download my résumé (French)",
+    copy: "Copy the email address",
+    copied: "Address copied",
+    copyFailed: "Could not copy, the address is:",
+    cv: "Download my résumé",
     github: "See my GitHub",
     linkedin: "See my LinkedIn",
   },
@@ -607,7 +617,7 @@ const en = {
     projects: "Projects",
     allProjects: "All projects",
     contact: "Contact",
-    cv: "Résumé (PDF, French)",
+    cv: "Résumé (PDF)",
     about: "About this site",
   },
   notFound: {
