@@ -6,7 +6,7 @@ justifie : ce document n'en donne que la carte.
 
 ## 1. En bref
 
-- **Site statique.** Astro génère 20 pages HTML au build, 10 par langue.
+- **Site statique.** Astro génère 36 pages HTML au build, 18 par langue, plus la page 404.
   Aucun serveur, aucune base de données : GitHub Pages sert le dossier `dist/`.
 - **Deux langues, deux thèmes.** Français par défaut, anglais sous `/en/` ;
   thème sombre par défaut, clair sur choix du visiteur (§3 et §4).
@@ -54,6 +54,7 @@ src/content/projects/*.md ─┴─> src/lib/projects.ts ─> sections/ ─> com
 | `/projects` | `ProjectsListPage.astro` | Première page de la liste (6 projets) |
 | `/projects/page/N` | `ProjectsListPage.astro` | Pages suivantes, générées selon le nombre de projets |
 | `/projects/<fichier>` | `ProjectDetail.astro` | Une fiche, son sommaire, les projets voisins |
+| `/colophon` | `ColophonPage.astro` | « Comment ce site est fait » : trame, thème, performance, chiffres avant et après (`src/data/colophon.ts`) |
 
 La version anglaise a les mêmes routes, préfixées par `/en` :
 `/en/`, `/en/projects/<fichier>`…
@@ -418,6 +419,10 @@ servie (les JPEG, cartes d'aperçu, sont exclus). Chaque poste a un plafond,
 15 à 20 % au-dessus de sa taille de novembre 2026 ; un dépassement fait
 échouer le job `build`, donc le déploiement. Relever un plafond se fait dans
 un commit qui dit pourquoi.
+
+La page `/colophon` affiche ces plafonds et les mesures du jour
+(`src/data/colophon.ts`) : un test vérifie qu'elle suit `LIMITS`, mais une
+nouvelle mesure s'y reporte à la main, dans les deux langues.
 
 Le dossier `tools/` ne contient dans le dépôt que ces sources. L'ancien fond
 (`background-archive/`, commit `7b8785d`) et l'étude du fond (`metal-study/`)

@@ -17,6 +17,8 @@ export const site = {
   ),
   email: "damien.aravena@gmail.com",
   github: "https://github.com/aravenad",
+  /** Le code du site, lié depuis « Comment ce site est fait ». */
+  repository: "https://github.com/aravenad/portfolio",
   linkedin: "https://www.linkedin.com/in/aravenad/",
   /**
    * L'hébergeur, que les mentions légales doivent nommer (LCEN, art. 1-1).

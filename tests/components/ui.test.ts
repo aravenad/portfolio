@@ -269,7 +269,7 @@ describe("Footer", () => {
     expect(rowLinks(body)).toEqual(socialLinks.map((link) => link.href));
   });
 
-  it("mène au plan du site, aux mentions légales et à l'accessibilité, dans cet ordre", async () => {
+  it("mène au plan du site, aux mentions légales, à l'accessibilité et aux coulisses du site, dans cet ordre", async () => {
     const { body } = await render(Footer);
     const row = [...body.querySelectorAll("footer > div p a")].map((a) => [
       a.textContent?.trim(),
@@ -280,6 +280,7 @@ describe("Footer", () => {
       ["Plan du site", "/portfolio/sitemap/"],
       ["Mentions légales", "/portfolio/legal/"],
       ["Accessibilité", "/portfolio/accessibility/"],
+      ["Comment c'est fait", "/portfolio/colophon/"],
     ]);
   });
 
@@ -287,7 +288,12 @@ describe("Footer", () => {
     const { body } = await render(Footer, at("/portfolio/en/projects"));
     const hrefs = [...body.querySelectorAll("footer > div p a")].map((a) => a.getAttribute("href"));
 
-    expect(hrefs).toEqual(["/portfolio/en/sitemap/", "/portfolio/en/legal/", "/portfolio/en/accessibility/"]);
+    expect(hrefs).toEqual([
+      "/portfolio/en/sitemap/",
+      "/portfolio/en/legal/",
+      "/portfolio/en/accessibility/",
+      "/portfolio/en/colophon/",
+    ]);
   });
 
   it("n'ouvre plus de plan par-dessus la page : c'en est une", async () => {

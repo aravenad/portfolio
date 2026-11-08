@@ -11,6 +11,7 @@ vi.mock("../../src/lib/og", async (importOriginal) => {
   return { projectCard: vi.fn(og.projectCard) };
 });
 
+import { colophon } from "../../src/data/colophon";
 import { site } from "../../src/data/site";
 import { projectCard } from "../../src/lib/og";
 import { fixtureProjects } from "../helpers/content";
@@ -28,6 +29,8 @@ const Legal = (await import("../../src/pages/legal.astro")).default;
 const LegalEn = (await import("../../src/pages/en/legal.astro")).default;
 const Accessibility = (await import("../../src/pages/accessibility.astro")).default;
 const AccessibilityEn = (await import("../../src/pages/en/accessibility.astro")).default;
+const Colophon = (await import("../../src/pages/colophon.astro")).default;
+const ColophonEn = (await import("../../src/pages/en/colophon.astro")).default;
 const Sitemap = (await import("../../src/pages/sitemap.astro")).default;
 const SitemapEn = (await import("../../src/pages/en/sitemap.astro")).default;
 const NotFound = (await import("../../src/pages/404.astro")).default;
@@ -734,6 +737,73 @@ describe("sommaire des pages d'information", () => {
   });
 });
 
+describe("comment ce site est fait", () => {
+  const french = () => renderPage(Colophon, { request: request("/portfolio/colophon") });
+
+  it("titre la page et la décrit pour les moteurs", async () => {
+    const { document } = await french();
+
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("Comment ce site est fait");
+    expect(document.title).toBe(`Comment ce site est fait | ${site.author}`);
+    expect(meta(document, "description")).toContain("performance");
+  });
+
+  it("mène à chacune de ses parties depuis le sommaire", async () => {
+    const { document } = await french();
+    const ids = [...document.querySelectorAll("article h2")].map((h2) => `#${h2.id}`);
+    const toc = [...document.querySelectorAll('[data-toc="sidebar"] a')].map((a) => a.getAttribute("href"));
+
+    expect(ids).toHaveLength(colophon.sections.length);
+    expect(toc).toEqual(ids);
+    for (const h2 of document.querySelectorAll("article h2")) {
+      expect(h2.classList.contains("scroll-mt-22"), h2.id).toBe(true);
+    }
+  });
+
+  it("met les chiffres dans de vrais tableaux, légendés, aux en-têtes de ligne et de colonne", async () => {
+    const { document } = await french();
+    const tables = document.querySelectorAll("article table");
+
+    expect(tables).toHaveLength(colophon.sections.filter((section) => section.table).length);
+    for (const table of tables) {
+      expect(table.querySelector("caption")?.textContent?.trim()).toBeTruthy();
+      expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(3);
+      const rows = table.querySelectorAll("tbody tr");
+      expect(rows.length).toBeGreaterThan(0);
+      for (const row of rows) {
+        expect(row.querySelector('th[scope="row"]')).toBeTruthy();
+      }
+    }
+    // Les chiffres et leur unité sont liés par une espace insécable.
+    expect(document.body.textContent?.replace(/[  ]/g, " ")).toContain("5,2 Mo");
+  });
+
+  it("ouvre le code sur GitHub dans un nouvel onglet, et le dit", async () => {
+    const { document } = await french();
+    const source = document.querySelector(`article a[href="${site.repository}"]`);
+
+    expect(source?.getAttribute("target")).toBe("_blank");
+    expect(source?.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(source?.querySelector(".sr-only")?.textContent).toContain("(nouvel onglet)");
+    expect(source?.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("renvoie à la déclaration d'accessibilité", async () => {
+    const { document } = await french();
+
+    expect(document.querySelector('article a[href="/portfolio/accessibility/"]')).toBeTruthy();
+  });
+
+  it("existe en anglais, à la même adresse sous /en/", async () => {
+    const { document } = await renderPage(ColophonEn, { request: request("/portfolio/en/colophon") });
+
+    expect(document.documentElement.getAttribute("lang")).toBe("en");
+    expect(document.querySelector("h1")?.textContent?.trim()).toBe("How this site is built");
+    expect(document.querySelector('article a[href="/portfolio/en/accessibility/"]')).toBeTruthy();
+    expect(document.querySelector(`article a[href="${site.repository}"] .sr-only`)?.textContent).toContain("(new tab)");
+  });
+});
+
 describe("plan du site", () => {
   it("est une page, titrée et décrite pour les moteurs", async () => {
     const { document } = await renderPage(Sitemap, { request: request("/portfolio/sitemap") });
@@ -756,6 +826,7 @@ describe("plan du site", () => {
     }
     expect(hrefs).toContain("/portfolio/legal/");
     expect(hrefs).toContain("/portfolio/accessibility/");
+    expect(hrefs).toContain("/portfolio/colophon/");
     expect(hrefs).toContain(`mailto:${site.email}`);
     expect(document.querySelector("article a[download]")).toBeTruthy();
   });

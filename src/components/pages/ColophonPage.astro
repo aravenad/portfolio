@@ -1,0 +1,101 @@
+---
+import Arrow from "../ui/Arrow.astro";
+import Breadcrumb from "../ui/Breadcrumb.astro";
+import Container from "../ui/Container.astro";
+import TableOfContents from "../ui/TableOfContents.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { colophon as colophonFr, colophonEn } from "../../data/colophon";
+import { site } from "../../data/site";
+import { getLang, localizedUrl } from "../../lib/i18n";
+
+/**
+ * « Comment ce site est fait », dans la langue de l'URL. Rendu par
+ * `colophon.astro`, en français et en anglais.
+ *
+ * Le texte et les chiffres vivent dans `src/data/colophon.ts` ; la page ne
+ * fait que les mettre en forme, sur le gabarit de la déclaration
+ * d'accessibilité (titre, sommaire à droite sur grand écran).
+ */
+const lang = getLang(Astro.url.pathname);
+const c = lang === "en" ? colophonEn : colophonFr;
+
+const tocHeadings = c.sections.map((section) => ({ slug: section.id, text: section.title, depth: 2 }));
+
+// Comme la déclaration d'accessibilité : une ancre du sommaire ne s'arrête
+// pas derrière le header collant.
+const heading = "scroll-mt-22 text-xl font-semibold text-zinc-100";
+const body = "mt-4 space-y-4 leading-7 text-zinc-400";
+const link = "text-zinc-200 underline decoration-zinc-600 underline-offset-4 transition hover:text-accent hover:decoration-current";
+// Les cellules : le poste en tête de ligne, l'avant en retrait, l'après en clair.
+const cell = "py-3 pr-4 align-top last:pr-0";
+---
+
+<BaseLayout title={c.metaTitle} description={c.metaDescription}>
+  <Container class="pt-10">
+    <Breadcrumb items={[{ label: c.title }]} />
+  </Container>
+
+  <article class="py-14 sm:py-20">
+    <Container>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-6xl">{c.title}</h1>
+
+      <div class="mt-10 lg:mt-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-x-12">
+        <TableOfContents
+          headings={tocHeadings}
+          class="border-t border-zinc-900 lg:col-start-2 lg:row-start-1 lg:border-0"
+        />
+
+        <div class="mt-10 max-w-2xl space-y-12 lg:col-start-1 lg:row-start-1 lg:mt-0">
+          <div class="space-y-4 leading-7 text-zinc-400">
+            <p>{c.intro}</p>
+            <p>
+              <a href={site.repository} target="_blank" rel="noopener noreferrer" class:list={[link, "group"]}>
+                {c.source}
+                <span class="sr-only">{` ${c.newTab}`}</span>
+                <Arrow class="ml-1 inline-block -rotate-45 align-[-0.15em] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+            </p>
+          </div>
+
+          {c.sections.map((section) => (
+            <section aria-labelledby={section.id}>
+              <h2 id={section.id} class={heading}>{section.title}</h2>
+              <div class={body}>
+                {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+
+                {section.table && (
+                  <table class="w-full text-left text-sm leading-6">
+                    <caption class="pb-2 text-left text-zinc-500">{section.table.caption}</caption>
+                    <thead class="border-b border-zinc-800 text-zinc-500">
+                      <tr>
+                        <th scope="col" class:list={[cell, "font-medium"]}>{section.table.headers.item}</th>
+                        <th scope="col" class:list={[cell, "font-medium"]}>{section.table.headers.from}</th>
+                        <th scope="col" class:list={[cell, "font-medium"]}>{section.table.headers.to}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-900">
+                      {section.table.rows.map((row) => (
+                        <tr>
+                          <th scope="row" class:list={[cell, "font-medium text-zinc-200"]}>{row.item}</th>
+                          <td class:list={[cell, "text-zinc-500"]}>{row.from}</td>
+                          <td class:list={[cell, "text-zinc-200"]}>{row.to}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {section.note && <p>{section.note}</p>}
+              </div>
+            </section>
+          ))}
+
+          <p class="leading-7 text-zinc-400">
+            {c.accessibility.before}{" "}
+            <a href={localizedUrl("/accessibility", lang)} class={link}>{c.accessibility.link}</a>{c.accessibility.after}
+          </p>
+        </div>
+      </div>
+    </Container>
+  </article>
+</BaseLayout>

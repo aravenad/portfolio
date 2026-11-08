@@ -363,6 +363,7 @@ const fr = {
     sitemap: "Plan du site",
     legal: "Mentions légales",
     accessibility: "Accessibilité",
+    colophon: "Comment c'est fait",
   },
 };
 
@@ -679,6 +680,7 @@ const en = {
     sitemap: "Site map",
     legal: "Legal notice",
     accessibility: "Accessibility",
+    colophon: "How it's built",
   },
 } satisfies Dictionary;
 

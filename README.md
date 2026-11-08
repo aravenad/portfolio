@@ -3,8 +3,9 @@
 Portfolio personnel de Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble.
 
 Construit avec [Astro](https://astro.build) et [Tailwind CSS](https://tailwindcss.com).
-Site entièrement statique : trente-deux pages HTML (seize en français, seize
-en anglais), une feuille de style et environ 58 Ko de JavaScript (25 Ko compressés).
+Site entièrement statique : trente-six pages HTML (dix-huit en français,
+dix-huit en anglais, hors page 404), une feuille de style et environ 58 Ko de
+JavaScript (25 Ko compressés).
 Ce JavaScript se limite au routeur de transitions d'Astro, à la trame de glyphes
 du fond et à une dizaine de petits comportements (menu, navigation active,
 apparition au défilement, thème, plan du site, texte replié sur téléphone, démo
@@ -37,6 +38,11 @@ son contact, l'hébergeur (GitHub Pages) et le bureau d'enregistrement du domain
 navigateur. Éditeur non professionnel, Damien n'y publie ni adresse
 postale ni téléphone, comme le permet l'article 1-1 de la LCEN.
 
+La page « Comment ce site est fait » (`/colophon`, liée depuis le pied de page)
+montre ce travail invisible : la trame de glyphes du fond, le changement de
+thème, les gains de performance mesurés avant et après, et le budget qui les
+protège.
+
 Une adresse inconnue affiche une page 404 aux couleurs du site, en anglais
 sous `/en/`, qui ramène à l'accueil ou aux projets.
 
@@ -50,7 +56,7 @@ npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère ./dist
 npm run preview  # prévisualise le build
-npm test         # 962 tests
+npm test         # 973 tests
 npm run coverage # tests + rapport de couverture
 npm run test:e2e # tests de bout en bout (Playwright)
 npm run budget   # tailles du build face à leurs plafonds, après build

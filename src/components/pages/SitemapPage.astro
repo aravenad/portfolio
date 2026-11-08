@@ -2,6 +2,7 @@
 import Breadcrumb from "../ui/Breadcrumb.astro";
 import Container from "../ui/Container.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { colophon, colophonEn } from "../../data/colophon";
 import { navLinks, navLinksEn, socialLinks } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { publicCv } from "../../lib/cv";
@@ -108,6 +109,11 @@ const link = "transition hover:text-zinc-100";
             </li>
             <li>
               <a href={localizedUrl("/accessibility", lang)} class={link}>{t.accessibility.title}</a>
+            </li>
+            <li>
+              <a href={localizedUrl("/colophon", lang)} class={link}>
+                {(lang === "en" ? colophonEn : colophon).title}
+              </a>
             </li>
           </ul>
         </section>

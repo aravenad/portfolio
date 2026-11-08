@@ -20,6 +20,8 @@ const routes = [
   "en/accessibility",
   "sitemap",
   "en/sitemap",
+  "colophon",
+  "en/colophon",
 ];
 
 for (const route of routes) {
