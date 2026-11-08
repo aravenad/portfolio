@@ -1,6 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-import { outlineButton } from "./button-styles";
+import { solidButton } from "./button-styles";
 
 interface Props {
   /** Le texte copié. */
@@ -17,8 +17,10 @@ const { text, label, copied, failed } = Astro.props;
 ---
 
 {/*
-  Un bouton carré à icône, comme les profils de Contact : un troisième bouton à
-  libellé alourdirait la ligne. Masqué sans script, où il ne ferait rien.
+  Un bouton carré à icône : un troisième bouton à libellé alourdirait la ligne.
+  Plein, comme « Envoyer un e-mail », et collé à lui : les deux donnent
+  l'adresse, l'un par le client mail, l'autre par le presse-papiers. Masqué
+  sans script, où il ne ferait rien.
 
   La bulle au-dessus est aussi la zone `role="status"` : ce qu'elle affiche est
   lu aux lecteurs d'écran. Vide, elle disparaît. Quand la copie est refusée,
@@ -38,8 +40,8 @@ const { text, label, copied, failed } = Astro.props;
     aria-label={label}
     title={label}
     class:list={[
-      "inline-flex size-12 items-center justify-center rounded-lg text-zinc-300 transition hover:text-zinc-100",
-      outlineButton,
+      "inline-flex size-12 items-center justify-center rounded-lg transition",
+      solidButton,
     ]}
   >
     <Icon name="copy" aria-hidden="true" class="size-5 group-data-copied:hidden" />
