@@ -33,39 +33,56 @@ export function toggledTheme(theme: Theme): Theme {
   return theme === "light" ? "dark" : "light";
 }
 
+/** Ce que l'animation reçoit de la transition lancée. */
+export interface ThemeTransition {
+  /** Résolue quand les captures sont prêtes et que l'animation commence. */
+  ready: Promise<unknown>;
+  finished: Promise<unknown>;
+}
+
 /** Ce que la transition utilise du document. */
 export interface TransitionDocument {
   documentElement: Pick<HTMLElement, "setAttribute" | "removeAttribute">;
-  startViewTransition?: (update: () => void) => { finished: Promise<unknown> };
+  startViewTransition?: (update: () => void) => ThemeTransition;
 }
 
 /**
- * Applique `update` dans un fondu enchaîné de toute la page (View Transitions),
- * ou directement si le navigateur ne sait pas le faire ou si le visiteur préfère
- * réduire les animations.
+ * Applique `update` dans une transition de toute la page (View Transitions),
+ * ou directement si le navigateur ne sait pas le faire.
  *
- * Le fondu couvre tout d'un coup, y compris ce que les transitions CSS ne savent
- * pas animer : la matière du fond qui s'inverse, son mode de fusion. Pendant le
- * fondu, `<html data-theme-switching>` permet à global.css d'en régler la durée
- * sans toucher aux fondus de navigation du routeur.
+ * La transition couvre tout d'un coup, y compris ce que les transitions CSS ne
+ * savent pas animer : la matière du fond qui s'inverse, son mode de fusion.
+ * Elle se pose sur `<html data-theme-switching>`, ce qui laisse global.css en
+ * régler l'allure sans toucher aux fondus de navigation du routeur :
+ *
+ * - `glyph` : `animate` reçoit la transition et la mène, image par image. Le
+ *   header y fait passer un front de glyphes (src/lib/theme-front.ts).
+ * - `fade` : pour qui préfère réduire les animations, un simple fondu, sans
+ *   rien qui bouge. Passer du noir au papier sans aucune transition serait le
+ *   changement le plus brutal de tous.
  */
 export function withViewTransition(
   doc: TransitionDocument,
   motionOk: boolean,
   update: () => void,
+  animate?: (transition: ThemeTransition) => void,
 ): void {
-  if (!motionOk || typeof doc.startViewTransition !== "function") {
+  if (typeof doc.startViewTransition !== "function") {
     update();
     return;
   }
 
   const root = doc.documentElement;
-  root.setAttribute("data-theme-switching", "");
+  const glyph = motionOk && animate !== undefined;
 
-  doc
-    .startViewTransition(update)
-    .finished.finally(() => root.removeAttribute("data-theme-switching"))
-    // Un fondu interrompu (nouveau clic, navigation) ne doit rien signaler.
+  root.setAttribute("data-theme-switching", glyph ? "glyph" : "fade");
+
+  const transition = doc.startViewTransition(update);
+  if (glyph) animate(transition);
+
+  transition.finished
+    .finally(() => root.removeAttribute("data-theme-switching"))
+    // Une transition interrompue (nouveau clic, navigation) ne doit rien signaler.
     .catch(() => {});
 }
 
@@ -85,13 +102,16 @@ export type ThemeButton = Pick<HTMLElement, "setAttribute" | "addEventListener">
  * Chaque bouton porte `aria-pressed` et un libellé fixe (« Thème clair ») : un
  * lecteur d'écran annonce ainsi l'état, sans libellé qui change à chaque clic.
  */
-export function wireThemeToggle(
-  buttons: readonly ThemeButton[],
+export function wireThemeToggle<Button extends ThemeButton>(
+  buttons: readonly Button[],
   root: ThemeRoot,
   getStore: () => ThemeStore,
   signal: AbortSignal,
-  /** Enrobe le changement, par exemple dans `withViewTransition`. */
-  transition: (update: () => void) => void = (update) => update(),
+  /**
+   * Enrobe le changement, par exemple dans `withViewTransition`. Reçoit le
+   * bouton cliqué, d'où la transition peut partir.
+   */
+  transition: (update: () => void, button: Button) => void = (update) => update(),
 ): void {
   const current = (): Theme => (root.dataset.theme === "light" ? "light" : "dark");
 
@@ -107,7 +127,7 @@ export function wireThemeToggle(
       "click",
       () => {
         const next = toggledTheme(current());
-        transition(() => apply(next));
+        transition(() => apply(next), button);
         saveTheme(getStore, next);
       },
       { signal },

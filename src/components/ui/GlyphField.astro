@@ -53,16 +53,15 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
     NIVEAUX_MATIERE,
     type Niveaux,
     POLICE,
-    RAMPE,
     TEINTES,
     aLaSource,
-    atlas,
     cadrageCouverture,
     cadrageFond,
     champ,
     empreinte,
     fraction,
     grille,
+    imageDAtlas,
     peindre,
     trame,
     trameLogo,
@@ -70,7 +69,12 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
 
   const root = document.documentElement;
   const FPS = 12;
-  const debut = performance.now();
+  /** Le départ de l'horloge du fond, reculé du temps passé figé (voir `image`). */
+  let debut = performance.now();
+  /** Combien de millisecondes la peinture par tranches s'accorde par image. */
+  const BUDGET = 3;
+  /** Lignes peintes d'un coup, entre deux coups d'œil à l'horloge. */
+  const LIGNES_PAR_COUP = 4;
 
   /** Une surface tramée : son canvas, sa grille et ce qu'elle a déjà peint. */
   interface Toile {
@@ -97,7 +101,7 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       lignes: number;
       pixels: number;
       contexte: CanvasRenderingContext2D;
-      tuiles: HTMLCanvasElement;
+      tuiles: CanvasImageSource;
       champ: ReturnType<typeof champ> | ReturnType<typeof empreinte>;
       codes: Uint8Array;
       avant: Uint8Array;
@@ -130,12 +134,7 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
   }
 
   function tuiles(pixels: number, toile: Toile) {
-    const teintes = [...couleurs(), ...(toile.logo?.couleurs() ?? [])];
-    const canvas = document.createElement("canvas");
-    canvas.width = RAMPE.length * pixels;
-    canvas.height = teintes.length * pixels;
-    atlas(canvas.getContext("2d")!, pixels, teintes);
-    return canvas;
+    return imageDAtlas(pixels, [...couleurs(), ...(toile.logo?.couleurs() ?? [])]);
   }
 
   /** (Re)construit la grille d'une surface à sa taille actuelle, puis la peint. */
@@ -210,21 +209,92 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       const etat = toile.etat;
       if (!etat) continue;
       if (nouvellesCouleurs) {
+        if ("close" in etat.tuiles) etat.tuiles.close();
         etat.tuiles = tuiles(etat.pixels, toile);
         etat.avant.fill(255);
       }
       etat.fige = false;
-      peindreToile(toile, performance.now());
     }
+
+    // Hors de la fenêtre, une surface attend d'y revenir : la boucle la
+    // repeindra alors.
+    const visibles = toiles.filter((toile) => toile.visible && toile.etat);
+    if (nouvellesCouleurs && root.getAttribute("data-theme-switching") === "glyph") {
+      repeindreParTranches(visibles);
+    } else {
+      for (const toile of visibles) peindreToile(toile, performance.now());
+    }
+  }
+
+  /*
+   * Au changement de thème par le front de glyphes, tout repeindre d'un bloc
+   * (des dizaines de milliers de cellules) retarderait d'autant le départ de la
+   * transition. Les surfaces sont donc repeintes aux nouvelles couleurs par
+   * tranches de lignes, quelques millisecondes par image, en commençant par la
+   * partie visible : le front met plus d'un dixième de seconde à découvrir
+   * quoi que ce soit, le temps qu'il faut pour finir.
+   *
+   * La trame est figée pendant ce temps (voir `image`) : ses codes ne bougent
+   * pas, et `avant`, rempli de 255, garantit que rien n'est oublié si la
+   * boucle reprend avant la fin.
+   */
+  let tranches = 0;
+
+  function repeindreParTranches(surfaces: Toile[]) {
+    cancelAnimationFrame(tranches);
+    const files = surfaces.map((toile) => {
+      const { lignes, pixels } = toile.etat!;
+      const haut = toile.canvas.getBoundingClientRect().top;
+      const premiere = Math.min(lignes - 1, Math.max(0, Math.floor((-haut * (window.devicePixelRatio || 1)) / pixels)));
+      // La partie visible d'abord, puis ce qui la précède.
+      return { toile, ordre: [...range(premiere, lignes), ...range(0, premiere)], rang: 0 };
+    });
+
+    const tranche = () => {
+      const limite = performance.now() + BUDGET;
+      while (files.length > 0 && performance.now() < limite) {
+        const file = files[0];
+        const etat = file.toile.etat;
+        if (!etat || file.rang >= file.ordre.length) {
+          files.shift();
+          continue;
+        }
+        for (const ligne of file.ordre.slice(file.rang, file.rang + LIGNES_PAR_COUP)) {
+          const debutLigne = ligne * etat.colonnes;
+          peindre(etat.contexte, etat.tuiles, etat.codes, etat.avant, etat.colonnes, etat.pixels, debutLigne, debutLigne + etat.colonnes);
+        }
+        file.rang += LIGNES_PAR_COUP;
+      }
+      if (files.length > 0) tranches = requestAnimationFrame(tranche);
+    };
+
+    tranches = requestAnimationFrame(tranche);
+  }
+
+  function range(de: number, a: number) {
+    return Array.from({ length: Math.max(0, a - de) }, (_, i) => de + i);
   }
 
   let toiles: Toile[] = [];
   let fond: Toile | undefined;
   let boucle = 0;
   let derniere = 0;
+  let figee: number | undefined;
 
   function image(maintenant: number) {
     boucle = requestAnimationFrame(image);
+    // Pendant un changement de thème, la trame se fige : l'ancienne page n'est
+    // plus qu'une capture immobile, et le front a besoin de chaque image. Elle
+    // repart ensuite d'où elle était : un saut d'une seconde la ferait
+    // repeindre presque entière d'un coup.
+    if (root.hasAttribute("data-theme-switching")) {
+      figee ??= maintenant;
+      return;
+    }
+    if (figee !== undefined) {
+      debut += maintenant - figee;
+      figee = undefined;
+    }
     if (document.hidden || maintenant - derniere < 1000 / FPS) return;
     derniere = maintenant;
 

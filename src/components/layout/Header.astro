@@ -1064,26 +1064,153 @@ const switches = [
   import { onEachPage } from "../../lib/enhance";
   import { switchLangPath, type Lang } from "../../lib/i18n";
   import { readingPosition, restoredScrollY, type ReadingPosition } from "../../lib/lang-switch";
-  import { wireGlyphToggle } from "../../lib/glyph";
+  import { imageDAtlas, TEINTES, wireGlyphToggle } from "../../lib/glyph";
   import { wireShineToggle } from "../../lib/shine";
-  import { wireThemeToggle, withViewTransition } from "../../lib/theme";
+  import { wireThemeToggle, withViewTransition, type ThemeTransition } from "../../lib/theme";
+  import {
+    CELLULE,
+    DUREE,
+    bordure,
+    front,
+    imagesDuMasque,
+    inverse,
+    peindreFront,
+    positionsDuMasque,
+    rayon,
+    taillesDuMasque,
+    type Sens,
+  } from "../../lib/theme-front";
 
   const motionOk = () => !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /** Le sens du prochain front : il alterne à chaque changement, et survit aux navigations. */
+  let sens: Sens = "descend";
+
+  /** Les teintes de la trame du thème affiché. */
+  function palette() {
+    const style = getComputedStyle(document.documentElement);
+    return TEINTES.map((teinte) => style.getPropertyValue(`--glyph-${teinte}`).trim() || "#888");
+  }
+
+  /**
+   * Change de thème derrière un front de glyphes qui traverse la page, en
+   * descendant puis en montant au changement suivant : voir
+   * src/lib/theme-front.ts pour le dessin, global.css pour la transition.
+   *
+   * La toile et le masque sont posés dans la mise à jour : la toile doit faire
+   * partie du nouvel état pour être capturée, et le masque cacher la nouvelle
+   * page dès la première image. Le front ne part qu'une fois les captures
+   * prêtes, et tout est retiré à la fin, interrompue ou non.
+   */
+  function changerDeTheme(update: () => void) {
+    if (!motionOk()) {
+      withViewTransition(document, false, update);
+      return;
+    }
+
+    const avant = palette();
+    const ceSens = sens;
+    sens = inverse(sens);
+    let apres = avant;
+    let toile: HTMLCanvasElement | undefined;
+    let masque: CSSStyleSheet | undefined;
+
+    const poser = () => {
+      update();
+      apres = palette();
+
+      // Un second clic en pleine transition : le front précédent laisse la place.
+      document.querySelector("[data-theme-front]")?.remove();
+      toile = document.createElement("canvas");
+      toile.dataset.themeFront = "";
+      toile.setAttribute("aria-hidden", "true");
+      toile.style.cssText =
+        "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;view-transition-name:theme-front";
+      document.body.append(toile);
+
+      masque = new CSSStyleSheet();
+      masque.replaceSync("::view-transition-new(root) { mask-image: linear-gradient(transparent, transparent); }");
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, masque];
+    };
+
+    const animer = ({ ready, finished }: ThemeTransition) => {
+      ready.then(() => toile && masque && lancerFront(toile, masque, ceSens, avant, apres)).catch(() => {});
+      finished
+        .finally(() => {
+          toile?.remove();
+          document.adoptedStyleSheets = document.adoptedStyleSheets.filter((sheet) => sheet !== masque);
+        })
+        .catch(() => {});
+    };
+
+    withViewTransition(document, true, poser, animer);
+  }
+
+  function lancerFront(
+    toile: HTMLCanvasElement,
+    masque: CSSStyleSheet,
+    sens: Sens,
+    avant: string[],
+    apres: string[],
+  ) {
+    const largeur = window.innerWidth;
+    const hauteur = window.innerHeight;
+    const densite = Math.min(2, window.devicePixelRatio || 1);
+    const pinceau = toile.getContext("2d");
+    if (!pinceau) return;
+
+    toile.width = Math.ceil(largeur * densite);
+    toile.height = Math.ceil(hauteur * densite);
+    pinceau.scale(densite, densite);
+
+    // Les glyphes dans les teintes des deux thèmes : l'ancien, puis le nouveau.
+    const tuile = Math.round(CELLULE * densite);
+    const tuiles = imageDAtlas(tuile, [...avant, ...apres]);
+
+    // Un bord tiré au hasard : deux changements de suite n'ont pas la même forme.
+    const grille = front(largeur, hauteur, sens, Math.floor(Math.random() * 1e6));
+
+    // Le masque est posé une fois : son bord, puis l'aplat qui le prolonge.
+    // Sa course est confiée au navigateur, qui le fait glisser sans que le
+    // style de la page soit recalculé à chaque image.
+    const regle = masque.cssRules[0] as CSSStyleRule;
+    regle.style.setProperty("mask-image", `${bordure(grille)}, linear-gradient(#000, #000)`);
+    regle.style.setProperty("mask-size", taillesDuMasque(grille));
+    regle.style.setProperty("mask-repeat", "no-repeat");
+    regle.style.setProperty("mask-position", positionsDuMasque(grille, 0));
+    const course = document.documentElement.animate(imagesDuMasque(grille), {
+      duration: DUREE,
+      fill: "both",
+      pseudoElement: "::view-transition-new(root)",
+    });
+
+    // Les glyphes suivent l'horloge de cette animation : à chaque image, le
+    // front et le masque en sont au même point. Elle part à la première image,
+    // sans saut si la préparation a pris du temps.
+    const image = () => {
+      if (!toile.isConnected || course.playState === "idle") return;
+
+      const bord = rayon(grille, Number(course.currentTime ?? 0));
+      peindreFront(pinceau, tuiles, tuile, grille, bord);
+      if (bord < grille.fin) requestAnimationFrame(image);
+    };
+
+    requestAnimationFrame(image);
+  }
 
   /**
    * Interrupteurs du panneau de réglages et du menu replié : voir src/lib/theme.ts et
    * src/lib/shine.ts et src/lib/glyph.ts, où ils sont testés. Le changement de
-   * thème se fait dans un fondu enchaîné de toute la page. Les réglages sont posés avant le
-   * premier rendu par le script en ligne de BaseLayout.
+   * thème passe derrière un front de glyphes, vers le bas puis vers le haut.
+   * Les réglages sont posés avant le premier rendu par le script en ligne de
+   * BaseLayout.
    */
   onEachPage((signal) => {
     const theme = [...document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")];
     const shine = [...document.querySelectorAll<HTMLButtonElement>("[data-shine-toggle]")];
     const glyph = [...document.querySelectorAll<HTMLButtonElement>("[data-glyph-toggle]")];
 
-    wireThemeToggle(theme, document.documentElement, () => localStorage, signal, (update) =>
-      withViewTransition(document, motionOk(), update),
-    );
+    wireThemeToggle(theme, document.documentElement, () => localStorage, signal, changerDeTheme);
     wireShineToggle(shine, document.documentElement, () => localStorage, signal);
     wireGlyphToggle(glyph, document.documentElement, () => localStorage, signal);
   });
@@ -1112,13 +1239,22 @@ const switches = [
      */
     const expand = (open: boolean) => gear.setAttribute("aria-expanded", String(open));
 
-    const place = () => {
-      const rect = gear.getBoundingClientRect();
-      const right = document.documentElement.clientWidth - rect.right;
+    let top = "";
+    let right = "";
 
-      panel.style.top = `${rect.bottom + 8}px`;
-      panel.style.right = `${Math.max(right, 16)}px`;
+    const place = () => {
       frame = requestAnimationFrame(place);
+      // Pendant un changement de thème, rien ne bouge, et mesurer forcerait le
+      // navigateur à recalculer la page à chaque image du front.
+      if (document.documentElement.hasAttribute("data-theme-switching")) return;
+
+      const rect = gear.getBoundingClientRect();
+      const nextTop = `${rect.bottom + 8}px`;
+      const nextRight = `${Math.max(document.documentElement.clientWidth - rect.right, 16)}px`;
+
+      // Réécrire la même position salirait le style pour rien.
+      if (nextTop !== top) panel.style.top = top = nextTop;
+      if (nextRight !== right) panel.style.right = right = nextRight;
     };
 
     const stop = () => cancelAnimationFrame(frame);

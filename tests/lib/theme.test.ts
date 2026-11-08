@@ -132,25 +132,48 @@ describe("wireThemeToggle, avec une transition", () => {
     // Avant l'appel : encore sombre ; après : clair. La transition enrobe bien le changement.
     expect(seen).toEqual(["dark", "light"]);
   });
+
+  it("passe à la transition le bouton cliqué, d'où elle part", () => {
+    const panel = fakeButton();
+    const menu = fakeButton();
+    const from: unknown[] = [];
+
+    wireThemeToggle(
+      [panel, menu],
+      { dataset: {} } as never,
+      () => fakeStore(),
+      new AbortController().signal,
+      (update, button) => {
+        from.push(button);
+        update();
+      },
+    );
+
+    menu.click();
+    expect(from).toEqual([menu]);
+  });
 });
 
 describe("withViewTransition", () => {
-  /** Un document dont on suit les attributs de <html> et les fondus lancés. */
+  /** Un document dont on suit les attributs de <html> et les transitions lancées. */
   function fakeDocument(supported = true) {
-    const attributes = new Set<string>();
+    const attributes = new Map<string, string>();
     let finish!: () => void;
     const calls: string[] = [];
 
     const doc = {
       documentElement: {
-        setAttribute: (name: string) => attributes.add(name),
+        setAttribute: (name: string, value: string) => attributes.set(name, value),
         removeAttribute: (name: string) => attributes.delete(name),
       },
       startViewTransition: supported
         ? (update: () => void) => {
             calls.push("start");
             update();
-            return { finished: new Promise<void>((resolve) => (finish = resolve)) };
+            return {
+              ready: Promise.resolve(),
+              finished: new Promise<void>((resolve) => (finish = resolve)),
+            };
           }
         : undefined,
     };
@@ -158,23 +181,26 @@ describe("withViewTransition", () => {
     return { doc, attributes, calls, finish: () => finish() };
   }
 
-  it("lance un fondu et marque <html> le temps du fondu", async () => {
+  it("confie la transition à l'animation et marque <html> le temps qu'elle dure", async () => {
     const { doc, attributes, calls, finish } = fakeDocument();
     const update = vi.fn();
+    const animate = vi.fn();
 
-    withViewTransition(doc, true, update);
+    withViewTransition(doc, true, update, animate);
 
     expect(calls).toEqual(["start"]);
     expect(update).toHaveBeenCalledOnce();
-    expect(attributes.has("data-theme-switching")).toBe(true);
+    expect(animate).toHaveBeenCalledOnce();
+    expect(animate.mock.calls[0][0]).toHaveProperty("ready");
+    expect(attributes.get("data-theme-switching")).toBe("glyph");
 
     finish();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(attributes.has("data-theme-switching")).toBe(false);
   });
 
-  it("reste silencieux et nettoie <html> quand le fondu est interrompu", async () => {
-    // Un second clic pendant le fondu l'abandonne : `finished` est alors rejeté.
+  it("reste silencieux et nettoie <html> quand la transition est interrompue", async () => {
+    // Un second clic pendant la transition l'abandonne : `finished` est alors rejeté.
     const attributes = new Set<string>();
     const doc = {
       documentElement: {
@@ -183,33 +209,47 @@ describe("withViewTransition", () => {
       },
       startViewTransition: (update: () => void) => {
         update();
-        return { finished: Promise.reject(new Error("AbortError")) };
+        return { ready: Promise.resolve(), finished: Promise.reject(new Error("AbortError")) };
       },
     };
 
-    expect(() => withViewTransition(doc, true, () => {})).not.toThrow();
+    expect(() => withViewTransition(doc, true, () => {}, () => {})).not.toThrow();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(attributes.has("data-theme-switching")).toBe(false);
   });
 
-  it("applique directement quand le visiteur préfère réduire les animations", () => {
+  it("se contente d'un fondu, sans animation, quand le visiteur réduit les animations", () => {
+    // Un passage instantané du noir au papier serait le plus brutal de tous.
     const { doc, attributes, calls } = fakeDocument();
     const update = vi.fn();
+    const animate = vi.fn();
 
-    withViewTransition(doc, false, update);
+    withViewTransition(doc, false, update, animate);
 
-    expect(calls).toEqual([]);
+    expect(calls).toEqual(["start"]);
     expect(update).toHaveBeenCalledOnce();
-    expect(attributes.size).toBe(0);
+    expect(animate).not.toHaveBeenCalled();
+    expect(attributes.get("data-theme-switching")).toBe("fade");
+  });
+
+  it("se contente aussi d'un fondu sans animation fournie", () => {
+    const { doc, attributes } = fakeDocument();
+
+    withViewTransition(doc, true, () => {});
+
+    expect(attributes.get("data-theme-switching")).toBe("fade");
   });
 
   it("applique directement sur un navigateur sans View Transitions", () => {
-    const { doc, calls } = fakeDocument(false);
+    const { doc, attributes, calls } = fakeDocument(false);
     const update = vi.fn();
+    const animate = vi.fn();
 
-    withViewTransition(doc, true, update);
+    withViewTransition(doc, true, update, animate);
 
     expect(calls).toEqual([]);
     expect(update).toHaveBeenCalledOnce();
+    expect(animate).not.toHaveBeenCalled();
+    expect(attributes.size).toBe(0);
   });
 });

@@ -847,15 +847,55 @@ body::after {
 }
 
 /*
- * Changement de thème : un fondu enchaîné de toute la page (View Transitions,
- * voir `withViewTransition` dans src/lib/theme.ts), un peu plus long que celui
- * du navigateur pour qu'on voie le fond basculer plutôt que clignoter. Le
- * drapeau limite la règle au thème : les fondus de navigation du routeur
- * gardent leur propre durée.
+ * Changement de thème (View Transitions, voir `withViewTransition` dans
+ * src/lib/theme.ts et le front dans src/lib/theme-front.ts). Le nouveau thème
+ * est imprimé par la trame : un front de glyphes traverse la page, vers le bas
+ * puis vers le haut au changement suivant, et la nouvelle page apparaît
+ * derrière lui.
+ *
+ * L'ancienne page reste immobile dessous. La nouvelle apparaît par un
+ * masque : le bord irrégulier du front, dessiné une fois en SVG et fondu sur
+ * son épaisseur, posé par une feuille adoptée le temps de la transition,
+ * puis glissé par une animation du navigateur (Web Animations sur
+ * `mask-position`), sans retoucher de style à chaque image.
+ * `theme-tenue` ne fait rien : elle donne seulement à la transition une
+ * durée, un peu plus longue que la course du front (`DUREE`, 1 s), sans
+ * quoi elle se terminerait dès son début. `normal` remplace le `plus-lighter` du fondu par défaut.
+ *
+ * Le front est une toile nommée `theme-front` : nommée, elle est capturée à
+ * part et peinte au-dessus de la page, et sa capture reste vivante.
+ *
+ * Le drapeau limite ces règles au thème : les fondus de navigation du routeur
+ * gardent les leurs.
  */
-:root[data-theme-switching]::view-transition-old(root),
-:root[data-theme-switching]::view-transition-new(root) {
-  animation-duration: 0.4s;
+:root[data-theme-switching="glyph"]::view-transition-old(root) {
+  animation: none;
+}
+
+:root[data-theme-switching="glyph"]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: theme-tenue 1.15s linear both;
+}
+
+@keyframes theme-tenue {
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-group(theme-front),
+::view-transition-new(theme-front) {
+  animation: none;
+}
+
+::view-transition-old(theme-front) {
+  display: none;
+}
+
+/* Animations réduites : un fondu seul, plus long que celui du navigateur. */
+:root[data-theme-switching="fade"]::view-transition-old(root),
+:root[data-theme-switching="fade"]::view-transition-new(root) {
+  animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 

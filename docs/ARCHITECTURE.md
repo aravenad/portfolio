@@ -125,7 +125,7 @@ Chaque comportement est aussi vérifié de bout en bout, dans `e2e/`.
 | Bouton de retour en haut | `ui/BackToTop.astro` | `lib/back-to-top.ts` |
 | Glissement de la page active | `ui/Pagination.astro` | `lib/pagination.ts` |
 | Sommaire des fiches et curseur de lecture | `ui/TableOfContents.astro` | `lib/toc.ts` |
-| Bouton de thème, en fondu enchaîné | `layout/Header.astro` | `lib/theme.ts` |
+| Bouton de thème, front de glyphes qui descend puis remonte | `layout/Header.astro` | `lib/theme.ts`, `lib/theme-front.ts` |
 | Lien de langue recalé après chaque navigation | `layout/Header.astro` | `lib/i18n.ts` |
 | Position de lecture gardée en changeant de langue | `layout/Header.astro` | `lib/lang-switch.ts` |
 | Apparition au défilement, ancres depuis une autre page | `layouts/BaseLayout.astro` | Tests de page |
@@ -218,10 +218,19 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 - **Aucun flash** : un script en ligne du `<head>` applique le thème mémorisé
   avant le premier rendu, et le reporte sur la page suivante à chaque
   navigation.
-- **Un fondu au changement** : le bouton bascule le thème dans une View
-  Transition (fondu enchaîné de toute la page, 0,4 s), qui couvre aussi ce que
-  CSS ne sait pas animer, comme la matière qui s'inverse. Sans ce support, ou
-  sous `prefers-reduced-motion`, le changement est immédiat.
+- **Un front de glyphes au changement** : le bouton bascule le thème dans une
+  View Transition, qui couvre aussi ce que CSS ne sait pas animer, comme la
+  matière qui s'inverse. Le nouveau thème se découvre du haut vers le bas, puis
+  du bas vers le haut au changement suivant (1 s), derrière un bord irrégulier
+  (colonnes décalées par une houle tirée au hasard), par un masque fondu sur
+  l'épaisseur d'une bande de glyphes peinte sur un canvas (même rampe, même
+  Bayer, mêmes teintes que la trame du fond ; `lib/theme-front.ts`). Pour la
+  fluidité, le bord du masque est une image SVG dessinée une fois puis glissée
+  par une animation du navigateur, dont l'horloge règle aussi le canvas ; celui-ci
+  ne parcourt que les lignes du front. La trame du fond se fige pendant la
+  course et se repeint aux nouvelles couleurs par tranches de 3 ms, lignes
+  visibles d'abord, avant que le front ne l'atteigne. Sous `prefers-reduced-motion`, un simple fondu de
+  0,6 s ; sans View Transitions, le changement est immédiat.
 - **Le clair retourne l'échelle `zinc`** au lieu d'ajouter des classes : sous
   `data-theme="light"`, `global.css` redonne à chaque nuance une valeur claire
   (`zinc-950`, le fond, devient un papier crème `#ECE5DA` ; `zinc-100`, les
@@ -246,9 +255,9 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 ## 5. Tests
 
 ```sh
-npm test          # 806 tests, quelques secondes
+npm test          # 862 tests, quelques secondes
 npm run coverage  # idem, avec le seuil de couverture (80 %) exigé par la CI
-npm run test:e2e  # 82 tests de bout en bout, une quarantaine de secondes
+npm run test:e2e  # 87 tests de bout en bout, une quarantaine de secondes
 ```
 
 Deux niveaux, qui se complètent :

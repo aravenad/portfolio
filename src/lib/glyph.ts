@@ -301,10 +301,38 @@ export function atlas(pinceau: Pinceau, cellule: number, couleurs: readonly stri
 }
 
 /**
+ * L'atlas de `atlas()`, rendu une fois en image : une `ImageBitmap` quand le
+ * navigateur sait faire (OffscreenCanvas), un canvas sinon. Copier depuis une
+ * image coûte moins que depuis un canvas, que le navigateur doit figer à
+ * chaque copie, soit des milliers de fois par image.
+ */
+export function imageDAtlas(cellule: number, couleurs: readonly string[]): CanvasImageSource {
+  const largeur = cellule * RAMPE.length;
+  const hauteur = cellule * couleurs.length;
+
+  if (typeof OffscreenCanvas === "function") {
+    const toile = new OffscreenCanvas(largeur, hauteur);
+    const pinceau = toile.getContext("2d");
+    if (pinceau) {
+      atlas(pinceau, cellule, couleurs);
+      return toile.transferToImageBitmap();
+    }
+  }
+
+  const toile = document.createElement("canvas");
+  toile.width = largeur;
+  toile.height = hauteur;
+  atlas(toile.getContext("2d")!, cellule, couleurs);
+  return toile;
+}
+
+/**
  * Peint les cellules de `codes` qui diffèrent de `avant`, puis met `avant` à
  * jour. D'une image à la suivante, seule une partie de la grille change : le
  * reste n'est pas repeint. Un `avant` rempli de 255, code impossible, force à
  * tout peindre.
+ *
+ * `debut` et `fin` bornent les cellules parcourues, pour peindre par tranches.
  *
  * Renvoie le nombre de cellules repeintes.
  */
@@ -315,10 +343,12 @@ export function peindre(
   avant: Uint8Array,
   colonnes: number,
   cellule: number,
+  debut = 0,
+  fin = codes.length,
 ): number {
   let repeintes = 0;
 
-  for (let i = 0; i < codes.length; i++) {
+  for (let i = debut; i < fin; i++) {
     const valeur = codes[i];
     if (valeur === avant[i]) continue;
 

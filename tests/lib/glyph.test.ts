@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   BALAYAGE,
@@ -19,6 +19,7 @@ import {
   empreinte,
   fraction,
   grille,
+  imageDAtlas,
   lumiere,
   peindre,
   ton,
@@ -231,6 +232,62 @@ describe("atlas", () => {
   });
 });
 
+describe("imageDAtlas", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  /** Un canvas factice : `contexte` est ce que rend `getContext`. */
+  function fakeToile(contexte: ReturnType<typeof fakePinceau> | null) {
+    return { width: 0, height: 0, getContext: () => contexte };
+  }
+
+  it("rend l'atlas une fois en image, quand le navigateur a OffscreenCanvas", () => {
+    const pinceau = fakePinceau();
+    const image = { image: true };
+    const tailles: number[][] = [];
+
+    vi.stubGlobal(
+      "OffscreenCanvas",
+      class {
+        constructor(largeur: number, hauteur: number) {
+          tailles.push([largeur, hauteur]);
+        }
+        getContext = () => pinceau;
+        transferToImageBitmap = () => image;
+      },
+    );
+
+    expect(imageDAtlas(10, ["#000", "#111"])).toBe(image);
+    expect(tailles).toEqual([[10 * RAMPE.length, 20]]);
+    expect(pinceau.textes).toHaveLength(2 * (RAMPE.length - 1));
+  });
+
+  it("se rabat sur un canvas sans OffscreenCanvas", () => {
+    const pinceau = fakePinceau();
+    const toile = fakeToile(pinceau);
+    vi.stubGlobal("OffscreenCanvas", undefined);
+    vi.stubGlobal("document", { createElement: () => toile });
+
+    expect(imageDAtlas(10, ["#000"])).toBe(toile);
+    expect([toile.width, toile.height]).toEqual([10 * RAMPE.length, 10]);
+    expect(pinceau.textes).toHaveLength(RAMPE.length - 1);
+  });
+
+  it("se rabat aussi sur un canvas quand OffscreenCanvas n'a pas de contexte 2D", () => {
+    const pinceau = fakePinceau();
+    const toile = fakeToile(pinceau);
+    vi.stubGlobal(
+      "OffscreenCanvas",
+      class {
+        getContext = () => null;
+      },
+    );
+    vi.stubGlobal("document", { createElement: () => toile });
+
+    expect(imageDAtlas(10, ["#000"])).toBe(toile);
+    expect(pinceau.textes).toHaveLength(RAMPE.length - 1);
+  });
+});
+
 describe("peindre", () => {
   it("ne repeint que les cellules qui ont changé, et les retient", () => {
     const pinceau = fakePinceau();
@@ -246,6 +303,20 @@ describe("peindre", () => {
     expect(pinceau.copies).toEqual([[16, 8, 8, 8, 8, 0, 8, 8]]);
     expect([...avant]).toEqual([0, 10, 0]);
     expect(peindre(pinceau, {} as CanvasImageSource, codes, avant, 2, 8)).toBe(0);
+  });
+
+  it("peut ne parcourir qu'une tranche, pour peindre ligne par ligne", () => {
+    const pinceau = fakePinceau();
+    const avant = new Uint8Array(4).fill(255);
+    const codes = new Uint8Array([1, 2, 3, 4]);
+
+    // La seconde ligne seule : les cellules 2 et 3.
+    expect(peindre(pinceau, {} as CanvasImageSource, codes, avant, 2, 8, 2, 4)).toBe(2);
+    expect(pinceau.effaces).toEqual([
+      [0, 8, 8, 8],
+      [8, 8, 8, 8],
+    ]);
+    expect([...avant]).toEqual([255, 255, 3, 4]);
   });
 });
 
