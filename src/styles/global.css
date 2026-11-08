@@ -52,13 +52,22 @@
  * et le noir s'échangent de la même façon : le bouton plein devient graphite,
  * et le lettrage chromé devient un reflet sombre sur le papier.
  *
- * Pensé pour ne pas fatiguer l'œil : pas de blanc pur (le fond est un gris
- * perle à 94,6 % de luminance), pas de noir pur (les titres restent à 23,5 %),
- * soit ~13:1 pour les titres et ~7:1 pour le texte courant — nets sans être
- * durs. Les neutres gardent la teinte froide de la palette zinc (286).
+ * UN PAPIER, PAS UN ÉCRAN BLANC. Le sombre est un métal froid ; le clair en est
+ * le négatif sur papier : fond crème (#ECE5DA, teinte 81), encre graphite
+ * légèrement chaude (teinte 62). Le premier clair, un gris perle froid à
+ * 94,6 %, éblouissait, surtout au basculement depuis le noir. Le papier
+ * descend à 92,4 % et sa chaleur retire le bleu qui fatiguait : ~13:1 pour les
+ * titres, ~7,5:1 pour le texte courant, nets sans être durs. Un crème plus
+ * clair (#F4EFE6, 95,4 %) a été essayé : plus lumineux que l'ancien gris, il
+ * éblouissait autant.
+ *
+ * Les surfaces suivent le papier (cartes et filets un ton plus foncés, boutons
+ * à contour un ton plus clairs, comme une carte posée dessus) ; les ombres sont
+ * brunes et les arêtes de lumière crème, un noir ou un blanc neutres salissant
+ * le papier.
  *
  * L'accent argent, illisible sur fond clair, devient un bleu acier de même
- * teinte (250) : même rôle, même discrétion.
+ * teinte (250) : une encre bleue sur le papier, la même que la trame.
  */
 :root {
   color-scheme: dark;
@@ -81,33 +90,39 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --color-zinc-950: oklch(94.6% 0.004 286);
-  --color-zinc-900: oklch(90.6% 0.005 286);
-  --color-zinc-800: oklch(86% 0.006 286);
-  --color-zinc-700: oklch(76% 0.009 286);
-  --color-zinc-600: oklch(57% 0.014 286);
-  --color-zinc-500: oklch(49% 0.015 286);
-  --color-zinc-400: oklch(40% 0.014 286);
-  --color-zinc-300: oklch(33% 0.012 286);
-  --color-zinc-200: oklch(28% 0.01 286);
-  --color-zinc-100: oklch(23.5% 0.008 286);
-  --color-zinc-50: oklch(21% 0.006 286);
-  --color-white: oklch(18% 0.005 286);
-  --color-black: oklch(97% 0.003 286);
-  --color-accent: oklch(46% 0.08 250);
+  /* Le papier et ses tons (fond, cartes, filets), teinte 81. */
+  --color-zinc-950: oklch(92.4% 0.017 81);
+  --color-zinc-900: oklch(88.8% 0.018 81);
+  --color-zinc-800: oklch(84.2% 0.019 80);
+  --color-zinc-700: oklch(74.6% 0.019 78);
+  /* L'encre graphite, teinte 62. */
+  --color-zinc-600: oklch(57% 0.016 70);
+  --color-zinc-500: oklch(48% 0.014 66);
+  --color-zinc-400: oklch(39.5% 0.013 62);
+  --color-zinc-300: oklch(33% 0.012 62);
+  --color-zinc-200: oklch(28% 0.011 62);
+  --color-zinc-100: oklch(23.5% 0.011 62);
+  --color-zinc-50: oklch(21% 0.01 62);
+  --color-white: oklch(18% 0.01 62);
+  --color-black: oklch(96.4% 0.013 84);
+  --color-accent: oklch(45% 0.085 252);
 
   /*
    * En clair, l'encre s'inverse comme la matière : les reflets, les glyphes
    * les plus pleins, deviennent les plus foncés. L'encre est plus soutenue
    * qu'en sombre : sur le papier clair, des bleus pâles ne se voyaient plus.
+   * Les teintes basses, les plus nombreuses, sont tirées vers l'encre : à
+   * peine plus foncées que le papier, la trame s'y effaçait. La nuit, qui
+   * borde le fond, et la cendre prennent la chaleur du papier ; les bleus
+   * restent une encre bleue.
    */
-  --glyph-nuit: oklch(85.1% 0.015 264);
-  --glyph-abysse: oklch(75.5% 0.05 263);
-  --glyph-cobalt: oklch(61.9% 0.091 264);
-  --glyph-azur: oklch(50.1% 0.117 263);
-  --glyph-ciel: oklch(41.3% 0.112 262);
-  --glyph-givre: oklch(28.2% 0.08 263);
-  --glyph-cendre: oklch(46.9% 0.016 258);
+  --glyph-nuit: oklch(78% 0.02 71);
+  --glyph-abysse: oklch(66% 0.065 263);
+  --glyph-cobalt: oklch(55% 0.1 264);
+  --glyph-azur: oklch(46% 0.12 263);
+  --glyph-ciel: oklch(38% 0.11 262);
+  --glyph-givre: oklch(27% 0.08 263);
+  --glyph-cendre: oklch(42% 0.014 60);
 }
 
 /*
@@ -269,11 +284,11 @@ body[data-home="true"] .glyph-field {
 }
 
 :root[data-theme="light"] .glyph-field {
-  opacity: 0.6;
+  opacity: 0.85;
 }
 
 :root[data-theme="light"] body[data-home="true"] .glyph-field {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /*
@@ -442,7 +457,7 @@ body::after {
  * En clair, l'encre est graphite et le reflet doit l'éclaircir. Les mêmes stops
  * passaient de 18 % à 40 % de luminance : un écart qui se voit sur un blanc,
  * pas sur une encre sombre. Le reflet monte donc jusqu'à `zinc-600` (57 %), ce
- * qui reste lisible sur le gris perle pour des corps de cette taille.
+ * qui reste lisible sur le papier pour des corps de cette taille.
  *
  * Chrome fixe seulement : de même poids que la règle du reflet et placée après
  * elle, cette règle écraserait sinon son dégradé animé.
@@ -492,10 +507,16 @@ body::after {
 
 /*
  * En clair, `--color-white` est l'encre graphite : l'arête doit rester une
- * lumière, donc un vrai blanc, plus appuyé pour se voir sur une surface claire.
+ * lumière, plus appuyée pour se voir sur une surface claire, et crème comme
+ * le papier (un blanc neutre y paraissait bleuté).
  */
+:root[data-theme="light"] {
+  --paper-light: oklch(99% 0.012 85);
+  --paper-shadow: oklch(30% 0.035 60);
+}
+
 :root[data-theme="light"] .surface-lit {
-  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 55%);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--paper-light) 55%, transparent);
 }
 
 /*
@@ -556,26 +577,27 @@ body::after {
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 10%);
 }
 
+/* En clair, des ombres brunes : un noir neutre grisait le papier. */
 :root[data-theme="light"] .surface-raised {
   box-shadow:
-    inset 0 1px 0 oklch(100% 0 0 / 60%),
-    inset 0 -1px 0 oklch(0% 0 0 / 6%),
-    0 1px 1px oklch(0% 0 0 / 7%),
-    0 2px 3px -1px oklch(0% 0 0 / 6%);
+    inset 0 1px 0 color-mix(in oklab, var(--paper-light) 60%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, var(--paper-shadow) 8%, transparent),
+    0 1px 1px color-mix(in oklab, var(--paper-shadow) 10%, transparent),
+    0 2px 3px -1px color-mix(in oklab, var(--paper-shadow) 8%, transparent);
 }
 
 @media (hover: hover) {
   :root[data-theme="light"] .surface-raised:hover {
     box-shadow:
-      inset 0 1px 0 oklch(100% 0 0 / 60%),
-      inset 0 -1px 0 oklch(0% 0 0 / 6%),
-      0 1px 1px oklch(0% 0 0 / 9%),
-      0 3px 6px -2px oklch(0% 0 0 / 12%);
+      inset 0 1px 0 color-mix(in oklab, var(--paper-light) 60%, transparent),
+      inset 0 -1px 0 color-mix(in oklab, var(--paper-shadow) 8%, transparent),
+      0 1px 1px color-mix(in oklab, var(--paper-shadow) 12%, transparent),
+      0 3px 6px -2px color-mix(in oklab, var(--paper-shadow) 16%, transparent);
   }
 }
 
 :root[data-theme="light"] .surface-raised:active {
-  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 60%);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--paper-light) 60%, transparent);
 }
 
 /*

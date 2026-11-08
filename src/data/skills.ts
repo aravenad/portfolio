@@ -27,8 +27,8 @@ export const technicalSkills: Skill[] = [
   // Le violet officiel du logo CSS (rebeccapurple, #663399) ne tient que 2,2:1
   // sur la tuile : éclairci de 25 % vers le blanc, teinte inchangée.
   { label: "CSS", icon: "simple-icons:css", color: "#8C66B3" },
-  // Le cyan officiel (#06B6D4) ne tient que 1,68:1 sur la tuile claire. En
-  // thème clair, il est assombri de 30 % vers le noir, teinte inchangée : 3,24:1.
+  // Le cyan officiel (#06B6D4) ne tient que 1,57:1 sur la tuile claire. En
+  // thème clair, il est assombri de 30 % vers le noir, teinte inchangée : 3,05:1.
   {
     label: "Tailwind CSS",
     short: "TW",
@@ -36,9 +36,9 @@ export const technicalSkills: Skill[] = [
     color: "#06B6D4",
     colorLight: "#047F94",
   },
-  // Le jaune officiel ne tient que 1,07:1 sur la tuile claire. En thème clair,
-  // il passe à un jaune assombri (OKLCH 71 %, chroma 0,15, teinte 99° au lieu
-  // de 90 %, 0,18 et 101°) : 1,76:1. C'est la seule couleur sous les 3:1 des
+  // Le jaune officiel ne tient que 1,14:1 sur la tuile claire. En thème clair,
+  // il passe à un jaune assombri (OKLCH 69 %, chroma 0,15, teinte 99° au lieu
+  // de 90 %, 0,18 et 101°) : 1,79:1. C'est la seule couleur sous les 3:1 des
   // autres logos, par choix : les versions à 3:1 viraient à l'or foncé et ne
   // se lisaient plus comme le jaune de JavaScript. Le test lui fixe un plancher
   // à part.
@@ -47,7 +47,7 @@ export const technicalSkills: Skill[] = [
     short: "JS",
     icon: "simple-icons:javascript",
     color: "#F7DF1E",
-    colorLight: "#B9A207",
+    colorLight: "#B39B00",
   },
   { label: "TypeScript", short: "TS", icon: "simple-icons:typescript", color: "#3178C6" },
   { label: "Astro", icon: "simple-icons:astro", color: "#BC52EE" },

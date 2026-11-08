@@ -11,14 +11,14 @@
 /**
  * Bouton à contour. Rempli à peine plus clair que le fond, pour avoir une
  * matière sur laquelle poser le relief. En clair, l'échelle retournée donnerait
- * un bouton plus sombre que la page : il prend un blanc cassé, comme une touche,
- * et s'assombrit d'un cran au survol.
+ * un bouton plus sombre que la page : il prend un crème plus clair que le
+ * papier, comme une carte posée dessus, et s'assombrit d'un cran au survol.
  */
 export const outlineButton = [
   "surface-raised border border-zinc-700/80 bg-gradient-to-b from-zinc-800/70 to-zinc-900",
   "hover:border-zinc-600 hover:from-zinc-700/80 hover:to-zinc-800",
-  "light:border-zinc-700 light:from-[oklch(99%_0.002_286)] light:to-[oklch(96.5%_0.004_286)]",
-  "light:hover:border-zinc-700 light:hover:from-[oklch(97.5%_0.002_286)] light:hover:to-[oklch(93.5%_0.004_286)]",
+  "light:border-zinc-700 light:from-[oklch(97%_0.01_84)] light:to-[oklch(94.4%_0.014_83)]",
+  "light:hover:border-zinc-700 light:hover:from-[oklch(95.5%_0.012_84)] light:hover:to-[oklch(91.5%_0.016_82)]",
 ].join(" ");
 
 /**

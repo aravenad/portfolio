@@ -54,12 +54,12 @@ const TILE_BACKGROUND = "#141415";
  * avec la palette claire de global.css. C'est là que la couleur de marque
  * apparaît.
  */
-const LIGHT_TILE_BACKGROUND = "#D6D6DA";
+const LIGHT_TILE_BACKGROUND = "#D7CFC4";
 
 /**
  * Seuil propre à une marque en thème clair, là où le 3:1 général trahirait sa
  * couleur. JavaScript : à 3:1, son jaune devient un or foncé méconnaissable ;
- * le plancher empêche seulement de retomber vers le jaune officiel (1,07:1).
+ * le plancher empêche seulement de retomber vers le jaune officiel (1,14:1).
  */
 const LIGHT_CONTRAST_EXCEPTIONS: Record<string, number> = { JavaScript: 1.7 };
 

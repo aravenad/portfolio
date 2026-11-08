@@ -23,8 +23,8 @@ const t = useTranslations(lang);
 const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
 ---
 
-<nav aria-label={t.breadcrumb.label} data-breadcrumb class="text-sm">
-  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500">
+<nav aria-label={t.breadcrumb.label} data-breadcrumb class="crumbs text-sm">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-zinc-500 light:text-zinc-300">
     {
       crumbs.map((crumb, index) => (
         <li class="crumb flex items-center gap-x-2" style={`--index: ${index}`}>
@@ -35,7 +35,7 @@ const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
               {crumb.label}
             </a>
           ) : (
-            <span aria-current="page" class="text-zinc-300">
+            <span aria-current="page" class="text-zinc-300 light:text-zinc-100">
               {crumb.label}
             </span>
           )}
@@ -88,6 +88,22 @@ const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
 </template>
 
 <style>
+  /*
+   * En clair, le fil tombe dans la partie la plus dense de la trame, dont les
+   * glyphes ont la valeur de son texte : les lettres s'y perdaient. Une encre
+   * plus foncée, et un liseré net couleur papier autour de chaque lettre,
+   * peint sous elle, qui la détache des glyphes comme le nom d'une ville sur
+   * une carte. En sombre, la trame est assez éteinte pour s'en passer.
+   */
+  :global(:root[data-theme="light"]) .crumbs {
+    -webkit-text-stroke: 4px var(--color-zinc-950);
+    paint-order: stroke fill;
+  }
+
+  :global(:root[data-theme="light"]) .crumbs :global(svg) {
+    filter: drop-shadow(0 0 1px var(--color-zinc-950)) drop-shadow(0 0 1px var(--color-zinc-950));
+  }
+
   /*
    * Entrée en cascade, transposée de Breadcrumb (smoothui.dev) : chaque niveau
    * arrive décalé de 4 px vers la gauche, à 40 ms d'intervalle. Le composant

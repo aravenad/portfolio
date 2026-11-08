@@ -224,13 +224,18 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
   sous `prefers-reduced-motion`, le changement est immédiat.
 - **Le clair retourne l'échelle `zinc`** au lieu d'ajouter des classes : sous
   `data-theme="light"`, `global.css` redonne à chaque nuance une valeur claire
-  (`zinc-950`, le fond, devient un gris perle ; `zinc-100`, les titres, un
-  graphite). Chaque composant garde ainsi la même hiérarchie dans les deux
-  thèmes, sans une ligne de code en plus. Pas de blanc ni de noir purs, dans
-  aucun des deux thèmes : `white` et `black` prennent la teinte des gris, et le
-  contraste reste net sans fatiguer l'œil.
+  (`zinc-950`, le fond, devient un papier crème `#ECE5DA` ; `zinc-100`, les
+  titres, un graphite chaud). Chaque composant garde ainsi la même hiérarchie
+  dans les deux thèmes, sans une ligne de code en plus. Pas de blanc ni de noir
+  purs, dans aucun des deux thèmes : `white` et `black` prennent la teinte des
+  gris (froide en sombre, chaude en clair), et le contraste reste net sans
+  fatiguer l'œil. Le papier (92,4 % de luminance) remplace un gris perle froid
+  plus lumineux, qui éblouissait au changement de thème.
 - **Ce qui change en plus** : la matière est inversée (plis gris sur fond
-  clair) et l'accent argent devient un bleu acier. Les logos des compétences
+  clair), l'accent argent devient un bleu acier, les ombres des boutons
+  deviennent brunes et leurs arêtes crème, et le fil d'Ariane, posé sur la
+  matière, prend un contour net couleur papier pour rester lisible. La trame
+  du fond, plus dense en clair, fonce ses teintes basses pour rester visible. Les logos des compétences
   gardent leurs couleurs vives ; seule une marque qui disparaîtrait sur la tuile
   claire en porte une autre (`colorLight` : le noir de GitHub, de Symfony et de
   Linux, le marine de Flutter, le jaune assombri de JavaScript, le cyan assombri

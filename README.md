@@ -173,7 +173,7 @@ sombre dans `@theme`, et toute la palette du thème clair dans le bloc
 La direction artistique est monochrome, calquée sur la bannière LinkedIn : fond
 noir, matière métallique en haut de page, tramée en glyphes ASCII animés
 (que les réglages peuvent figer), lettrage chromé. Le thème clair en
-est le négatif doux : fond gris perle, matière en plis gris, lettrage graphite.
+est le négatif sur papier : fond crème, matière en plis gris, lettrage graphite.
 Elle tient dans `src/styles/global.css` (palette, calques, utilitaires),
 `src/assets/` (la matière, sa copie réduite pour la trame, et son masque de
 fondu) et `tools/og.html` (l'image
