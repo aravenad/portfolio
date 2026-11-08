@@ -324,6 +324,8 @@ Deux niveaux, qui se complètent :
   déclare attendues (`test.use({ expectedErrors })`), comme le statut 404 de la
   page introuvable. Les clics dans la barre passent par `clickInPlace`
   (`e2e/helpers.ts`), qui attend la cible immobile, ses transitions finies.
+  Après un saut d'ancre, `scrollSettled` attend la page immobile plutôt qu'un
+  délai fixe : un saut doux dure plus longtemps sur une machine chargée.
   Première fois : `npx playwright install --only-shell chromium`.
 
 Côté Vitest :

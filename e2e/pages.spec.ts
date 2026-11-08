@@ -1,4 +1,12 @@
-import { afterNavigation, expect, scrollToId, scrollToY, scrollY, test } from "./helpers";
+import {
+  afterNavigation,
+  expect,
+  scrollSettled,
+  scrollToId,
+  scrollToY,
+  scrollY,
+  test,
+} from "./helpers";
 
 /**
  * Le reste des scripts du site : apparition au défilement, sommaire des
@@ -142,8 +150,10 @@ test("le sommaire allume l'entrée cliquée, même quand la ligne de lecture en 
 
     await link.click();
     await expect(page.locator(`[id="${id}"]`)).toBeInViewport();
-    // Au-delà du délai de pose : l'entrée doit tenir une fois le saut fini.
-    await page.waitForTimeout(400);
+    // L'entrée doit tenir une fois le saut fini. Il faut attendre qu'il le
+    // soit : un coup de molette pendant le saut doux est ignoré par Chrome,
+    // qui finit le saut et rallume la dernière section.
+    await scrollSettled(page);
     await expect(link).toHaveAttribute("aria-current", "location");
     await expect(sidebar.locator("[aria-current]")).toHaveCount(1);
   }

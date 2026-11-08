@@ -78,6 +78,27 @@ export async function scrollToY(page: Page, y: number): Promise<void> {
 
 export const scrollY = (page: Page) => page.evaluate(() => window.scrollY);
 
+/**
+ * Attend la fin d'un défilement doux : deux mesures de suite, à 150 ms
+ * d'écart, identiques. Un délai fixe ne suffit pas : sur une machine chargée,
+ * le saut d'ancre dure plus longtemps.
+ */
+export async function scrollSettled(page: Page): Promise<void> {
+  let last = Number.NaN;
+
+  await expect
+    .poll(
+      async () => {
+        const y = await scrollY(page);
+        const still = y === last;
+        last = y;
+        return still;
+      },
+      { intervals: [150] },
+    )
+    .toBe(true);
+}
+
 /** Position du haut d'un élément dans la fenêtre. */
 export const topOf = (page: Page, id: string) =>
   page.evaluate((target) => document.getElementById(target)!.getBoundingClientRect().top, id);
