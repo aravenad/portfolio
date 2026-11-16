@@ -321,12 +321,21 @@ test.describe("accueil allégé", () => {
 
     test("LinkedIn et GitHub restent sur la même ligne", async ({ page }) => {
       await page.goto("");
-      const contact = page.locator("#contact");
-      await contact.scrollIntoViewIfNeeded();
 
-      const linkedin = await contact.locator('a[href*="linkedin"]').boundingBox();
-      const github = await contact.locator('a[href*="github"]').boundingBox();
-      expect(linkedin!.y).toBe(github!.y);
+      // Les deux hauteurs sont lues dans la même image, sans défiler. Deux
+      // `boundingBox()` successives après un défilement pouvaient encadrer un
+      // recalage de l'émulation mobile : à la taille imposée, la fenêtre de
+      // mise en page naît plus haute que l'écran (841 px pour 780), la zone
+      // visible glisse de l'écart, puis revient. Une icône semblait alors
+      // 61 px plus haut que l'autre, sur la même ligne.
+      const [linkedin, github] = await page
+        .locator("#contact")
+        .evaluate((section) =>
+          ['a[href*="linkedin"]', 'a[href*="github"]'].map(
+            (selector) => section.querySelector(selector)!.getBoundingClientRect().top,
+          ),
+        );
+      expect(linkedin).toBe(github);
     });
   });
 
