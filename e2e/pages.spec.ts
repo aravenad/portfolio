@@ -95,6 +95,26 @@ test.describe("apparition au défilement", () => {
   });
 });
 
+test("le focus clavier garde l'arrondi des boutons et des cartes", async ({ page }) => {
+  // Une règle de focus hors couche écrasait les arrondis Tailwind : un élément
+  // focalisé passait à 2 px de rayon, et ses coins devenaient carrés.
+  await page.goto("");
+  const radius = (locator: ReturnType<typeof page.locator>) =>
+    locator.evaluate((element) => getComputedStyle(element).borderTopLeftRadius);
+
+  for (const element of [
+    page.getByRole("link", { name: "Voir mes projets" }),
+    page.locator("#projects a[href*='/projects/']").filter({ has: page.locator("h3") }).first(),
+  ]) {
+    const before = await radius(element);
+    expect(parseFloat(before)).toBeGreaterThan(2);
+
+    await element.focus();
+    expect(await element.evaluate((el) => el.matches(":focus-visible"))).toBe(true);
+    expect(await radius(element)).toBe(before);
+  }
+});
+
 test("sur grand écran, le texte n'est jamais replié", async ({ page }) => {
   await page.goto("");
 

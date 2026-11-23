@@ -909,11 +909,14 @@ html {
   }
 }
 
-/* Un seul style de focus clavier pour tout le site. */
+/*
+ * Un seul style de focus clavier pour tout le site. Le contour suit l'arrondi
+ * de l'élément : un `border-radius` posé ici, hors couche, écrasait celui des
+ * utilitaires Tailwind, et un bouton focalisé perdait ses coins arrondis.
+ */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
-  border-radius: 2px;
 }
 
 /*
