@@ -148,23 +148,11 @@ describe("BaseLayout", () => {
       });
     });
 
-    it("ne déclare aucune directive que la balise <meta> ignorerait", async () => {
-      // `frame-ancestors`, `report-uri` et `sandbox` n'ont d'effet qu'en en-tête
-      // HTTP : les écrire ici donnerait l'illusion d'une protection.
-      const noms = Object.keys(await directives());
-
-      for (const ignorée of ["frame-ancestors", "report-uri", "sandbox"]) {
-        expect(noms).not.toContain(ignorée);
-      }
-    });
-
-    it("n'ouvre pas 'unsafe-inline' au détour d'une directive de script", async () => {
-      // Une politique qui autorise tout l'inline ne protège de rien : mieux vaut
-      // ne pas déclarer la directive que la déclarer ouverte.
-      const noms = Object.keys(await directives());
-
-      expect(noms).not.toContain("script-src");
-      expect(noms).not.toContain("default-src");
+    it("ne porte que la base, que le build complète", async () => {
+      // `script-src` et les empreintes des scripts en ligne ne s'écrivent
+      // qu'une fois le site construit (src/lib/csp.ts) : sous `astro dev`,
+      // Vite injecte ses propres scripts.
+      expect(Object.keys(await directives())).toEqual(["base-uri", "object-src", "form-action"]);
     });
   });
 

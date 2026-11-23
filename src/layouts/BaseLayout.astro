@@ -28,6 +28,7 @@ import Header from "../components/layout/Header.astro";
 import { site } from "../data/site";
 import { useTranslations } from "../data/ui";
 import { defaultLang, getLang, languages, switchLangPath } from "../lib/i18n";
+import { BASE_POLICY } from "../lib/csp";
 import { personSchema, toJsonLd } from "../lib/structured-data";
 import { url } from "../lib/url";
 import "../styles/global.css";
@@ -96,25 +97,14 @@ const ogImage = image
     />
 
     {/*
-      Ce qu'une politique de sécurité du contenu peut faire ici, et rien de plus.
-
-      GitHub Pages ne permet pas de poser d'en-têtes HTTP : il ne reste que la
-      balise `<meta>`, qui ignore `frame-ancestors`. Le CSP intégré d'Astro
-      (`security.csp`) hacherait les scripts et les styles, mais sa
-      documentation exclut explicitement `<ClientRouter />`, dont dépend toute
-      la navigation du site. Une directive `script-src` écrite à la main
-      devrait alors ouvrir `'unsafe-inline'`, ce qui ne protégerait plus de
-      rien.
-
-      Restent trois directives sans risque, qu'aucune page n'utilise et qui
-      ferment autant de portes : pas de `<base>` injecté qui détournerait tous
-      les liens relatifs, pas de greffon, et aucun formulaire — donc aucun
-      envoi de données possible vers l'extérieur.
+      Politique de sécurité du contenu, en balise `<meta>` : GitHub Pages ne
+      permet aucun en-tête HTTP. La page rendue n'en porte que la base (pas de
+      `<base>` injecté, pas de greffon, aucun envoi de formulaire) ; le build
+      la complète dans chaque page, `script-src` compris, avec les empreintes
+      des scripts en ligne (src/lib/csp.ts). En premier dans `<head>` : elle ne
+      vaut que pour ce qui la suit.
     */}
-    <meta
-      http-equiv="content-security-policy"
-      content="base-uri 'self'; object-src 'none'; form-action 'none'"
-    />
+    <meta http-equiv="content-security-policy" content={BASE_POLICY} />
 
     {/* Ce qu'une page doit exécuter avant d'être peinte (voir NotFoundPage). */}
     <slot name="head" />

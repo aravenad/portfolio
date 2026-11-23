@@ -170,6 +170,21 @@ Le code du compte est dans `COUNT_ENDPOINT` (`src/lib/analytics.ts`).
 Les mentions légales en donnent ce que demande l'article 13 du RGPD : base
 légale, destinataire, hébergement dans l'UE, conservation de 25 mois au plus.
 
+**Politique de sécurité du contenu.** En balise `<meta>`, GitHub Pages ne
+permettant aucun en-tête HTTP (donc pas de `frame-ancestors`). BaseLayout n'en
+pose que la base ; une fois le site construit, l'intégration
+`contentSecurityPolicy` d'`astro.config.mjs` la remplace dans chaque page par
+la politique complète (`src/lib/csp.ts`) : tout vient du site, les scripts en
+ligne sont autorisés un par un par leur empreinte SHA-256, et les images
+acceptent en plus le pixel de GoatCounter. La même politique pour tout le site,
+qui réunit les empreintes de toutes les pages : le routeur change de page sans
+recharger le document, et seule la politique du premier reste appliquée. La CSP
+intégrée d'Astro (`security.csp`) ne gère pas `<ClientRouter />`. Les styles
+gardent `'unsafe-inline'`, que des centaines d'attributs `style` réclament.
+`astro dev` n'a que la base : Vite y injecte ses propres scripts.
+`e2e/csp.spec.ts` parcourt le site sous la politique ; une empreinte manquante
+s'y lit aussi comme une erreur de console, qui fait échouer tout test e2e.
+
 **Filtres des projets.** Chaque page de la liste porte toutes les fiches,
 celles des autres pages masquées (`data-off-page`) : sans script, rien ne
 change. Le script montre quatre listes déroulantes (statut, type, compétence,
@@ -357,6 +372,7 @@ Côté Vitest :
 | **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind, sauf `zinc-500`, redéfini dans `@theme` ; un gris de texte sous 4,5:1 fait échouer les tests. |
 | **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. Les cartes des fiches, elles, se refont par `npm run og` (titre, équipe, année ou couverture changés, ou retouche de `tools/og-projects/Card.astro`). |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
+| **Charger une ressource d'un autre site** | Ajouter son origine à la directive qui la concerne dans `sitePolicy()` (`src/lib/csp.ts`), avec son test. Un script en ligne n'a besoin de rien : le build calcule son empreinte. |
 | **Changer de domaine** | Mettre à jour `site` dans `astro.config.mjs` et `SITE_ORIGIN` dans `tests/helpers/render.ts`, le domaine personnalisé dans les réglages Pages du dépôt, puis les DNS chez le registraire (Infomaniak). Pour revenir sur `aravenad.github.io/portfolio`, remettre aussi `base: '/portfolio'` et le préfixe `/portfolio/` dans `e2e/` et `playwright.config.ts`. |
 
 Rendu de l'image d'aperçu, depuis la racine du projet. Sous Windows, remplacer

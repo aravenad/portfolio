@@ -1,6 +1,8 @@
 // @ts-check
 import { existsSync } from 'node:fs';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'astro/config';
 
@@ -17,6 +19,8 @@ import { satteriFrenchSpacing } from './src/lib/typography.ts';
 import { satteriExternalLinks } from './src/lib/external-links.ts';
 
 import { satteriFigures } from './src/lib/figures.ts';
+
+import { collectHashes, sitePolicy, withPolicy } from './src/lib/csp.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -44,6 +48,7 @@ export default defineConfig({
   integrations: [
     icon(),
     ogCards(),
+    contentSecurityPolicy(),
     // Plan du site pour les moteurs de recherche, publié en
     // /sitemap-index.xml et annoncé par /robots.txt (src/pages/robots.txt.ts).
     // Chaque page y renvoie à sa version dans l'autre langue, comme les
@@ -111,6 +116,41 @@ function ogCards() {
           pattern: '/__og/[lang]/[slug]',
           entrypoint: './tools/og-projects/Card.astro',
         });
+      },
+    },
+  };
+}
+
+/**
+ * Complète la politique de sécurité du contenu de chaque page construite :
+ * scripts du site seulement, et les scripts en ligne autorisés par leur
+ * empreinte (src/lib/csp.ts). Une seule politique pour tout le site : le
+ * routeur garde celle du premier document chargé.
+ *
+ * @returns {import('astro').AstroIntegration}
+ */
+function contentSecurityPolicy() {
+  return {
+    name: 'content-security-policy',
+    hooks: {
+      'astro:build:done': async ({ dir, logger }) => {
+        const root = fileURLToPath(dir);
+        const files = (await readdir(root, { recursive: true }))
+          .filter((file) => file.endsWith('.html'))
+          .map((file) => join(root, file));
+        const pages = await Promise.all(files.map(async (file) => ({ file, html: await readFile(file, 'utf8') })));
+
+        const hashes = collectHashes(pages.map(({ html }) => html));
+        const policy = sitePolicy(hashes);
+
+        let count = 0;
+        for (const { file, html } of pages) {
+          const updated = withPolicy(html, policy);
+          if (updated === null) continue;
+          await writeFile(file, updated);
+          count++;
+        }
+        logger.info(`${count} pages, ${hashes.size} scripts en ligne autorisés par empreinte`);
       },
     },
   };
