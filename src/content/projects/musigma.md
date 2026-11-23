@@ -20,7 +20,7 @@ role:
   - "Participation au persona, au logo, au Lean Canvas et aux pitchs en français et en anglais."
   - "En 2026, reprise seul de toute l’application : audit du code, corrections, cas d’utilisation terminés, tests et ergonomie."
 sae: ["2.01", "2.02", "2.05", "2.06"]
-ac: ["AC11.01", "AC11.02", "AC11.03", "AC11.04", "AC12.01", "AC12.02", "AC12.03", "AC15.01", "AC15.02", "AC15.03", "AC16.01", "AC16.02", "AC16.03", "AC16.04"]
+ac: ["AC11.01", "AC11.02", "AC11.03", "AC11.04", "AC12.01", "AC12.03", "AC15.01", "AC15.02", "AC15.03", "AC16.03", "AC16.04"]
 learned:
   - "Modéliser un logiciel en UML avant de le coder : cas d’utilisation décrits, diagrammes de classes, de séquence et d’objets."
   - "Construire une application de bureau en Java et JavaFX selon l’architecture MVC."

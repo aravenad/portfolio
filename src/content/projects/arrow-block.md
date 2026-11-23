@@ -19,7 +19,7 @@ role:
   - "Développement de la version web, de son générateur de niveaux et de son solveur."
   - "Emballage Android avec Capacitor, puis réécriture complète en Flutter."
   - "Tests et mesures de performance sur téléphone."
-ac: ["AC21.02", "AC21.03", "AC21.04", "AC22.02", "AC31.01", "AC31.02", "AC32.02", "AC32.03"]
+ac: ["AC21.02", "AC21.04"]
 learned:
   - "Travailler avec une IA de code : cadrer sa tâche, vérifier ce qu’elle produit, garder la main sur les décisions."
   - "Écrire un rendu 3D sans moteur : projection, tri des faces, éclairage et textures dessinés à la main."

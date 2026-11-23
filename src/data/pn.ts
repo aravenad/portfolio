@@ -187,7 +187,7 @@ const fr: PnLabels = {
     "AC25.03": "Identifier les critères de faisabilité d'un projet informatique",
     "AC25.04": "Définir et mettre en œuvre une démarche de suivi de projet",
     "AC26.01":
-      "Comprendre la diversité, la structure et la dimension de l'informatique dans une organisation (ESN, DSI…)",
+      "Comprendre la diversité, la structure et la dimension de l'informatique dans une organisation (ESN, DSI,…)",
     "AC26.02": "Appliquer une démarche pour intégrer une équipe informatique au sein d'une organisation",
     "AC26.03": "Mobiliser les compétences interpersonnelles pour travailler dans une équipe informatique",
     "AC26.04": "Rendre compte de son activité professionnelle",

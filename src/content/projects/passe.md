@@ -16,7 +16,7 @@ role:
   - "Planification des sprints : capacité de l’équipe estimée en story points, charge de chaque sprint comparée à cette capacité."
   - "Charte graphique de l’application : palette tirée de l’identité de l’université, typographies et matrice de contrastes."
 sae: ["3.Real.01"]
-ac: ["AC21.01", "AC21.02", "AC21.03", "AC22.01", "AC23.01", "AC23.02", "AC24.03", "AC24.04", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
+ac: ["AC21.01", "AC21.02", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
 learned:
   - "Cadrer un produit à partir d’un pitch : problème, utilisateurs visés, priorités et risques."
   - "Coter des risques selon leur impact et leur probabilité, et prévoir une version de repli pour chaque cas d’utilisation."

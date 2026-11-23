@@ -10,7 +10,7 @@ year: 2025
 order: 10
 cover: network
 sae: ["2.03"]
-ac: ["AC13.01", "AC13.02", "AC13.03", "AC13.04"]
+ac: ["AC13.02", "AC13.03", "AC13.04"]
 ---
 
 ## Context

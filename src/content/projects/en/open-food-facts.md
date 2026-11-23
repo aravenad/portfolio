@@ -12,7 +12,7 @@ cover: chart
 role:
   - "All the work done together: psql exploration and cleaning script, statistics and charts in R, report in English and project framing."
 sae: ["2.04"]
-ac: ["AC14.01", "AC14.02", "AC14.03"]
+ac: ["AC14.01", "AC14.02"]
 learned:
   - "Exploring a table of several million rows with SQL queries, going through only part of it at a time with LIMIT and OFFSET."
   - "Cleaning open data entered by contributors: duplicates, impossible values, barcodes and nutritional values to check."

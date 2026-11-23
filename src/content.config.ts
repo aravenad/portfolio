@@ -85,7 +85,9 @@ const schema = z.object({
   /**
    * Compétences mobilisées, au sens du Programme National (src/data/pn.ts) :
    * la ou les SAÉ dont le projet relève, s'il en relève, et les apprentissages
-   * critiques qu'il prouve. Les compétences et les niveaux se lisent dans les
+   * critiques qu'il prouve : ceux dont la fiche montre la trace, pas la liste
+   * que le PN fixe pour la SAÉ. Un AC que la fiche ne prouve pas encore n'y
+   * figure pas. Les compétences et les niveaux se lisent dans les
    * codes des AC (src/lib/competences.ts) : la fiche ne les répète pas.
    */
   sae: z.array(z.enum(SAE_CODES)).default([]),

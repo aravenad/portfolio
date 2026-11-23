@@ -16,7 +16,7 @@ role:
   - "Sprint planning: the team’s capacity estimated in story points, and each sprint’s workload checked against it."
   - "The application’s style guide: a palette drawn from the university’s identity, typefaces and a contrast matrix."
 sae: ["3.Real.01"]
-ac: ["AC21.01", "AC21.02", "AC21.03", "AC22.01", "AC23.01", "AC23.02", "AC24.03", "AC24.04", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
+ac: ["AC21.01", "AC21.02", "AC25.02", "AC25.03", "AC25.04", "AC26.02", "AC26.03", "AC26.04"]
 learned:
   - "Framing a product from a pitch: problem, target users, priorities and risks."
   - "Scoring risks by impact and likelihood, and planning a fallback version for each use case."
