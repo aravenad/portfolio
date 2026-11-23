@@ -24,8 +24,10 @@ const { title, summary, teaser, tags, kind, status, cover } = project.data;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
 // Le statut se lit en pied de carte en grand, sur la ligne du type sur
-// téléphone : la même couleur aux deux endroits.
-const statusClass = status === "en-cours" ? "text-accent/80" : "text-zinc-500";
+// téléphone : la même couleur aux deux endroits. L'accent adouci ne garde
+// son contraste que sur fond sombre (9,3:1) ; sur le papier du thème clair, il
+// tombait à 3,8:1, sous les 4,5:1 d'un texte de 12 px. L'accent plein y fait 5,7:1.
+const statusClass = status === "en-cours" ? "text-accent/80 light:text-accent" : "text-zinc-500";
 ---
 
 {/*

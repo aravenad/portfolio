@@ -317,6 +317,8 @@ describe("ProjectCard", () => {
     const termine = await render(ProjectCard, { props: { project: project() } });
 
     expect(encours.html).toContain("text-accent/80");
+    // L'accent adouci ne tient son contraste que sur le fond sombre.
+    expect(encours.html).toContain("light:text-accent");
     expect(termine.html).not.toContain("text-accent/80");
   });
 });
