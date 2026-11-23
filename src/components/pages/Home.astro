@@ -7,6 +7,7 @@ import ProjectsPreview from "../sections/ProjectsPreview.astro";
 import Skills from "../sections/Skills.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { softSkills, softSkillsEn, technicalSkills } from "../../data/skills";
+import { internship } from "../../data/internship";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { getLang, localized } from "../../lib/i18n";
@@ -25,7 +26,12 @@ const t = useTranslations(lang);
   section en cours de lecture. L'ordre des sections est celui des liens.
 */}
 <BaseLayout title={t.meta.title} description={t.meta.description}>
-  <Hero intro={t.hero.intro} name={site.name} description={t.hero.description} />
+  <Hero
+    intro={t.hero.intro}
+    name={site.name}
+    description={t.hero.description}
+    availability={internship.open ? t.hero.availability : undefined}
+  />
 
   <About />
 

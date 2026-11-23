@@ -9,9 +9,14 @@ interface Props {
   intro: string;
   name: string;
   description: string;
+  /**
+   * Le stage recherché, sous l'accroche : c'est l'objet du site, il ne doit
+   * pas attendre la section Contact. Absent une fois le stage trouvé.
+   */
+  availability?: string;
 }
 
-const { intro, name, description } = Astro.props;
+const { intro, name, description, availability } = Astro.props;
 const t = useTranslations(getLang(Astro.url.pathname));
 
 /** Les mots de l'accroche, animés un à un (`.blur-word`), le prénom en dernier. */
@@ -42,6 +47,18 @@ const introWords = intro.split(/\s+/).filter(Boolean);
     <p class="page-enter mt-6 max-w-2xl text-lg leading-8 text-zinc-400" style="--index: 1">
       {description}
     </p>
+
+    {/*
+      Une phrase plutôt qu'un badge : le texte plus clair suffit
+      à la distinguer de l'accroche, et « Me contacter » suit juste en dessous.
+    */}
+    {
+      availability && (
+        <p class="availability page-enter mt-4 max-w-2xl text-lg leading-8 text-zinc-200" style="--index: 1">
+          {availability}
+        </p>
+      )
+    }
 
     {/*
       Sur téléphone, « Voir mes projets » et « Me contacter » ne tiennent pas

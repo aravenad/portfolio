@@ -1,5 +1,9 @@
 import type { CareerEntry } from "../types";
 import { withFrenchSpacing } from "../lib/typography";
+import { internshipDates } from "./internship";
+
+const datesFr = internshipDates("fr");
+const datesEn = internshipDates("en");
 
 /**
  * Logos : `icon` pour les marques présentes dans simple-icons, sinon `initials`.
@@ -32,7 +36,7 @@ export const experiences: CareerEntry[] = withFrenchSpacing([
     location: "Grenoble et alentours",
     period: "Avril – juin 2027",
     description:
-      "Stage de fin de 2e année de BUT, de 10 à 12 semaines : du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet. Je cherche une entreprise, de préférence en développement web.",
+      `Stage de fin de 2e année de BUT, de 10 à 12 semaines : du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}. Je cherche une entreprise, de préférence en développement web.`,
     icon: "calendar",
     upcoming: true,
     project: "stage-2027",
@@ -136,7 +140,7 @@ export const experiencesEn: CareerEntry[] = [
     location: "Grenoble area",
     period: "April – June 2027",
     description:
-      "End-of-second-year internship of my BUT, 10 to 12 weeks: from April 19 to June 25, 2027, extendable to July 9. I am looking for a company, ideally in web development.",
+      `End-of-second-year internship of my BUT, 10 to 12 weeks: from ${datesEn.start} to ${datesEn.end}, extendable to ${datesEn.extendedTo}. I am looking for a company, ideally in web development.`,
     icon: "calendar",
     upcoming: true,
     project: "stage-2027",

@@ -64,6 +64,18 @@ describe("Hero", () => {
       expect(link.getAttribute("href")).toMatch(/^#/);
     }
   });
+
+  it("annonce le stage recherché quand il est donné", async () => {
+    const availability = "Je cherche un stage du 19 avril au 25 juin 2027.";
+    const { body } = await render(Hero, { props: { ...props, availability } });
+
+    expect(body.querySelector("p.availability")?.textContent?.trim()).toBe(availability);
+  });
+
+  it("se passe de la ligne de stage une fois le stage trouvé", async () => {
+    const { body } = await render(Hero, { props });
+    expect(body.querySelector(".availability")).toBeNull();
+  });
 });
 
 describe("About", () => {

@@ -1,7 +1,11 @@
 import type { Lang } from "../lib/i18n";
 import type { Competence, ProjectKind, ProjectStatus } from "../types";
 import { withFrenchSpacing } from "../lib/typography";
+import { internshipDates } from "./internship";
 import { site } from "./site";
+
+const datesFr = internshipDates("fr");
+const datesEn = internshipDates("en");
 
 /**
  * Tous les textes de l'interface, dans chaque langue.
@@ -52,7 +56,13 @@ const fr = {
   hero: {
     intro: "Bonjour, moi c'est",
     description:
-      "Étudiant en BUT informatique à Grenoble, je développe des applications, des sites web et différents projets logiciels.",
+      "Étudiant en BUT Informatique à Grenoble, je développe surtout pour le web. En ce moment, je mène une équipe de sept sur PASSE, une application d'aide aux étudiants, et je construis Arrow Block, un jeu de réflexion en 3D aux 240\u00a0niveaux vérifiés par un solveur.",
+    /**
+     * Le stage recherché, sous l'accroche. Les dates viennent de
+     * src/data/internship.ts ; la phrase disparaît quand `internship.open`
+     * passe à `false`.
+     */
+    availability: `Je cherche un stage de développement du ${datesFr.start} au ${datesFr.end}, à Grenoble ou dans ses environs.`,
     projects: "Voir mes projets",
     contact: "Me contacter",
   },
@@ -69,7 +79,7 @@ const fr = {
       {
         label: "Recherche",
         value:
-          "Stage du 19 avril au 25 juin 2027 (jusqu'au 9 juillet possible), puis alternance en 3e année",
+          `Stage du ${datesFr.start} au ${datesFr.end} (jusqu'au ${datesFr.extendedTo} possible), puis alternance en 3e année`,
       },
       {
         label: "Formation",
@@ -213,7 +223,7 @@ const fr = {
   contact: {
     title: "Me contacter",
     description:
-      "Je recherche un stage de 10 à 12 semaines, du 19 avril au 25 juin 2027, prolongeable jusqu'au 9 juillet, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écris-moi.",
+      `Je recherche un stage de 10 à 12 semaines, du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écris-moi.`,
     email: "Envoyer un e-mail",
     /*
      * Pour qui n'a pas de client mail configuré : le lien `mailto:` n'ouvre
@@ -422,7 +432,8 @@ const en = {
   hero: {
     intro: "Hi, I'm",
     description:
-      "Computer science student in Grenoble, I build applications, websites and all kinds of software projects.",
+      "I'm a computer science student in Grenoble and I mostly build for the web. Right now, I'm leading a team of seven on PASSE, an app that helps students find support, and building Arrow Block, a 3D puzzle game with 240\u00a0levels checked by a solver.",
+    availability: `I'm looking for a development internship from ${datesEn.start} to ${datesEn.end}, in or around Grenoble.`,
     projects: "See my projects",
     contact: "Contact me",
   },
@@ -439,7 +450,7 @@ const en = {
       {
         label: "Looking for",
         value:
-          "Internship from April 19 to June 25, 2027 (extendable to July 9), then work-study in my 3rd year",
+          `Internship from ${datesEn.start} to ${datesEn.end} (extendable to ${datesEn.extendedTo}), then work-study in my 3rd year`,
       },
       {
         label: "Studies",
@@ -573,7 +584,7 @@ const en = {
   contact: {
     title: "Contact me",
     description:
-      "I am looking for a 10 to 12-week internship, from April 19 to June 25, 2027, extendable until July 9, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also travel to the surrounding area. A question, an opportunity? Write to me.",
+      `I am looking for a 10 to 12-week internship, from ${datesEn.start} to ${datesEn.end}, extendable until ${datesEn.extendedTo}, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also travel to the surrounding area. A question, an opportunity? Write to me.`,
     email: "Send an email",
     copy: "Copy the email address",
     copied: "Address copied",
