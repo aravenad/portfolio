@@ -13,6 +13,7 @@ vi.mock("../../src/lib/og", async (importOriginal) => {
 
 import { colophon } from "../../src/data/colophon";
 import { site } from "../../src/data/site";
+import { useTranslations } from "../../src/data/ui";
 import { projectCard } from "../../src/lib/og";
 import { fixtureProjects } from "../helpers/content";
 import { SITE_ORIGIN, meta, renderPage } from "../helpers/render";
@@ -62,17 +63,24 @@ beforeEach(() => {
   vi.stubEnv("BASE_URL", "/portfolio/");
 });
 
+/** Les données structurées de la page, tous blocs confondus. */
+function jsonLd(document: Document): Record<string, any>[] {
+  return [...document.querySelectorAll('script[type="application/ld+json"]')].map((tag) =>
+    JSON.parse(tag.textContent ?? ""),
+  );
+}
+
 /** Requête pour une page du site déployé. */
 function request(pathname: string) {
   return new Request(`${SITE_ORIGIN}${pathname}`);
 }
 
 describe("page d'accueil", () => {
-  it("annonce le titre et la description du site", async () => {
+  it("annonce son titre et sa description, le stage recherché compris", async () => {
     const { document } = await renderPage(Home, { request: request("/portfolio/") });
 
-    expect(document.title).toBe(site.title);
-    expect(meta(document, "description")).toBe(site.description);
+    expect(document.title).toBe(useTranslations("fr").meta.title);
+    expect(meta(document, "description")).toBe(useTranslations("fr").meta.description);
   });
 
   it("déclare la langue du document", async () => {
@@ -210,6 +218,29 @@ describe("fiche d'un projet", () => {
     });
 
     expect(meta(document, "og:image")).toMatch(/og-v\d+\.jpg$/);
+  });
+
+  it("décrit le projet et son fil d'Ariane pour les moteurs", async () => {
+    const props = await propsFor("projet-3");
+    const { document } = await renderPage(ProjectDetail, {
+      request: request("/portfolio/projects/projet-3"),
+      props,
+    });
+    const data = jsonLd(document);
+    const page = `${SITE_ORIGIN}/portfolio/projects/projet-3`;
+
+    expect(data.find((item) => item["@type"] === "BreadcrumbList")?.itemListElement).toEqual([
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${SITE_ORIGIN}/portfolio/` },
+      { "@type": "ListItem", position: 2, name: "Projets", item: `${SITE_ORIGIN}/portfolio/projects/` },
+      { "@type": "ListItem", position: 3, name: "Projet 3", item: page },
+    ]);
+    expect(data.find((item) => item["@type"] === "SoftwareSourceCode")).toMatchObject({
+      url: page,
+      name: "Projet 3",
+      inLanguage: "fr",
+      codeRepository: "https://github.com/exemple/projet-3",
+      author: { "@id": `${SITE_ORIGIN}/portfolio/#person` },
+    });
   });
 
   it("affiche les étiquettes, le statut, le type et le contexte", async () => {
@@ -493,7 +524,7 @@ describe("version anglaise", () => {
     const { document } = await renderPage(HomeEn, { request: request("/portfolio/en/") });
 
     expect(document.documentElement.getAttribute("lang")).toBe("en");
-    expect(document.title).toBe(site.title);
+    expect(document.title).toBe(useTranslations("en").meta.title);
     expect(meta(document, "og:locale")).toBe("en_US");
     expect(document.querySelector("h1 .sr-only")?.textContent?.replace(/\s+/g, " ").trim())
       .toBe("Hi, I'm Damien.");
@@ -626,6 +657,16 @@ describe("mentions légales", () => {
 
     expect(document.title).toBe(`Mentions légales | ${site.author}`);
     expect(meta(document, "description")).toContain("hébergeur");
+  });
+
+  it("donnent leur fil d'Ariane aux moteurs, dans la langue de la page", async () => {
+    const { document } = await renderPage(LegalEn, { request: request("/portfolio/en/legal") });
+    const [crumbs] = jsonLd(document).filter((item) => item["@type"] === "BreadcrumbList");
+
+    expect(crumbs.itemListElement.map((item: { name: string; item: string }) => [item.name, item.item])).toEqual([
+      ["Home", `${SITE_ORIGIN}/portfolio/en/`],
+      [useTranslations("en").legal.title, `${SITE_ORIGIN}/portfolio/en/legal`],
+    ]);
   });
 
   it("décrivent la mesure d'audience et permettent de la refuser", async () => {

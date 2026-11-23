@@ -4,6 +4,7 @@ import { education, experiences } from "../../src/data/career";
 import { site } from "../../src/data/site";
 import { softSkills } from "../../src/data/skills";
 import { ui, useTranslations } from "../../src/data/ui";
+import { internship } from "../../src/data/internship";
 import { languages } from "../../src/lib/i18n";
 
 /**
@@ -28,6 +29,24 @@ function strings(value: unknown): string[] {
   if (value && typeof value === "object") return Object.values(value).flatMap(strings);
   return [];
 }
+
+describe("titre et description de l'accueil", () => {
+  it.each(languages)("commencent par le nom complet et disent le stage recherché (%s)", (lang) => {
+    const { title, description } = useTranslations(lang).meta;
+
+    expect(title.startsWith(`${site.author} | `)).toBe(true);
+    // Google coupe un titre vers 60 signes.
+    expect(title.length).toBeLessThanOrEqual(62);
+    if (internship.open) expect(title).toContain(internship.start.slice(0, 4));
+    // LinkedIn veut 100 signes au moins, Google coupe au-delà de 160 environ.
+    expect(description.length).toBeGreaterThanOrEqual(100);
+    expect(description.length).toBeLessThanOrEqual(170);
+  });
+
+  it("diffèrent d'une langue à l'autre", () => {
+    expect(useTranslations("en").meta.title).not.toBe(useTranslations("fr").meta.title);
+  });
+});
 
 describe("textes de l'interface", () => {
   it("a un dictionnaire par langue", () => {

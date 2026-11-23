@@ -1,0 +1,18 @@
+---
+import { toJsonLd } from "../../lib/structured-data";
+
+/**
+ * Des données structurées (src/lib/structured-data.ts), dans le corps de la
+ * page, à côté de ce qu'elles décrivent : Google les lit aussi bien hors du
+ * `<head>`. Un bloc de données n'est jamais exécuté : la politique de sécurité
+ * n'a pas à l'autoriser (src/lib/csp.ts). `is:inline` garde la balise telle
+ * quelle, Astro ne tente pas de la traiter comme un module JavaScript.
+ */
+interface Props {
+  data: object;
+}
+
+const { data } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={toJsonLd(data)} />

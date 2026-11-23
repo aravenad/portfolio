@@ -1,11 +1,12 @@
 import type { Lang } from "../lib/i18n";
 import type { Competence, ProjectKind, ProjectStatus } from "../types";
 import { withFrenchSpacing } from "../lib/typography";
-import { internshipDates } from "./internship";
+import { internship, internshipDates } from "./internship";
 import { site } from "./site";
 
 const datesFr = internshipDates("fr");
 const datesEn = internshipDates("en");
+const internshipYear = internship.start.slice(0, 4);
 
 /**
  * Tous les textes de l'interface, dans chaque langue.
@@ -24,8 +25,20 @@ const fr = {
   ogLocale: "fr_FR",
 
   meta: {
-    title: site.title,
-    description: site.description,
+    /*
+     * Le titre et la description de l'accueil, ceux que Google et LinkedIn
+     * affichent. Le nom complet d'abord, c'est lui qu'on cherche ; puis le
+     * métier et le stage recherché, tirés de src/data/internship.ts : quand le
+     * stage est trouvé (`open: false`), l'accueil reprend la description
+     * générale du site. Une soixantaine de signes pour le titre, que Google
+     * coupe au-delà ; 100 à 170 pour la description (voir site.ts).
+     */
+    title: internship.open
+      ? `${site.author} | Étudiant développeur web, stage ${internshipYear}`
+      : `${site.author} | Étudiant développeur web`,
+    description: internship.open
+      ? `Étudiant en BUT Informatique à Grenoble, je cherche un stage de développement web du ${datesFr.start} au ${datesFr.end}. Projets web, Java et bases de données.`
+      : site.description,
     ogImageAlt: "Damien Aravena Bravo, étudiant en BUT Informatique à Grenoble",
     /** Intitulé des données structurées `Person` (lib/structured-data.ts). */
     jobTitle: "Étudiant en BUT Informatique",
@@ -411,9 +424,12 @@ const en = {
   ogLocale: "en_US",
 
   meta: {
-    title: site.title,
-    description:
-      "Portfolio of Damien Aravena Bravo, computer science student (BUT Informatique) in Grenoble: web development, Java applications and database projects.",
+    title: internship.open
+      ? `${site.author} | Student web developer, ${internshipYear} internship`
+      : `${site.author} | Student web developer`,
+    description: internship.open
+      ? `Computer science student in Grenoble, looking for a web development internship from ${datesEn.start} to ${datesEn.end}. Projects in web, Java and databases.`
+      : "Portfolio of Damien Aravena Bravo, computer science student (BUT Informatique) in Grenoble: web development, Java applications and database projects.",
     ogImageAlt: "Damien Aravena Bravo, computer science student in Grenoble",
     jobTitle: "Computer science student (BUT Informatique)",
   },

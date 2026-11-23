@@ -1,7 +1,9 @@
 ---
 import Chevron from "./Chevron.astro";
+import JsonLd from "./JsonLd.astro";
 import { useTranslations } from "../../data/ui";
 import { getLang, localizedUrl } from "../../lib/i18n";
+import { breadcrumbSchema } from "../../lib/structured-data";
 
 interface Crumb {
   label: string;
@@ -21,6 +23,21 @@ const { items } = Astro.props;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
 const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
+
+/*
+ * Le même fil pour les moteurs de recherche, tiré des mêmes niveaux : ce que
+ * Google affiche ne peut pas diverger de ce que montre la page. Le dernier
+ * niveau, sans lien à l'écran, y porte l'adresse de la page. L'origine est
+ * celle du site publié ; à défaut (composant rendu seul, en test), celle de
+ * la requête.
+ */
+const origin = Astro.site ?? Astro.url;
+const schema = breadcrumbSchema(
+  crumbs.map((crumb) => ({
+    name: crumb.label,
+    url: new URL(crumb.href ? localizedUrl(crumb.href, lang) : Astro.url.pathname, origin).href,
+  })),
+);
 ---
 
 <nav aria-label={t.breadcrumb.label} data-breadcrumb class="crumbs text-sm">
@@ -44,6 +61,8 @@ const crumbs: Crumb[] = [{ label: t.breadcrumb.home, href: "/" }, ...items];
     }
   </ol>
 </nav>
+
+<JsonLd data={schema} />
 
 {/*
   Le même fil, tel que la barre l'affiche une fois celui-ci défilé sous elle

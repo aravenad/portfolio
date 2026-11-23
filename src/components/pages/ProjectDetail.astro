@@ -9,13 +9,15 @@ import Container from "../ui/Container.astro";
 import ImageViewer from "../ImageViewer.astro";
 import ProjectCompetences from "../ProjectCompetences.astro";
 import ProjectDemo from "../ProjectDemo.astro";
+import JsonLd from "../ui/JsonLd.astro";
 import TableOfContents from "../ui/TableOfContents.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { getLang } from "../../lib/i18n";
 import { projectCard } from "../../lib/og";
-import { getProjectHref, type Project } from "../../lib/projects";
+import { getProjectHref, isListed, type Project } from "../../lib/projects";
+import { projectSchema } from "../../lib/structured-data";
 
 interface Props {
   project: Project;
@@ -69,6 +71,22 @@ const image = card && {
   height: card.height,
   alt: [title, site.author, ...meta].join(" · "),
 };
+
+/*
+ * Le projet pour les moteurs de recherche. Pas pour une fiche hors de la liste
+ * (le stage recherché) : ce n'est pas une réalisation.
+ */
+const schema =
+  isListed(project) &&
+  projectSchema(Astro.site!, lang, {
+    url: new URL(Astro.url.pathname, Astro.site).href,
+    title,
+    summary,
+    tags,
+    year,
+    repo: links.repo,
+    image: card && new URL(card.src, Astro.site).href,
+  });
 ---
 
 <BaseLayout title={`${title} | ${site.author}`} description={summary} image={image}>
@@ -76,6 +94,7 @@ const image = card && {
     <Breadcrumb
       items={[{ label: t.breadcrumb.projects, href: "/projects" }, { label: title }]}
     />
+    {schema && <JsonLd data={schema} />}
   </Container>
 
   <article class="py-14 sm:py-20">

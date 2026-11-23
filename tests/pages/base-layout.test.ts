@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import BaseLayout from "../../src/layouts/BaseLayout.astro";
 import { site } from "../../src/data/site";
+import { useTranslations } from "../../src/data/ui";
 import { SITE_ORIGIN, meta, renderPage } from "../helpers/render";
 
 /**
@@ -42,9 +43,9 @@ describe("BaseLayout", () => {
     expect(document.body.querySelector("a")?.textContent?.trim()).toBe("Skip to content");
   });
 
-  it("reprend la description du site quand la page n'en donne pas", async () => {
+  it("reprend la description de l'accueil quand la page n'en donne pas", async () => {
     const { document } = await renderPage(BaseLayout, options());
-    expect(meta(document, "description")).toBe(site.description);
+    expect(meta(document, "description")).toBe(useTranslations("fr").meta.description);
   });
 
   it("préfère la description de la page quand elle en a une", async () => {

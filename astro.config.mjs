@@ -53,10 +53,12 @@ export default defineConfig({
     // /sitemap-index.xml et annoncé par /robots.txt (src/pages/robots.txt.ts).
     // Chaque page y renvoie à sa version dans l'autre langue, comme les
     // `hreflang` de BaseLayout : le français à la racine, l'anglais sous /en.
+    // Mêmes codes que les pages (`fr`, `en`, src/lib/i18n.ts) : un `fr-FR` ici
+    // et un `fr` dans la page sont deux signaux différents pour la même URL.
     sitemap({
       i18n: {
         defaultLocale: 'fr',
-        locales: { fr: 'fr-FR', en: 'en-US' },
+        locales: { fr: 'fr', en: 'en' },
       },
     }),
   ],

@@ -106,11 +106,20 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
 - **Pour les moteurs de recherche**, chaque page déclare ses deux versions
   (`<link rel="alternate" hreflang>`), le français servant de défaut. Le plan
   du site (`@astrojs/sitemap`, `/sitemap-index.xml`) fait de même pour chaque
-  URL, et `/robots.txt` (`src/pages/robots.txt.ts`) l'annonce. Le titre de
-  l'accueil porte le nom complet, celui qu'on tape pour trouver le site.
-  L'accueil décrit aussi la personne en données structurées (`Person`,
-  JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
-  GitHub et LinkedIn, tirés des données du site.
+  URL, avec les mêmes codes de langue (`fr`, `en`), et `/robots.txt`
+  (`src/pages/robots.txt.ts`) l'annonce. Le titre et la description de
+  l'accueil (`meta` de `src/data/ui.ts`) portent le nom complet, celui qu'on
+  tape pour trouver le site, et la recherche de stage tant qu'elle est ouverte
+  (`src/data/internship.ts`) : année dans le titre, dates dans la description.
+  Les données structurées (JSON-LD, `src/lib/structured-data.ts`, rendues par
+  `JsonLd.astro`) sont tirées des données du site : l'accueil décrit la
+  personne (`Person` : nom, études, ville, profils GitHub et LinkedIn) ; chaque
+  page intérieure, son fil d'Ariane (`BreadcrumbList`, émis par
+  `Breadcrumb.astro`, donc identique au fil affiché) ; chaque fiche listée, son
+  projet (`SoftwareSourceCode` s'il a un dépôt, `CreativeWork` sinon : titre,
+  résumé, année, technologies, dépôt, carte d'aperçu, et l'auteur relié à la
+  `Person` par son `@id`). La politique de sécurité ne compte pas ces blocs :
+  ils ne s'exécutent pas.
 - **L'aperçu d'un lien** (LinkedIn, messageries) montre `public/og-v6.jpg`,
   sauf sur une fiche, qui a sa propre carte : sa couverture tramée, son titre
   chromé, l'auteur, l'équipe et l'année (`src/assets/og/<langue>/<fiche>.jpg`,
