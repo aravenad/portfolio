@@ -30,7 +30,7 @@ learned:
 ## Contexte
 
 Arrow Block est un projet personnel, commencé en 2026 en parallèle de ma
-2e année de BUT. C'est un jeu de réflexion en 3D : une forme faite de cubes
+deuxième année de BUT. C'est un jeu de réflexion en 3D : une forme faite de cubes
 fléchés, qu'il faut défaire en lançant les cubes dans le bon ordre. Un cube
 part dans le sens de sa flèche ; s'il en heurte un autre, le joueur perd un
 cœur.

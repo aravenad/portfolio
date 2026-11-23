@@ -57,7 +57,7 @@ festivals de musique et appelé l'application **Musigma**.
 La [note de cadrage](https://github.com/aravenad/musigma/blob/master/conception/note-de-cadrage.pdf) posait les besoins fonctionnels, sous forme de cas
 d'utilisation classés par priorité, et les besoins non fonctionnels. Nous y
 avons analysé douze risques, de la mésentente dans l'équipe à la panne d'un
-outil, chacun noté avant et après mitigation, puis classés dans une matrice de
+outil, chacun noté avant et après atténuation, puis classés dans une matrice de
 criticité. Les rôles étaient répartis avec la méthode RACI. L'équipe
 communiquait sur Discord, planifiait sur Asana et partageait le code sur le
 GitLab de l'université.

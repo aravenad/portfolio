@@ -1,5 +1,5 @@
 ---
-title: "Capgemini expliqué aux élèves de 3e"
+title: "Capgemini expliqué aux collégiens"
 summary: "Recueil de besoins puis réalisation d'un site sobre présentant Capgemini à des élèves de troisième, repris et enrichi en 2026."
 tags: ["HTML", "CSS", "Git", "GitHub"]
 kind: "website"

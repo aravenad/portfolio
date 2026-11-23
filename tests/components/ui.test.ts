@@ -280,7 +280,7 @@ describe("Footer", () => {
       ["Plan du site", "/portfolio/sitemap/"],
       ["Mentions légales", "/portfolio/legal/"],
       ["Accessibilité", "/portfolio/accessibility/"],
-      ["Comment c'est fait", "/portfolio/colophon/"],
+      ["Comment ce site est fait", "/portfolio/colophon/"],
     ]);
   });
 

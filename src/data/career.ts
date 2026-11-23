@@ -36,7 +36,7 @@ export const experiences: CareerEntry[] = withFrenchSpacing([
     location: "Grenoble et alentours",
     period: "Avril – juin 2027",
     description:
-      `Stage de fin de 2e année de BUT, de 10 à 12 semaines : du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}. Je cherche une entreprise, de préférence en développement web.`,
+      `Stage de fin de deuxième année de BUT, de 10 à 12 semaines : du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}. Je cherche une entreprise, de préférence en développement web.`,
     icon: "calendar",
     upcoming: true,
     project: "stage-2027",

@@ -79,11 +79,11 @@ const fr = {
       {
         label: "Recherche",
         value:
-          `Stage du ${datesFr.start} au ${datesFr.end} (jusqu'au ${datesFr.extendedTo} possible), puis alternance en 3e année`,
+          `Stage du ${datesFr.start} au ${datesFr.end} (jusqu'au ${datesFr.extendedTo} possible), puis alternance en troisième année`,
       },
       {
         label: "Formation",
-        value: "BUT Informatique, 2e année · IUT2 Grenoble",
+        value: "BUT Informatique, deuxième année · IUT2 Grenoble",
       },
       { label: "Métier visé", value: "Développeur web, et plus largement développeur d'applications" },
       { label: "Mobilité", value: "Grenoble et alentours, en transports en commun" },
@@ -121,7 +121,7 @@ const fr = {
 
   projects: {
     previewTitle: "Mes projets",
-    previewDescription: "Ces compétences se retrouvent dans les projets menés durant ma formation.",
+    previewDescription: "Une sélection de mes projets, menés en cours ou sur mon temps libre.",
     seeAll: "Voir tous les projets",
     listTitle: "Tous mes projets",
     listDescription:
@@ -225,7 +225,7 @@ const fr = {
   contact: {
     title: "Me contacter",
     description:
-      `Je recherche un stage de 10 à 12 semaines, du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écris-moi.`,
+      `Je recherche un stage de 10 à 12 semaines, du ${datesFr.start} au ${datesFr.end}, prolongeable jusqu'au ${datesFr.extendedTo}, pour valider ma deuxième année de BUT Informatique. Idéalement à Grenoble, mais je peux aussi me déplacer dans les environs. Une question, une opportunité ? Écrivez-moi.`,
     email: "Envoyer un e-mail",
     /*
      * Pour qui n'a pas de client mail configuré : le lien `mailto:` n'ouvre
@@ -400,7 +400,7 @@ const fr = {
     sitemap: "Plan du site",
     legal: "Mentions légales",
     accessibility: "Accessibilité",
-    colophon: "Comment c'est fait",
+    colophon: "Comment ce site est fait",
   },
 };
 
@@ -494,7 +494,7 @@ const en = {
 
   projects: {
     previewTitle: "My projects",
-    previewDescription: "These skills come together in the projects I carried out during my studies.",
+    previewDescription: "A selection of my projects, from coursework and my own time.",
     seeAll: "See all projects",
     listTitle: "All my projects",
     listDescription:
@@ -744,7 +744,7 @@ const en = {
     sitemap: "Site map",
     legal: "Legal notice",
     accessibility: "Accessibility",
-    colophon: "How it's built",
+    colophon: "How this site is built",
   },
 } satisfies Dictionary;
 

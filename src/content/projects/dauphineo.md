@@ -58,7 +58,7 @@ pitch et une rétrospective en anglais.
 Le premier dossier comparait Dauphinéo à TripAdvisor, Airbnb Expériences et
 Booking : aucun ne réunissait fiches détaillées, recommandations, réservation
 de guides et avis. Nous y avons analysé les contraintes et les risques du
-projet, chacun noté avant et après mitigation, réparti les rôles avec une
+projet, chacun noté avant et après atténuation, réparti les rôles avec une
 matrice RACI et décrit trois personas : une personne âgée, une famille et
 une personne à mobilité réduite. L'équipe communiquait sur Discord, suivait ses
 tâches dans un tableau Kanban sur Notion et partageait le code sur le GitLab de

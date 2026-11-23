@@ -1,6 +1,6 @@
 ---
 title: "Stage de développement"
-summary: "Stage de 10 à 12 semaines au printemps 2027, pour valider ma 2e année de BUT. Entreprise et missions à venir."
+summary: "Stage de 10 à 12 semaines au printemps 2027, pour valider ma deuxième année de BUT. Entreprise et missions à venir."
 tags: []
 kind: "internship"
 status: "a-venir"
@@ -21,7 +21,7 @@ prolongation possible jusqu'au 9 juillet.
   type d'application.
 - Une entreprise à Grenoble ou dans ses alentours, accessible en transports en
   commun.
-- Idéalement, la possibilité de poursuivre en alternance pendant ma 3e année.
+- Idéalement, la possibilité de poursuivre en alternance pendant ma troisième année.
 
 ## À venir
 

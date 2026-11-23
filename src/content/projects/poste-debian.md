@@ -14,7 +14,7 @@ ac: ["AC13.01", "AC13.02", "AC13.03"]
 
 ## Contexte
 
-Projet individuel de BUT informatique : installer et configurer un poste de
+Projet individuel de BUT Informatique : installer et configurer un poste de
 travail sous Debian, destiné au développement logiciel. Il couvrait la mise en
 place du système d'exploitation, l'installation des outils de développement et
 la gestion des paquets.
