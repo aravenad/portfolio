@@ -23,13 +23,13 @@ learned:
 ## Context
 
 First-year BUT project, carried out in pairs from April 2 to 9, 2024 for
-SAÉ 2.04, "Exploiting a database". It reproduced a small data science
+SAÉ 2.04, "Working with a database". It reproduced a small data science
 assignment at the crossroads of three subjects: databases, statistics and
 English. The scenario: two members of an association committed to open data
 want to inform consumers about the Nutri-Score.
 
 The data came from Open Food Facts, an open database filled in by its
-contributors, so poorly completed and far richer than needed: more than
+contributors, so often incomplete and far richer than needed: more than
 3 million rows, about 7 GiB. Each pair accessed it in PostgreSQL through a
 personal read-only view, with a specific question to address about the
 Nutri-Score of a product family.
@@ -74,9 +74,9 @@ changes for line graphs, quartiles and outliers for boxplots.
 
 ### Project management
 
-Alongside, the analysis of the brief listed the imposed constraints, sorted by
+Alongside that, the analysis of the brief listed the imposed constraints, sorted by
 type (time, human and material resources, technologies), then the risks they
-induced. Each risk was rated by its criticality, impact times probability,
+created. Each risk was rated by its criticality, impact times probability,
 placed in a matrix and given a preventive or corrective measure.
 
 ## Results

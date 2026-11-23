@@ -22,7 +22,7 @@ const t = useTranslations(lang);
 const { accessibility: a11y } = t;
 const { audit } = site;
 
-const auditDate = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "fr-FR", {
+const auditDate = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "fr-FR", {
   dateStyle: "long",
   timeZone: "UTC",
 }).format(new Date(audit.date));

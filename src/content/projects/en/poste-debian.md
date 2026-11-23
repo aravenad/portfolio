@@ -14,7 +14,7 @@ ac: ["AC13.01", "AC13.02", "AC13.03"]
 
 ## Context
 
-Individual project of my computer science degree: install and configure a
+An individual project in my computer science degree: installing and configuring a
 Debian workstation for software development. It covered setting up the
 operating system, installing the development tools and managing packages.
 
@@ -29,27 +29,27 @@ operating system, installing the development tools and managing packages.
 
 ### Preparation
 
-Download of the Debian ISO image and integrity check with `sha512sum`, then
-creation of the virtual machine's disk image and start of the installation.
+I downloaded the Debian ISO image and checked its integrity with `sha512sum`,
+then created the virtual machine's disk image and started the installation.
 
 ### System installation
 
-Initial configuration (language, locale, keyboard, root password, user
-accounts), disk partitioning and installation of the essential packages,
+I set the initial configuration (language, locale, keyboard, root password,
+user accounts), partitioned the disk and installed the essential packages,
 including the KDE/Plasma desktop environment.
 
 ### System improvements
 
-- Configuration of the `apt` package manager for updates.
-- Installation and configuration of `sudo` for administrative commands.
-- Addition of `snapd` and `flatpak` to broaden software sources, then removal
-  of unneeded packages.
+- Configured the `apt` package manager for updates.
+- Installed and configured `sudo` for administrative commands.
+- Added `snapd` and `flatpak` to broaden the software sources, then removed
+  unneeded packages.
 
 ### Development tools
 
-Installation of the JDK and Git through `apt`, checking each installation, then
-installation of NetBeans tested with three methods (archive, snap, flatpak),
-and creation of symbolic links to make the tools easier to use.
+I installed the JDK and Git through `apt`, checking each installation, then
+installed NetBeans with three methods (archive, snap, flatpak) to compare them,
+and created symbolic links to make the tools easier to use.
 
 ## Results
 

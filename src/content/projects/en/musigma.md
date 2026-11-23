@@ -101,7 +101,7 @@ had no screen for artists, and its sales optimization gave a wrong result.
 ## Results
 
 Musigma now covers every priority use case of our design, from creating the
-festival to forecasting revenue. As project manager, the lesson I kept is our
+festival to forecasting revenue. As project manager, I learned from our
 organizational mistake: splitting the work by complete module, with model,
 controller and interface together, would have kept everyone from waiting on the
 others. The rework taught me to work on code I had not entirely written, making

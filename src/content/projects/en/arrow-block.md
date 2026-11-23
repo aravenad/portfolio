@@ -29,7 +29,7 @@ learned:
 
 ## Context
 
-Arrow Block is a personal project, started in 2026 alongside my second year of
+Arrow Block is a personal project, started in 2026 alongside the second year of
 my BUT degree. It is a 3D puzzle game: a shape made of arrow cubes, which you
 take apart by launching the cubes in the right order. A cube moves in the
 direction of its arrow; if it hits another one, the player loses a heart.
@@ -58,7 +58,7 @@ now rather than discover it later at work.
 
 The roles were split. The AI wrote most of the code and suggested technical
 solutions; I decided what the game should be, chose among its proposals and
-signed off every step: review, testing on my phone, and rolling back when the
+signed off on every step: review, testing on my phone, and rolling back when the
 result did not suit me.
 
 Working this way takes method:

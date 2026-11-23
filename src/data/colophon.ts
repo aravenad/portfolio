@@ -166,7 +166,7 @@ export const colophonEn = {
       title: "The foundations",
       paragraphs: [
         "A fully static site, built with Astro and Tailwind CSS and served by GitHub Pages: no server, no database. Every page exists in French and in English.",
-        "JavaScript is limited to the router that moves between pages without a reload and a handful of behaviours. Without it, all the content stays readable and every link works.",
+        "JavaScript is limited to the router that moves between pages without a reload and a handful of behaviors. Without it, all the content stays readable and every link works.",
       ],
     },
     {
@@ -183,8 +183,8 @@ export const colophonEn = {
       title: "The theme change",
       paragraphs: [
         "The theme button does not just fade: the new theme is revealed from top to bottom, then from bottom to top on the next change, behind a front of glyphs with a ragged edge, in one second.",
-        "It is a browser View Transition. Its mask is an SVG image drawn once, then slid by a native animation; the front's canvas only paints the lines it crosses. While it runs, the background texture repaints in the new colours in 3-millisecond slices, visible lines first, so that it is ready before the front reaches it.",
-        "The light theme adds no classes: it gives each shade of grey a light value, and the background becomes cream paper. Every component keeps its hierarchy in both themes.",
+        "It is a browser View Transition. Its mask is an SVG image drawn once, then slid by a native animation; the front's canvas only paints the lines it crosses. While it runs, the background texture repaints in the new colors in 3-millisecond slices, visible lines first, so that it is ready before the front reaches it.",
+        "The light theme adds no classes: it gives each shade of gray a light value, and the background becomes cream paper. Every component keeps its hierarchy in both themes.",
       ],
     },
     {
@@ -240,7 +240,7 @@ export const colophonEn = {
       id: "colophon-checks",
       title: "Checked before every release",
       paragraphs: [
-        "Every rule in the scripts is written separately, in plain TypeScript, and tested; every behaviour is also checked in a real browser. These tests run on every change, along with a dependency audit: if one fails, the live site stays on the previous version.",
+        "Every rule in the scripts is written separately, in plain TypeScript, and tested; every behavior is also checked in a real browser. These tests run on every change, along with a dependency audit: if one fails, the live site stays on the previous version.",
       ],
     },
   ],

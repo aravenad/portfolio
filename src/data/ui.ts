@@ -444,7 +444,7 @@ const en = {
     title: "About",
     paragraphs: [
       "After a technology baccalaureate (STI2D), I spent three years in a TSI preparatory class in Chambéry. It taught me to sustain a heavy workload over time, to be rigorous, and how much helping one another changes teamwork. Moving on to the BUT in computer science took me from very theoretical teaching to learning by doing: a demanding shift, and one I enjoyed from the first year.",
-      "In 2025-2026, I took a gap year to discover the working world. At Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large corporate clients, I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside, I kept building personal projects.",
+      "In 2025-2026, I took a gap year to get a first taste of the working world. At Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large corporate clients, I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside that, I kept building personal projects.",
       "What I enjoy most is carrying a project from start to finish, from the need to an application that works. Arrow Block is one example: from the rules of the game and its twelve worlds to a playable online demo and an Android app.",
       "Outside computing, I spend my time on music, video games and documentaries, especially investigative ones, and I closely follow news about new technologies.",
     ],
@@ -452,16 +452,16 @@ const en = {
       {
         label: "Looking for",
         value:
-          `Internship from ${datesEn.start} to ${datesEn.end} (extendable to ${datesEn.extendedTo}), then work-study in my 3rd year`,
+          `Internship from ${datesEn.start} to ${datesEn.end} (extendable to ${datesEn.extendedTo}), then a work-study placement in my third year`,
       },
       {
         label: "Studies",
         value: "BUT in computer science, 2nd year · IUT2 Grenoble",
       },
       { label: "Target role", value: "Web developer, and more broadly application developer" },
-      { label: "Location", value: "Grenoble and surroundings, by public transport" },
+      { label: "Location", value: "The Grenoble area, by public transport" },
     ],
-    cta: "An internship or a work-study position to offer?",
+    cta: "Have an internship or a work-study position to offer?",
   },
 
   skills: {
@@ -538,7 +538,7 @@ const en = {
     },
     competences: {
       realiser: "Develop applications",
-      optimiser: "Optimise applications",
+      optimiser: "Optimize applications",
       administrer: "Administer complex networked computer systems",
       gerer: "Manage information data",
       conduire: "Lead a project",
@@ -575,7 +575,7 @@ const en = {
       empty: "No project matches all these filters.",
       competences: {
         realiser: "Develop",
-        optimiser: "Optimise",
+        optimiser: "Optimize",
         administrer: "Administer",
         gerer: "Manage",
         conduire: "Lead",
@@ -587,11 +587,11 @@ const en = {
   contact: {
     title: "Contact me",
     description:
-      `I am looking for a 10 to 12-week internship, from ${datesEn.start} to ${datesEn.end}, extendable until ${datesEn.extendedTo}, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also travel to the surrounding area. A question, an opportunity? Write to me.`,
+      `I am looking for a 10- to 12-week internship, from ${datesEn.start} to ${datesEn.end}, extendable until ${datesEn.extendedTo}, to complete the second year of my computer science degree. Ideally in Grenoble, but I can also work in nearby towns. Questions or an opportunity? Get in touch.`,
     email: "Send an email",
     copy: "Copy the email address",
     copied: "Address copied",
-    copyFailed: "Could not copy, the address is:",
+    copyFailed: "Couldn't copy. The address is:",
     cv: "Download my résumé",
     github: "See my GitHub",
     linkedin: "See my LinkedIn",

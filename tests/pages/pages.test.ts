@@ -729,7 +729,7 @@ describe("déclaration d'accessibilité", () => {
 
     expect(document.documentElement.getAttribute("lang")).toBe("en");
     expect(document.querySelector("h1")?.textContent?.trim()).toBe("Accessibility");
-    expect(document.querySelector("time")?.textContent).toBe("12 October 2026");
+    expect(document.querySelector("time")?.textContent).toBe("October 12, 2026");
   });
 });
 

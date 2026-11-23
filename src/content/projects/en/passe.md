@@ -31,7 +31,7 @@ from a need described in a few lines, each team must gather and formalize the
 requirements, then build a secure client-server application backed by a
 database, with attention to usability, software quality and security. Fifteen
 teams of six or seven students work on it, each mentored by two teachers: ten
-weeks of two half-days, then three full-time weeks.
+weeks of two half-days a week, then three full-time weeks.
 
 The shared brief: help future students discover university life in Grenoble
 through personalized services. The Université Grenoble Alpes welcomes about

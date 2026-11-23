@@ -14,7 +14,7 @@ ac: ["AC13.01", "AC13.02", "AC13.03", "AC13.04"]
 
 ## Context
 
-Individual project: write, in English, an installation guide for a Debian 12
+An individual project: writing, in English, an installation guide for a Debian 12
 server running Apache, PostgreSQL and PHP. The server had to be working and
 reachable from the host machine. The exercise combined system administration
 and technical writing.
@@ -31,28 +31,28 @@ and technical writing.
 
 ### Phase 1: preparation
 
-Installation of QEMU/KVM for emulation, download of the Debian 12 ISO and
-integrity check, then graphical installation: language, locale, keyboard,
-hostname, root password and user creation. Partitioning was followed by the
-installation of the standard system utilities, without a desktop environment,
-and of the GRUB boot loader.
+I installed QEMU/KVM for emulation, downloaded the Debian 12 ISO and checked
+its integrity, then ran the graphical installer: language, locale, keyboard,
+hostname, root password and user creation. After partitioning, I installed the
+standard system utilities, without a desktop environment, and the GRUB boot
+loader.
 
 ### Phase 2: installing the services
 
-- **Apache**: installation with `apt-get install apache2`, start-up, service
-  status check and port forwarding setup to reach it from the host.
-- **PostgreSQL**: installation with `apt-get install postgresql`, creation of a
-  user and a database, then opening of external connections by editing
+- **Apache**: installed it with `apt-get install apache2`, started it, checked
+  the service status and set up port forwarding to reach it from the host.
+- **PostgreSQL**: installed it with `apt-get install postgresql`, created a user
+  and a database, then opened external connections by editing
   `postgresql.conf` and `pg_hba.conf`.
-- **PHP**: installation of `php`, `libapache2-mod-php` and `php-pgsql`, then
-  creation of an `info.php` file to validate the configuration.
+- **PHP**: installed `php`, `libapache2-mod-php` and `php-pgsql`, then created
+  an `info.php` file to validate the configuration.
 
 ### Phase 3: validation
 
-Access to the Apache server from the host at `http://localhost:8080`,
-connection to PostgreSQL from the host and query execution, then database
-management through the phpPgAdmin web interface. Every step was documented
-with screenshots and written in English.
+From the host, I reached the Apache server at `http://localhost:8080`,
+connected to PostgreSQL and ran queries, then managed the database through the
+phpPgAdmin web interface. Every step was documented in English, with
+screenshots.
 
 ## Results
 

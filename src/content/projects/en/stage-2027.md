@@ -1,6 +1,6 @@
 ---
 title: "Development internship"
-summary: "A 10 to 12-week internship in spring 2027, to complete the second year of my BUT. Company and assignments to come."
+summary: "A 10- to 12-week internship in spring 2027, to complete the second year of my BUT. Company and assignments to come."
 tags: []
 kind: "internship"
 status: "a-venir"
@@ -11,7 +11,7 @@ cover: calendar
 
 ## Context
 
-The second year of the BUT in computer science is completed with a 10 to
+The second year of the BUT in computer science is completed with a 10- to
 12-week internship in a company. Mine will run from April 19 to June 25, 2027,
 with a possible extension to July 9.
 

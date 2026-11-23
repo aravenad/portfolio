@@ -135,7 +135,7 @@ export const experiencesEn: CareerEntry[] = [
     location: "Grenoble area",
     period: "April – June 2027",
     description:
-      `End-of-second-year internship of my BUT, 10 to 12 weeks: from ${datesEn.start} to ${datesEn.end}, extendable to ${datesEn.extendedTo}. I am looking for a company, ideally in web development.`,
+      `End-of-second-year internship for my BUT, 10 to 12 weeks long: from ${datesEn.start} to ${datesEn.end}, extendable to ${datesEn.extendedTo}. I am looking for a company, ideally in web development.`,
     icon: "calendar",
     upcoming: true,
     project: "stage-2027",
@@ -145,7 +145,7 @@ export const experiencesEn: CareerEntry[] = [
     location: "Villard-Bonnot",
     period: "July 2025 – June 2026",
     description:
-      "Group bringing together Microstore, Iso Rhône-Alpes and Chryséis, specializing in the reuse and managed services of IT equipment fleets.",
+      "A group bringing together Microstore, Iso Rhône-Alpes and Chryséis, specializing in the reuse and managed services of IT equipment fleets.",
     initials: "HG",
     roles: [
       {
@@ -153,21 +153,21 @@ export const experiencesEn: CareerEntry[] = [
         contract: "Permanent contract",
         period: "May – June 2026",
         description:
-          "Imaging and preparation of IT equipment for the key account Saint-Gobain, within the technical department. Configuration of Lenovo, Microsoft, Honeywell and Cisco hardware.",
+          "Imaged and prepared IT equipment for the key account Saint-Gobain, within the technical department. Configured Lenovo, Microsoft, Honeywell and Cisco hardware.",
       },
       {
         title: "Diagnostic technician",
         contract: "Permanent contract",
         period: "January – May 2026",
         description:
-          "Audit and grading of IT equipment intended for reuse, for several clients: Capgemini, Saint-Gobain, Nexity.",
+          "Audited and graded IT equipment for reuse, for several clients: Capgemini, Saint-Gobain, Nexity.",
       },
       {
         title: "Receiving technician",
         contract: "Fixed-term, then permanent contract",
         period: "July 2025 – January 2026",
         description:
-          "Management of incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Stock tracking for all clients. Hired on a fixed-term contract for the summer, with some administrative tasks too, then on a permanent contract from September 2025.",
+          "Handled incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Tracked stock for all clients. Hired on a fixed-term contract for the summer, with some administrative tasks too, then on a permanent contract from September 2025.",
       },
     ],
   },
@@ -214,7 +214,7 @@ export const educationEn: CareerEntry[] = [
     organization: "Pablo Neruda High School",
     location: "Saint-Martin-d'Hères",
     period: "September 2018 – June 2020",
-    description: "Information and digital systems (SIN) specialty, with honors (mention assez bien).",
+    description: "Information and digital systems (SIN) specialty, with a “fairly good” grade (mention assez bien).",
     initials: "PN",
   },
 ];
