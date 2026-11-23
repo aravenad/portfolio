@@ -75,6 +75,11 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
   const BUDGET = 3;
   /** Lignes peintes d'un coup, entre deux coups d'œil à l'horloge. */
   const LIGNES_PAR_COUP = 4;
+  /**
+   * Combien de millisecondes une première peinture s'accorde avant de rendre
+   * la main : sous les 50 ms d'une tâche longue, même sur un téléphone lent.
+   */
+  const TRANCHE = 25;
 
   /** Une surface tramée : son canvas, sa grille et ce qu'elle a déjà peint. */
   interface Toile {
@@ -107,6 +112,8 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       avant: Uint8Array;
       fige: boolean;
       marque: boolean;
+      /** Sa première peinture est en cours, par tranches : la boucle l'attend. */
+      enCours: boolean;
     };
   }
 
@@ -181,17 +188,57 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
     attente ||= quandLibre(viderLAttente);
   }
 
-  function viderLAttente(delai?: IdleDeadline) {
+  /*
+   * Une surface par pause, la suivante une fois la précédente peinte. Une
+   * pause en vidait autant que son délai le permettait, et toute la file d'un
+   * coup à l'échéance (`didTimeout`) : une tâche de 100 ms sur un téléphone
+   * moyen, quand un écho passait.
+   */
+  function viderLAttente() {
     attente = 0;
-    for (const [toile, source] of enAttente) {
-      // Il en reste pour la prochaine pause.
-      if (delai && delai.timeRemaining() < 4 && !delai.didTimeout) break;
-      enAttente.delete(toile);
-      if (toiles.includes(toile)) construire(toile, source);
-      // Sans échéance, une surface par appel.
-      if (!delai) break;
+    const [suivante] = enAttente;
+    if (!suivante) return;
+    const [toile, source] = suivante;
+    enAttente.delete(toile);
+    const peinte = toiles.includes(toile) ? construire(toile, source) : Promise.resolve();
+    void peinte.then(() => {
+      if (enAttente.size > 0) attente ||= quandLibre(viderLAttente);
+    });
+  }
+
+  const planificateur = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  /** Rend la main au navigateur, le temps qu'il peigne ou réponde, puis reprend. */
+  const ceder: () => Promise<void> = planificateur?.yield
+    ? () => planificateur.yield!()
+    : () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  /*
+   * Les surfaces proches de l'écran attendent la même image et la même
+   * police : construites dès leur arrivée, elles l'étaient toutes dans la même
+   * tâche, qui bloquait la page à son ouverture. Elles passent donc une à une,
+   * le fond d'abord.
+   */
+  const aConstruire = new Map<Toile, HTMLImageElement>();
+  let construction: Promise<void> | undefined;
+
+  function construireBientot(toile: Toile, source: HTMLImageElement) {
+    enAttente.delete(toile);
+    aConstruire.set(toile, source);
+    construction ??= construireUneParUne();
+  }
+
+  async function construireUneParUne() {
+    while (aConstruire.size > 0) {
+      // La main rendue d'abord, même pour la première : les surfaces arrivées
+      // dans la même tâche ont alors rejoint la file, et le fond passe devant.
+      await ceder();
+      const toile = fond && aConstruire.has(fond) ? fond : aConstruire.keys().next().value!;
+      const source = aConstruire.get(toile)!;
+      aConstruire.delete(toile);
+      // Une surface d'une page déjà quittée n'est plus à construire.
+      if (toiles.includes(toile)) await construire(toile, source);
     }
-    if (enAttente.size > 0) attente = quandLibre(viderLAttente);
+    construction = undefined;
   }
 
   /** La surface est-elle à l'écran, ou à moins d'un écran de distance ? */
@@ -203,12 +250,12 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
   async function preparer(toile: Toile) {
     const [source] = await Promise.all([toile.source(), police]);
     if (!source) return;
-    enAttente.delete(toile);
-    if (toile.etat || proche(toile.canvas.parentElement!.getBoundingClientRect())) construire(toile, source);
+    if (toile.etat || proche(toile.canvas.parentElement!.getBoundingClientRect())) construireBientot(toile, source);
     else differer(toile, source);
   }
 
-  function construire(toile: Toile, source: HTMLImageElement) {
+  async function construire(toile: Toile, source: HTMLImageElement) {
+    const depart = performance.now();
     const boite = toile.canvas.parentElement!;
     const { width, height } = boite.getBoundingClientRect();
     if (width === 0 || height === 0) return;
@@ -250,14 +297,62 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       avant: new Uint8Array(colonnes * lignes),
       fige: false,
       marque: false,
+      enCours: true,
     };
 
-    peindreToile(toile, performance.now());
+    await premierePeinture(toile, depart);
+  }
+
+  /*
+   * La première peinture d'une surface pose toutes ses cellules : 140 ms pour
+   * le fond d'un téléphone, au processeur ralenti 4 fois, d'une seule traite.
+   * Elle passe donc par tranches de lignes, la partie à l'écran d'abord, en
+   * rendant la main entre deux. Le canvas reste masqué tant que cette partie
+   * n'est pas finie : la surface apparaît entière, comme avant, et non ligne
+   * à ligne.
+   */
+  async function premierePeinture(toile: Toile, depart: number) {
+    const etat = toile.etat!;
+    const enMouvement = animationVoulue() && toile.anime();
+    const marque = toile.logo?.marque() ?? false;
+    const temps = enMouvement ? toile.temps(performance.now()) : null;
+    if ("encre" in etat.champ) trameLogo(etat.champ, etat.codes, temps, marque);
+    else trame(etat.champ, etat.codes, temps, toile.niveaux);
+    etat.fige = !enMouvement;
+    etat.marque = marque;
+
+    const { canvas } = toile;
+    const hauteurDeLigne = etat.pixels / (window.devicePixelRatio || 1);
+    const haut = canvas.getBoundingClientRect().top;
+    const premiere = Math.min(etat.lignes, Math.max(0, Math.floor(-haut / hauteurDeLigne)));
+    const derniere = Math.min(etat.lignes, Math.max(premiere, Math.ceil((window.innerHeight - haut) / hauteurDeLigne)));
+    const aLEcran = derniere - premiere;
+    const ordre = [...range(premiere, etat.lignes), ...range(0, premiere)];
+
+    if (aLEcran > 0) canvas.style.visibility = "hidden";
+    // La lecture de la source compte dans la première tranche.
+    let limite = depart + TRANCHE;
+    for (let rang = 0; rang < ordre.length; rang += LIGNES_PAR_COUP) {
+      if (performance.now() > limite) {
+        await ceder();
+        // Reconstruite entre-temps, à une autre taille : sa nouvelle peinture
+        // a pris la relève.
+        if (toile.etat !== etat) return;
+        limite = performance.now() + TRANCHE;
+      }
+      for (const ligne of ordre.slice(rang, rang + LIGNES_PAR_COUP)) {
+        const debutLigne = ligne * etat.colonnes;
+        peindre(etat.contexte, etat.tuiles, etat.codes, etat.avant, etat.colonnes, etat.pixels, debutLigne, debutLigne + etat.colonnes);
+      }
+      if (rang + LIGNES_PAR_COUP >= aLEcran) canvas.style.visibility = "";
+    }
+    canvas.style.visibility = "";
+    etat.enCours = false;
   }
 
   function peindreToile(toile: Toile, maintenant: number) {
     const etat = toile.etat;
-    if (!etat) return;
+    if (!etat || etat.enCours) return;
 
     const anime = animationVoulue() && toile.anime();
     // Un logo change de couleurs au survol, même quand rien ne s'anime.
@@ -388,10 +483,7 @@ import chromeGlyph from "../../assets/chrome-glyph.webp";
       toile.visible = entree.isIntersecting;
       // Mise de côté, elle arrive à l'écran avant que le navigateur ait eu le temps.
       const source = enAttente.get(toile);
-      if (toile.visible && source) {
-        enAttente.delete(toile);
-        construire(toile, source);
-      }
+      if (toile.visible && source) construireBientot(toile, source);
     });
 
     taille.observe(boite);

@@ -278,7 +278,11 @@ surface se fige. Comme « Animer les titres », il est coupé par défaut sous
 Pour le coût : l'atlas de glyphes est partagé par toutes les surfaces de même
 taille et de mêmes teintes (vidé au changement de thème) ; une surface loin de
 la fenêtre n'est construite qu'au repos (`requestIdleCallback`), ou dès qu'elle
-approche ; les effacements d'une ligne sont fusionnés en un seul `clearRect` ;
+approche ; les surfaces se construisent une à une, le fond d'abord, et leur
+première peinture passe par tranches de 25 ms au plus, la partie à l'écran
+d'abord, canvas masqué jusqu'à ce qu'elle soit finie, pour ne pas bloquer la
+page à son ouverture ; les effacements d'une ligne sont fusionnés en
+un seul `clearRect` ;
 et l'observateur de `<html>` ignore la réécriture des attributs par le routeur
 quand ni le thème ni `data-glyph` n'ont changé.
 
