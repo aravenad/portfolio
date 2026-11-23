@@ -30,6 +30,13 @@ const schema = z.object({
   /** Résumé affiché sur les cartes. */
   summary: text(),
   /**
+   * Résumé court, à la place du résumé sur les cartes en téléphone : trois
+   * lignes au plus à 360 px, sans points de suspension. Coupé en CSS, le
+   * résumé finissait souvent sur « musique,… ». Sans lui, la carte coupe le
+   * résumé à trois lignes.
+   */
+  teaser: text().optional(),
+  /**
    * Les technologies du projet, et elles seules : langages, frameworks,
    * bibliothèques, outils. Ce qu'est le projet va dans `kind`, ce qu'il a
    * appris (gestion de projet, RGPD…) dans `role` et `learned`.

@@ -1,6 +1,7 @@
 ---
 title: "A Debian development workstation"
 summary: "Complete installation and configuration of a Debian development workstation, from the system to the tools."
+teaser: "Installing and configuring a Debian development machine."
 tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
 kind: "systems"
 status: "termine"

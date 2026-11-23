@@ -1,6 +1,7 @@
 ---
 title: "Musigma"
 summary: "Application de bureau en Java pour organiser un festival de musique, menée comme chef de projet d'une équipe de six, reprise et terminée en 2026."
+teaser: "Application Java pour organiser un festival de musique."
 tags: ["Java", "JavaFX", "CalendarFX", "UML", "SpotBugs", "PMD"]
 kind: "desktop-app"
 status: "termine"

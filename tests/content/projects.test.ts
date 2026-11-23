@@ -54,6 +54,22 @@ const read = (directory: string) => readdirSync(directory)
 const fiches = read(DIRECTORY);
 const fichesEn = read(DIRECTORY_EN);
 
+/**
+ * Le résumé court des cartes en téléphone (`teaser`) : affiché en entier, il
+ * doit tenir en trois lignes dès 360 px de large, mesuré dans le navigateur
+ * vers 70 signes. Une fiche à venir, hors de la liste, n'en a pas besoin.
+ */
+function expectTeaser(data: Record<string, unknown>) {
+  const teaser = data.teaser as string | undefined;
+  if (data.status === "a-venir") return;
+
+  expect(teaser, "résumé court manquant").toBeDefined();
+  expect(teaser!.length).toBeGreaterThanOrEqual(40);
+  expect(teaser!.length).toBeLessThanOrEqual(70);
+  expect(teaser!.length).toBeLessThan((data.summary as string).length);
+  expect(teaser).toMatch(/[.!?]$/);
+}
+
 describe("fiches de projet", () => {
   it("il y en a au moins une", () => {
     expect(fiches.length).toBeGreaterThan(0);
@@ -80,6 +96,10 @@ describe("fiches de projet", () => {
 
     it("termine son résumé par un point", () => {
       expect(data.summary as string).toMatch(/[.!?]$/);
+    });
+
+    it("a un résumé court pour les cartes en téléphone", () => {
+      expectTeaser(data);
     });
 
     it("annonce au moins une technologie, sauf un projet à venir", () => {
@@ -166,6 +186,10 @@ describe("fiches de projet en anglais", () => {
       for (const key of ["order", "status", "kind", "year", "featured", "cover", "sae", "ac"]) {
         expect(data[key], key).toEqual(original[key]);
       }
+    });
+
+    it("a un résumé court pour les cartes en téléphone", () => {
+      expectTeaser(data);
     });
 
     it("garde la démo de la version française", () => {

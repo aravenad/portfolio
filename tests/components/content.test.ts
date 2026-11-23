@@ -272,6 +272,35 @@ describe("ProjectCard", () => {
     expect(body.querySelector(".flex-wrap")).toBeNull();
   });
 
+  it("donne au téléphone le résumé court, et le résumé entier en grand", async () => {
+    const { body } = await render(ProjectCard, {
+      props: { project: project({ teaser: "Un résumé court." }) },
+    });
+    const teaser = body.querySelector("[data-card-teaser]");
+    const summary = [...body.querySelectorAll("p")].find((p) => p.textContent?.trim() === "Une phrase de résumé.");
+
+    expect(teaser?.textContent?.trim()).toBe("Un résumé court.");
+    expect(teaser?.className).toContain("sm:hidden");
+    expect(summary?.className).toMatch(/(^| )hidden( |$)/);
+    expect(summary?.className).toContain("sm:block");
+    expect(summary?.className).not.toContain("line-clamp-3");
+  });
+
+  it("coupe le résumé sur téléphone quand la fiche n'a pas de résumé court", async () => {
+    const { body } = await render(ProjectCard, { props: { project: project() } });
+
+    expect(body.querySelector("[data-card-teaser]")).toBeNull();
+    expect(body.innerHTML).toContain("line-clamp-3");
+  });
+
+  it("donne le statut sur la ligne du type en téléphone", async () => {
+    const { body } = await render(ProjectCard, { props: { project: project({ status: "en-cours" }) } });
+    const status = body.querySelector("[data-card-status]");
+
+    expect(status?.textContent).toBe("En cours");
+    expect(status?.closest(".sm\\:hidden")).not.toBeNull();
+  });
+
   it("traduit le statut", async () => {
     for (const [status, label] of [
       ["termine", "Terminé"],

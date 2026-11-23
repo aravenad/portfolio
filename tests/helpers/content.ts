@@ -7,6 +7,7 @@ export interface FixtureProject {
   data: {
     title: string;
     summary: string;
+    teaser?: string;
     tags: string[];
     kind: ProjectKind;
     status: "termine" | "en-cours" | "a-venir";

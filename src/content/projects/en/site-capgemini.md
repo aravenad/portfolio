@@ -1,6 +1,7 @@
 ---
 title: "Capgemini explained to middle schoolers"
 summary: "Requirements gathering, then a simple website presenting Capgemini to middle school students, reworked and expanded in 2026."
+teaser: "A simple website presenting Capgemini to middle school students."
 tags: ["HTML", "CSS", "Git", "GitHub"]
 kind: "website"
 status: "termine"

@@ -1,6 +1,7 @@
 ---
 title: "Open Food Facts et Nutri-Score"
 summary: "Nettoyage sous PostgreSQL de la base Open Food Facts, analyse statistique sous R et rapport en anglais sur le Nutri-Score."
+teaser: "Nettoyage d'Open Food Facts et analyse du Nutri-Score sous R."
 tags: ["PostgreSQL", "SQL", "R", "R Markdown"]
 kind: "database"
 status: "termine"

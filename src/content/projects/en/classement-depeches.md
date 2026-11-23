@@ -1,6 +1,7 @@
 ---
 title: "Sorting news dispatches by topic"
 summary: "Automatic classification of news dispatches using weighted lexicons, built in pairs, then reworked in 2026 to make its evaluation sound and compare it with other machine learning methods."
+teaser: "Automatic classification of news dispatches with weighted lexicons."
 tags: ["Java", "Maven", "JUnit", "GitHub Actions"]
 kind: "algorithms"
 status: "termine"

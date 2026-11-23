@@ -20,15 +20,20 @@ interface Props {
 
 const { project, showTags = true, headingLevel = 3 } = Astro.props;
 const Heading = `h${headingLevel}` as const;
-const { title, summary, tags, kind, status, cover } = project.data;
+const { title, summary, teaser, tags, kind, status, cover } = project.data;
 const lang = getLang(Astro.url.pathname);
 const t = useTranslations(lang);
+// Le statut se lit en pied de carte en grand, sur la ligne du type sur
+// téléphone : la même couleur aux deux endroits.
+const statusClass = status === "en-cours" ? "text-accent/80" : "text-zinc-500";
 ---
 
 {/*
   Sur téléphone, la carte passe en ligne : vignette à gauche, titre et résumé à
   droite, sans étiquettes ni pied. Empilées en grand, six cartes faisaient plus
   de trois écrans avant la pagination ; la fiche du projet garde tout le détail.
+  Le type et le statut y restent, sur une ligne au-dessus du titre : sans eux,
+  un projet en cours ne se distinguait plus d'un projet terminé.
 */}
 <Card
   href={getProjectHref(project, lang)}
@@ -40,14 +45,38 @@ const t = useTranslations(lang);
   />
 
   <div class="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
-    {/* Le type du projet, au-dessus du titre ; masqué sur téléphone, comme les étiquettes. */}
-    <p class="mb-2 hidden text-xs text-zinc-500 sm:block">{t.projects.kinds[kind]}</p>
+    {/*
+      Le type du projet, au-dessus du titre ; sur téléphone, suivi du statut.
+      Une espace insécable tient le point au type : si la ligne ne tient pas
+      (« Application de bureau » à 360 px), elle se coupe après lui, et le
+      statut ne commence pas sa ligne par un point.
+    */}
+    <p class="mb-1 text-xs text-zinc-500 sm:mb-2">
+      {t.projects.kinds[kind]}
+      <span class="sm:hidden">
+        {"\u00A0"}<span aria-hidden="true">·</span>{" "}
+        <span class={statusClass} data-card-status>{t.projects.status[status]}</span>
+      </span>
+    </p>
 
     <Heading class="font-medium text-zinc-100 transition group-hover:text-white">
       {title}
     </Heading>
 
-    <p class="mt-1.5 line-clamp-3 text-sm leading-6 text-zinc-400 sm:mt-3 sm:line-clamp-none">
+    {/* Sur téléphone, le résumé court quand la fiche en a un ; sinon le résumé, coupé. */}
+    {
+      teaser && (
+        <p class="mt-1.5 text-sm leading-6 text-zinc-400 sm:hidden" data-card-teaser>
+          {teaser}
+        </p>
+      )
+    }
+    <p
+      class:list={[
+        "mt-1.5 text-sm leading-6 text-zinc-400 sm:mt-3 sm:block sm:line-clamp-none",
+        teaser ? "hidden" : "line-clamp-3",
+      ]}
+    >
       {summary}
     </p>
 
@@ -71,12 +100,7 @@ const t = useTranslations(lang);
         <Arrow class="transition group-hover:translate-x-1" />
       </span>
 
-      <span
-        class:list={[
-          "shrink-0 text-xs",
-          status === "en-cours" ? "text-accent/80" : "text-zinc-500",
-        ]}
-      >
+      <span class:list={["shrink-0 text-xs", statusClass]}>
         {t.projects.status[status]}
       </span>
     </div>

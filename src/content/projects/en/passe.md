@@ -1,6 +1,7 @@
 ---
 title: "PASSE"
 summary: "A web application that guides new students in Grenoble facing financial hardship to health and food support, which I am leading as project manager of a team of seven."
+teaser: "A web application that guides students to health and food support."
 tags: ["Symfony", "Twig", "PostgreSQL", "Leaflet", "OpenStreetMap", "Docker", "Figma", "Jira", "Git"]
 kind: "web-app"
 status: "en-cours"

@@ -1,6 +1,7 @@
 ---
 title: "Dauphinéo"
 summary: "Site de réservation de visites guidées dans les sites patrimoniaux du Dauphiné, mené comme chef de projet d'une équipe de sept, repris et publié en 2026."
+teaser: "Site de réservation de visites guidées du patrimoine dauphinois."
 tags: ["React", "TypeScript", "MUI", "Laravel", "PostgreSQL", "Pest", "GitHub Actions"]
 kind: "web-app"
 status: "termine"

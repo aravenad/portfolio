@@ -1,6 +1,7 @@
 ---
 title: "Poste de développement sous Debian"
 summary: "Installation et configuration complète d'un poste de développement sous Debian, du système aux outils."
+teaser: "Installation et configuration d'un poste de travail Debian."
 tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
 kind: "systems"
 status: "termine"

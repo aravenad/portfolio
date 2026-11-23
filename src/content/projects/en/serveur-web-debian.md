@@ -1,6 +1,7 @@
 ---
 title: "A Debian web server: Apache, PostgreSQL, PHP"
 summary: "Writing an installation guide in English for a Debian 12 server running Apache, PostgreSQL and PHP, validated from the host machine."
+teaser: "An installation guide in English for a Debian web server."
 tags: ["Linux", "Debian", "QEMU/KVM", "Apache", "PHP", "PostgreSQL"]
 kind: "systems"
 status: "termine"

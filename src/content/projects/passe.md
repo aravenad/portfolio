@@ -1,6 +1,7 @@
 ---
 title: "PASSE"
 summary: "Point d'Accès aux Services de Soutien Étudiant : application web qui guide les nouveaux étudiants grenoblois vers les aides de santé et d'alimentation, menée comme chef de projet d'une équipe de sept."
+teaser: "Orienter les étudiants vers les aides de santé et d'alimentation."
 tags: ["Symfony", "Twig", "PostgreSQL", "Leaflet", "OpenStreetMap", "Docker", "Figma", "Jira", "Git"]
 kind: "web-app"
 status: "en-cours"

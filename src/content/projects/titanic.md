@@ -1,6 +1,7 @@
 ---
 title: "Le naufrage du Titanic en base de données"
 summary: "Modélisation en schéma entités-associations, implémentation PostgreSQL et interrogation d'une base de données sur le naufrage du Titanic."
+teaser: "Base de données sur le naufrage du Titanic, du schéma aux requêtes."
 tags: ["PostgreSQL", "SQL"]
 kind: "database"
 status: "termine"

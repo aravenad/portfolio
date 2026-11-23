@@ -347,6 +347,18 @@ test.describe("accueil allégé", () => {
     const title = (await card.locator("h2").boundingBox())!;
     expect(cover.x + cover.width).toBeLessThanOrEqual(title.x);
     await expect(card.locator(".flex-wrap")).toBeHidden();
+
+    // Le type et le statut restent, sur une ligne au-dessus du titre.
+    const status = card.locator("[data-card-status]");
+    await expect(status).toBeVisible();
+    expect((await status.boundingBox())!.y).toBeLessThan(title.y);
+    await expect(card.locator("p").first()).toHaveText(/^Application web\s·\sEn cours$/);
+
+    // Le résumé court remplace le résumé, en entier : rien n'est coupé.
+    const teaser = card.locator("[data-card-teaser]");
+    await expect(teaser).toBeVisible();
+    expect(await teaser.evaluate((p) => p.scrollHeight <= p.clientHeight)).toBe(true);
+    await expect(teaser.locator("xpath=following-sibling::p[1]")).toBeHidden();
   });
 
   test("les filtres des projets se replient derrière un bouton", async ({ page }) => {

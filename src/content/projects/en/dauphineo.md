@@ -1,6 +1,7 @@
 ---
 title: "Dauphinéo"
 summary: "A booking site for guided tours of the heritage towns of the Dauphiné, which I led as project manager of a team of seven, then reworked and published in 2026."
+teaser: "A booking site for guided tours of the Dauphiné's heritage."
 tags: ["React", "TypeScript", "MUI", "Laravel", "PostgreSQL", "Pest", "GitHub Actions"]
 kind: "web-app"
 status: "termine"

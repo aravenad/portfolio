@@ -1,6 +1,7 @@
 ---
 title: "The Titanic disaster as a database"
 summary: "Entity-relationship modeling, PostgreSQL implementation and querying of a database about the sinking of the Titanic."
+teaser: "A database about the sinking of the Titanic, from schema to queries."
 tags: ["PostgreSQL", "SQL"]
 kind: "database"
 status: "termine"

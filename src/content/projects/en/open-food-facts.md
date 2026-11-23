@@ -1,6 +1,7 @@
 ---
 title: "Open Food Facts and the Nutri-Score"
 summary: "Cleaning the Open Food Facts database in PostgreSQL, statistical analysis in R and a report in English about the Nutri-Score."
+teaser: "Cleaning Open Food Facts data and analyzing the Nutri-Score in R."
 tags: ["PostgreSQL", "SQL", "R", "R Markdown"]
 kind: "database"
 status: "termine"

@@ -1,6 +1,7 @@
 ---
 title: "Arrow Block"
 summary: "Jeu de réflexion en 3D pour téléphone : 240 niveaux vérifiés par un solveur, une version web en three.js, puis une application Flutter au moteur 3D maison."
+teaser: "Jeu de réflexion en 3D : 240 niveaux vérifiés par un solveur."
 tags: ["JavaScript", "three.js", "Capacitor", "Flutter", "Dart", "Android"]
 kind: "game"
 status: "en-cours"
