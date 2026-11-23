@@ -1,5 +1,5 @@
 ---
-title: "Exploitation d'une base de données"
+title: "Open Food Facts et Nutri-Score"
 summary: "Nettoyage sous PostgreSQL de la base Open Food Facts, analyse statistique sous R et rapport en anglais sur le Nutri-Score."
 tags: ["PostgreSQL", "SQL", "R", "R Markdown"]
 kind: "database"

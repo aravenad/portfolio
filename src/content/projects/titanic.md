@@ -1,5 +1,5 @@
 ---
-title: "Création d'une base de données"
+title: "Le naufrage du Titanic en base de données"
 summary: "Modélisation en schéma entités-associations, implémentation PostgreSQL et interrogation d'une base de données sur le naufrage du Titanic."
 tags: ["PostgreSQL", "SQL"]
 kind: "database"

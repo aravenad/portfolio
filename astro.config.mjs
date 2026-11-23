@@ -26,6 +26,21 @@ export default defineConfig({
   // une `base` si le site retournait dans un sous-dossier.
   site: 'https://damien-aravena.fr',
 
+  // Les anciennes adresses des fiches, du temps où elles portaient le nom de
+  // la SAÉ : un lien déjà partagé (CV, LinkedIn, moteur de recherche) mène
+  // toujours à la fiche. GitHub Pages ne sait pas rediriger : Astro publie à
+  // chaque ancienne adresse une page qui renvoie aussitôt à la nouvelle.
+  redirects: projectRedirects({
+    'sae-3-01-2026': 'passe',
+    'developpement-application': 'musigma',
+    'creation-base-de-donnees': 'titanic',
+    'exploitation-base-de-donnees': 'open-food-facts',
+    'comparaison-algorithmique': 'classement-depeches',
+    'mise-en-oeuvre-site-web': 'site-capgemini',
+    'installation-poste-de-travail': 'poste-debian',
+    'installation-services-reseau': 'serveur-web-debian',
+  }),
+
   integrations: [
     icon(),
     ogCards(),
@@ -64,6 +79,20 @@ export default defineConfig({
     plugins: [tailwindcss(), publicDirectoryIndex()]
   }
 });
+
+/**
+ * Les redirections d'anciennes adresses de fiches, en français et en anglais.
+ *
+ * @param {Record<string, string>} renamed ancienne adresse → nouvelle
+ * @returns {Record<string, string>}
+ */
+function projectRedirects(renamed) {
+  return Object.fromEntries(
+    Object.entries(renamed).flatMap(([from, to]) =>
+      ['', '/en'].map((prefix) => [`${prefix}/projects/${from}`, `${prefix}/projects/${to}`]),
+    ),
+  );
+}
 
 /**
  * Les cartes d'aperçu des projets (tools/og-projects/Card.astro), servies sous

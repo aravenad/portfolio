@@ -1,5 +1,5 @@
 ---
-title: "Creating a database"
+title: "The Titanic disaster as a database"
 summary: "Entity-relationship modeling, PostgreSQL implementation and querying of a database about the sinking of the Titanic."
 tags: ["PostgreSQL", "SQL"]
 kind: "database"

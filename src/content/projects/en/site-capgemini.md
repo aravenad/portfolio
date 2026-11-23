@@ -1,5 +1,5 @@
 ---
-title: "Building a website"
+title: "Capgemini explained to middle schoolers"
 summary: "Requirements gathering, then a simple website presenting Capgemini to middle school students, reworked and expanded in 2026."
 tags: ["HTML", "CSS", "Git", "GitHub"]
 kind: "website"

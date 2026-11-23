@@ -77,7 +77,7 @@ test("la page courante est marquée dans la barre", async ({ page }) => {
   await expect(navLink(page, "Projets")).toHaveAttribute("aria-current", "page");
 
   // Sur une fiche, le lien de la liste reste marqué, mais comme parent.
-  await page.goto("projects/developpement-application");
+  await page.goto("projects/musigma");
   await expect(navLink(page, "Projets")).toHaveAttribute("aria-current", "true");
 });
 
@@ -93,7 +93,7 @@ test("une ancre de l'accueil atteinte depuis une autre page est rejointe", async
 test("le fil d'Ariane passe dans la barre une fois défilé sous elle, et y mène", async ({
   page,
 }) => {
-  await page.goto("projects/developpement-application");
+  await page.goto("projects/musigma");
   // La fiche a son propre `<header>` : la barre est le seul `banner`.
   const header = page.getByRole("banner");
   const trail = page.locator("[data-header-trail]");
@@ -105,7 +105,7 @@ test("le fil d'Ariane passe dans la barre une fois défilé sous elle, et y mèn
   await scrollToY(page, 600);
   await expect(header).toHaveAttribute("data-trail");
   await expect(page.locator("[data-home-link]")).toBeVisible();
-  await expect(trail).toContainText("Développement d'une application");
+  await expect(trail).toContainText("Musigma");
 
   const projects = trail.getByRole("link", { name: "Projets" });
   await afterNavigation(page, () => clickInPlace(page, projects));

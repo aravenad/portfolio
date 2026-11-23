@@ -198,6 +198,8 @@ const fr = {
      */
     filters: {
       label: "Filtrer les projets",
+      /** Le bouton qui déplie les filtres, sur téléphone seulement. */
+      toggle: "Filtrer",
       status: "Statut",
       kind: "Type",
       competence: "Compétence",
@@ -559,6 +561,7 @@ const en = {
     },
     filters: {
       label: "Filter the projects",
+      toggle: "Filter",
       status: "Status",
       kind: "Type",
       competence: "Skill",

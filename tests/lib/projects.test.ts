@@ -18,6 +18,7 @@ vi.mock("astro:content", () => ({
 const {
   PROJECTS_PER_PAGE,
   getFeaturedProjects,
+  getListedProjects,
   getProjects,
   getProjectsPage,
   getProjectHref,
@@ -29,6 +30,12 @@ const {
 /** Projet minimal : seuls `order` et `featured` comptent pour ces fonctions. */
 function project(id: string, order: number, featured = false) {
   return { id, data: { title: id, summary: "", tags: [], kind: "web-app", status: "termine", order, featured } };
+}
+
+/** Une fiche « à venir », comme le stage avant qu'il commence. */
+function upcoming(id: string, order: number) {
+  const entry = project(id, order, true);
+  return { ...entry, data: { ...entry.data, status: "a-venir" } };
 }
 
 /** `n` projets d'ordre croissant, nommés p1, p2… */
@@ -51,6 +58,33 @@ describe("getProjects", () => {
 
   it("renvoie une liste vide sans projet", async () => {
     expect(await getProjects()).toEqual([]);
+  });
+});
+
+describe("fiches à venir", () => {
+  it("les garde hors de la liste, sans changer l'ordre du reste", async () => {
+    entries.value = [upcoming("stage", 1), project("a", 2), project("b", 3)];
+
+    expect((await getListedProjects()).map((p) => p.id)).toEqual(["a", "b"]);
+    expect((await getProjectsPage(1)).all.map((p) => p.id)).toEqual(["a", "b"]);
+    // Toujours connue de getProjects : le plan du site et les cartes OG la lisent.
+    expect((await getProjects()).map((p) => p.id)).toEqual(["stage", "a", "b"]);
+  });
+
+  it("les garde hors de l'accueil, même mises en avant", async () => {
+    entries.value = [upcoming("stage", 1), project("a", 2, true)];
+    expect((await getFeaturedProjects()).map((p) => p.id)).toEqual(["a"]);
+  });
+
+  it("leur donne une page, mais sans voisines ni place dans celles des autres", async () => {
+    entries.value = [project("a", 1), upcoming("stage", 2), project("b", 3)];
+    const paths = await getProjectPaths();
+    const stage = paths.find((path) => path.params.slug === "stage");
+
+    expect(stage?.props.previous).toBeUndefined();
+    expect(stage?.props.next).toBeUndefined();
+    expect(paths.find((path) => path.params.slug === "a")?.props.next?.id).toBe("b");
+    expect(paths.find((path) => path.params.slug === "b")?.props.previous?.id).toBe("a");
   });
 });
 

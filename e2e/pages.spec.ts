@@ -18,10 +18,10 @@ const routes = [
   "",
   "projects",
   "projects/page/2",
-  "projects/developpement-application",
+  "projects/musigma",
   "en/",
   "en/projects",
-  "en/projects/developpement-application",
+  "en/projects/musigma",
   "legal",
   "en/legal",
   "accessibility",
@@ -31,6 +31,20 @@ const routes = [
   "colophon",
   "en/colophon",
 ];
+
+// Les fiches renommées d'après leur projet : un lien vers l'ancienne adresse,
+// déjà partagé, mène toujours à la fiche, dans les deux langues.
+for (const [from, to, title] of [
+  ["projects/sae-3-01-2026", "projects/passe", "PASSE"],
+  ["en/projects/developpement-application", "en/projects/musigma", "Musigma"],
+]) {
+  test(`/${from} renvoie à /${to}`, async ({ page }) => {
+    await page.goto(from);
+
+    await expect(page).toHaveURL(new RegExp(`/${to}/?$`));
+    await expect(page.locator("h1")).toHaveText(title);
+  });
+}
 
 for (const route of routes) {
   test(`/${route} s'ouvre sans erreur`, async ({ page }) => {
@@ -95,7 +109,7 @@ test("sur grand écran, le texte n'est jamais replié", async ({ page }) => {
 
 test.describe("fiche projet", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("projects/developpement-application");
+    await page.goto("projects/musigma");
   });
 
   test("le sommaire suit la section lue et y mène", async ({ page }) => {
@@ -142,7 +156,7 @@ test("le sommaire allume l'entrée cliquée, même quand la ligne de lecture en 
   // Les deux pièges de la règle de franchissement, sur une vraie fiche : un `h2`
   // suivi aussitôt d'un `h3` (« Réalisation »), et une section de fin de page
   // que la ligne, descendue, dépasse (« Compétences mobilisées »).
-  await page.goto("projects/mise-en-oeuvre-site-web");
+  await page.goto("projects/site-capgemini");
   const sidebar = page.locator('nav[data-toc="sidebar"]');
 
   for (const id of ["réalisation", "competences-mobilisees"]) {
@@ -197,7 +211,7 @@ test("les filtres cherchent dans toutes les pages et se gardent dans l'adresse",
   // Huit projets terminés, répartis sur les deux pages : la page 1 les montre tous.
   await page.getByLabel("Statut").selectOption("termine");
   await expect(cards).toHaveCount(8);
-  await expect(count).toHaveText("8 projets sur 11");
+  await expect(count).toHaveText("8 projets sur 10");
   await expect(pagination).toBeHidden();
   await expect(page).toHaveURL(/\/projects\/\?status=termine$/);
 
@@ -221,25 +235,25 @@ test("les filtres cherchent dans toutes les pages et se gardent dans l'adresse",
 });
 
 test("un lien filtré s'ouvre filtré, même sur une autre page", async ({ page }) => {
-  // Le stage à venir est en tête de la page 1 ; la page 2 le trouve quand même.
-  await page.goto("projects/page/2/?status=a-venir&tag=inconnue");
+  // Les deux projets en cours sont sur la page 1 ; la page 2 les trouve quand même.
+  await page.goto("projects/page/2/?status=en-cours&tag=inconnue");
   const cards = page.locator("[data-project-list] > li:visible");
 
-  await expect(page.getByLabel("Statut")).toHaveValue("a-venir");
+  await expect(page.getByLabel("Statut")).toHaveValue("en-cours");
   // Une valeur que la liste ne propose pas est ignorée plutôt que de tout vider.
   await expect(page.getByLabel("Technologie")).toHaveValue("");
-  await expect(cards).toHaveCount(1);
-  await expect(cards.locator("h2")).toHaveText("Stage de développement");
+  await expect(cards.locator("h2")).toHaveText(["PASSE", "Arrow Block"]);
   await expect(page.locator("[data-filters-empty]")).toBeHidden();
 });
 
 test("les filtres disent quand rien ne répond", async ({ page }) => {
-  await page.goto("projects/?status=a-venir");
+  await page.goto("projects/?status=en-cours");
 
-  await page.getByLabel("Compétence").selectOption("administrer");
+  // Aucun projet en cours n'est une base de données.
+  await page.getByRole("combobox", { name: "Type", exact: true }).selectOption("database");
   await expect(page.locator("[data-project-list] > li:visible")).toHaveCount(0);
   await expect(page.locator("[data-filters-empty]")).toBeVisible();
-  await expect(page.locator("[data-filters-count]")).toHaveText("0 projet sur 11");
+  await expect(page.locator("[data-filters-count]")).toHaveText("0 projet sur 10");
 });
 
 test("le sommaire des mentions légales mène à chaque partie, sous le header", async ({ page }) => {

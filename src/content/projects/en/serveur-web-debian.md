@@ -1,5 +1,5 @@
 ---
-title: "Setting up network services"
+title: "A Debian web server: Apache, PostgreSQL, PHP"
 summary: "Writing an installation guide in English for a Debian 12 server running Apache, PostgreSQL and PHP, validated from the host machine."
 tags: ["Linux", "Debian", "QEMU/KVM", "Apache", "PHP", "PostgreSQL"]
 kind: "systems"

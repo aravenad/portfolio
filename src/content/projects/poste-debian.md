@@ -1,5 +1,5 @@
 ---
-title: "Installation d'un poste de travail"
+title: "Poste de développement sous Debian"
 summary: "Installation et configuration complète d'un poste de développement sous Debian, du système aux outils."
 tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
 kind: "systems"

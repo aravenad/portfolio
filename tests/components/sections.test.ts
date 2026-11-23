@@ -417,10 +417,32 @@ describe("ProjectsList", () => {
     const options = (key: string) =>
       [...body.querySelectorAll(`select[data-filter="${key}"] option`)].map((o) => o.textContent);
 
-    expect(options("status")).toEqual(["Tous les statuts", "Terminé", "En cours"]);
+    expect(options("status")).toEqual(["Tous les statuts", "Terminé (6)", "En cours (1)"]);
     expect(options("kind")).toEqual(["Tous les types", "Application web (3)", "Base de données (4)"]);
-    expect(options("competence")).toEqual(["Toutes les compétences", "Réaliser", "Collaborer"]);
+    expect(options("competence")).toEqual(["Toutes les compétences", "Réaliser (1)", "Collaborer (1)"]);
     expect(options("tag")).toEqual(["Toutes les technologies", "Java (4)", "PHP (3)", "SQL (4)"]);
+  });
+
+  it("ne propose une technologie qu'à partir de deux projets", async () => {
+    // La plupart des technologies n'ont qu'un projet : en lister une
+    // quarantaine noyait les quelques-unes qui servent à trier.
+    const [first, ...rest] = page.all;
+    const lone = { ...first, data: { ...first.data, tags: [...first.data.tags, "Rust"] } };
+    const all = [lone, ...rest];
+    const { body } = await render(ProjectsList, { props: { ...page, all, projects: all.slice(0, 6) } });
+    const tags = [...body.querySelectorAll('select[data-filter="tag"] option')].map((o) => o.textContent);
+
+    expect(tags).not.toContain("Rust (1)");
+    expect(tags).toContain("Java (4)");
+  });
+
+  it("replie les filtres derrière un bouton, sur téléphone", async () => {
+    const { body } = await render(ProjectsList, { props: page });
+    const toggle = body.querySelector("[data-filters-toggle]");
+
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(body.querySelector(`#${toggle?.getAttribute("aria-controls")}`)?.querySelectorAll("select"))
+      .toHaveLength(4);
   });
 
   // Sans script, des filtres qui ne filtrent rien n'ont pas à paraître.

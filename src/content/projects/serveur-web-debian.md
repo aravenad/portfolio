@@ -1,5 +1,5 @@
 ---
-title: "Installation de services réseau"
+title: "Serveur web Debian : Apache, PostgreSQL, PHP"
 summary: "Rédaction d'un guide d'installation en anglais pour un serveur Debian 12 équipé d'Apache, PostgreSQL et PHP, validé depuis la machine hôte."
 tags: ["Linux", "Debian", "QEMU/KVM", "Apache", "PHP", "PostgreSQL"]
 kind: "systems"

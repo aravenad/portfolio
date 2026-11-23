@@ -27,27 +27,42 @@ const onPage = new Set(projects.map((project) => project.id));
 const competencesOf = (project: (typeof all)[number]) =>
   groupAc(project.data.ac).map((group) => group.competence);
 
-// Les choix de chaque filtre : seulement ce que les fiches contiennent.
-const statuses = (Object.keys(t.projects.status) as ProjectStatus[]).filter((status) =>
-  all.some((project) => project.data.status === status),
+/*
+  Les choix de chaque filtre : seulement ce que les fiches contiennent, chacun
+  avec son nombre de projets. Une technologie n'est proposée qu'à partir de
+  deux projets : la plupart n'en ont qu'un, et la liste en comptait une
+  quarantaine, que la fiche montre déjà.
+*/
+const MIN_TAG_PROJECTS = 2;
+const counted = <T extends string>(values: readonly T[], has: (project: (typeof all)[number], value: T) => boolean) =>
+  values
+    .map((value) => [value, all.filter((project) => has(project, value)).length] as const)
+    .filter(([, count]) => count > 0);
+
+const statuses = counted(
+  Object.keys(t.projects.status) as ProjectStatus[],
+  (project, status) => project.data.status === status,
 );
-const kinds = KINDS.map(
-  (kind) => [kind, all.filter((project) => project.data.kind === kind).length] as const,
-).filter(([, count]) => count > 0);
-const competences = COMPETENCES.filter((competence) =>
-  all.some((project) => competencesOf(project).includes(competence)),
+const kinds = counted(KINDS, (project, kind) => project.data.kind === kind);
+const competences = counted(COMPETENCES, (project, competence) =>
+  competencesOf(project).includes(competence),
 );
 const tagCounts = new Map<string, number>();
 for (const project of all)
   for (const tag of project.data.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
-const tags = [...tagCounts].sort(([a], [b]) => a.localeCompare(b, lang, { sensitivity: "base" }));
+const tags = [...tagCounts]
+  .filter(([, count]) => count >= MIN_TAG_PROJECTS)
+  .sort(([a], [b]) => a.localeCompare(b, lang, { sensitivity: "base" }));
 
 const fields = [
   {
     key: "status",
     label: f.status,
     any: f.anyStatus,
-    options: statuses.map((status) => ({ value: status, label: t.projects.status[status] })),
+    options: statuses.map(([status, count]) => ({
+      value: status,
+      label: `${t.projects.status[status]} (${count})`,
+    })),
   },
   {
     key: "kind",
@@ -62,9 +77,9 @@ const fields = [
     key: "competence",
     label: f.competence,
     any: f.anyCompetence,
-    options: competences.map((competence) => ({
+    options: competences.map(([competence, count]) => ({
       value: competence,
-      label: f.competences[competence],
+      label: `${f.competences[competence]} (${count})`,
     })),
   },
   {
@@ -102,7 +117,41 @@ const fields = [
       hidden
       class="mt-12"
     >
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/*
+        Sur téléphone, les quatre listes prenaient plus d'un écran avant la
+        première carte : elles se replient derrière ce bouton, et s'ouvrent
+        d'elles-mêmes quand l'adresse porte déjà un filtre.
+      */}
+      <button
+        type="button"
+        data-filters-toggle
+        aria-expanded="false"
+        aria-controls="project-filter-fields"
+        class:list={[
+          "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-zinc-200 transition sm:hidden",
+          outlineButton,
+        ]}
+      >
+        {f.toggle}
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-4 text-zinc-500 transition-transform"
+        >
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </button>
+
+      <div
+        id="project-filter-fields"
+        data-filter-fields
+        class="filter-fields grid gap-4 max-sm:mt-4 sm:grid-cols-2 lg:grid-cols-4"
+      >
         {fields.map((field) => (
           <label class="flex flex-col gap-1.5 text-sm text-zinc-400">
             {field.label}
@@ -203,6 +252,12 @@ const fields = [
     if (!root || !list || !count || !reset) return;
 
     const items = [...list.querySelectorAll<HTMLElement>(":scope > li")];
+    const toggle = root.querySelector<HTMLButtonElement>("[data-filters-toggle]");
+    const fields = root.querySelector<HTMLElement>("[data-filter-fields]");
+    const setOpen = (open: boolean) => {
+      toggle?.setAttribute("aria-expanded", String(open));
+      fields?.toggleAttribute("data-open", open);
+    };
     const empty = document.querySelector<HTMLElement>("[data-filters-empty]");
     const pagination = document.querySelector<HTMLElement>("[data-projects-pagination]");
     const selects = Object.fromEntries(
@@ -239,7 +294,14 @@ const fields = [
       if (select.value !== initial[key]) select.value = "";
     }
     root.hidden = false;
+    setOpen(isActive(read()));
     show(read());
+
+    toggle?.addEventListener(
+      "click",
+      () => setOpen(toggle.getAttribute("aria-expanded") !== "true"),
+      { signal },
+    );
 
     const update = () => {
       const filters = read();
@@ -264,3 +326,16 @@ const fields = [
     );
   });
 </script>
+
+<style>
+  /* Repliés sur téléphone tant que le bouton ne les a pas ouverts ; toujours visibles au-delà. */
+  @media (width < 40rem) {
+    .filter-fields:not([data-open]) {
+      display: none;
+    }
+  }
+
+  [aria-expanded="true"] > svg {
+    rotate: 180deg;
+  }
+</style>

@@ -1,5 +1,5 @@
 ---
-title: "Developing an application"
+title: "Musigma"
 summary: "A Java desktop application for organizing a music festival, which I led as project manager of a team of six, then reworked and finished in 2026."
 tags: ["Java", "JavaFX", "CalendarFX", "UML", "SpotBugs", "PMD"]
 kind: "desktop-app"

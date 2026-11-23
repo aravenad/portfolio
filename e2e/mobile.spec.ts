@@ -91,7 +91,7 @@ test("les réglages de langue, de thème et du reflet restent accessibles", asyn
 test("le sommaire replié se loge contre le filet de l'en-tête de la fiche", async ({ page }) => {
   // Un seul filet au-dessus du sommaire : le sien et celui de l'en-tête, séparés
   // par un vide, faisaient une double ligne.
-  await page.goto("projects/developpement-application");
+  await page.goto("projects/musigma");
   const [headerBottom, tocTop, tocBorderTop] = await page.evaluate(() => {
     const details = document.querySelector("[data-toc-details]")!;
     return [
@@ -106,7 +106,7 @@ test("le sommaire replié se loge contre le filet de l'en-tête de la fiche", as
 });
 
 test("le sommaire replié se referme sur la section choisie", async ({ page }) => {
-  await page.goto("projects/developpement-application");
+  await page.goto("projects/musigma");
   const details = page.locator("[data-toc-details]");
   await expect(page.locator('nav[data-toc="sidebar"]')).toBeHidden();
 
@@ -347,6 +347,21 @@ test.describe("accueil allégé", () => {
     const title = (await card.locator("h2").boundingBox())!;
     expect(cover.x + cover.width).toBeLessThanOrEqual(title.x);
     await expect(card.locator(".flex-wrap")).toBeHidden();
+  });
+
+  test("les filtres des projets se replient derrière un bouton", async ({ page }) => {
+    await page.goto("projects");
+    const toggle = page.getByRole("button", { name: "Filtrer", exact: true });
+
+    await expect(page.getByLabel("Statut")).toBeHidden();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByLabel("Statut")).toBeVisible();
+
+    // Une adresse filtrée les ouvre d'emblée : le filtre actif se voit.
+    await page.goto("projects/?status=en-cours");
+    await expect(page.getByLabel("Statut")).toHaveValue("en-cours");
+    await expect(page.getByLabel("Statut")).toBeVisible();
   });
 });
 

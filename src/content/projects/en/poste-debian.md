@@ -1,5 +1,5 @@
 ---
-title: "Setting up a workstation"
+title: "A Debian development workstation"
 summary: "Complete installation and configuration of a Debian development workstation, from the system to the tools."
 tags: ["Linux", "Debian", "KDE Plasma", "JDK", "Git", "NetBeans"]
 kind: "systems"
