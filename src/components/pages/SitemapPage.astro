@@ -3,7 +3,7 @@ import Breadcrumb from "../ui/Breadcrumb.astro";
 import Container from "../ui/Container.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { colophon, colophonEn } from "../../data/colophon";
-import { navLinks, navLinksEn, socialLinks } from "../../data/site";
+import { navLinks, navLinksEn, socialLinks, socialLinksEn } from "../../data/site";
 import { useTranslations } from "../../data/ui";
 import { publicCv } from "../../lib/cv";
 import { getLang, localizedUrl } from "../../lib/i18n";
@@ -89,7 +89,7 @@ const link = "transition hover:text-zinc-100";
           <h2 id="sitemap-contact" class={groupTitle}>{sitemap.contact}</h2>
           <ul class={list}>
             {
-              socialLinks.map((social) => (
+              (lang === "en" ? socialLinksEn : socialLinks).map((social) => (
                 <li>
                   <a href={social.href} rel={outbound(social.href)} class={link}>{social.label}</a>
                 </li>

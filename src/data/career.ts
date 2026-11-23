@@ -65,15 +65,10 @@ export const experiences: CareerEntry[] = withFrenchSpacing([
       },
       {
         title: "Technicien réception",
-        contract: "CDI",
-        period: "Septembre 2025 – janvier 2026",
+        contract: "CDD, puis CDI",
+        period: "Juillet 2025 – janvier 2026",
         description:
-          "Gestion du flux entrant de matériel informatique chez Microstore (Green IT) : PC, tablettes, téléphones et accessoires. Suivi des stocks pour l'ensemble des clients.",
-      },
-      {
-        title: "Assistant administratif et technicien réception",
-        contract: "CDD",
-        period: "Juillet – août 2025",
+          "Gestion du flux entrant de matériel informatique chez Microstore (Green IT) : PC, tablettes, téléphones et accessoires. Suivi des stocks pour l'ensemble des clients. Recruté en CDD pour l'été, avec aussi des tâches administratives, puis en CDI dès septembre 2025.",
       },
     ],
   },
@@ -169,15 +164,10 @@ export const experiencesEn: CareerEntry[] = [
       },
       {
         title: "Receiving technician",
-        contract: "Permanent contract",
-        period: "September 2025 – January 2026",
+        contract: "Fixed-term, then permanent contract",
+        period: "July 2025 – January 2026",
         description:
-          "Management of incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Stock tracking for all clients.",
-      },
-      {
-        title: "Administrative assistant and receiving technician",
-        contract: "Fixed-term contract",
-        period: "July – August 2025",
+          "Management of incoming IT equipment at Microstore (Green IT): PCs, tablets, phones and accessories. Stock tracking for all clients. Hired on a fixed-term contract for the summer, with some administrative tasks too, then on a permanent contract from September 2025.",
       },
     ],
   },

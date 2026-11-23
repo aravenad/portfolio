@@ -91,8 +91,14 @@ export const navLinksEn: NavLink[] = [
   { label: "Contact", href: "/#contact", sections: ["contact"] },
 ];
 
+/** Le français écrit « e-mail », comme le recommande l'usage. */
 export const socialLinks: SocialLink[] = [
   { label: "GitHub", href: site.github },
   { label: "LinkedIn", href: site.linkedin },
-  { label: "Email", href: `mailto:${site.email}` },
+  { label: "E-mail", href: `mailto:${site.email}` },
 ];
+
+/** Les mêmes liens en anglais : seul « Email » change. */
+export const socialLinksEn: SocialLink[] = socialLinks.map((link) =>
+  link.href.startsWith("mailto:") ? { ...link, label: "Email" } : link,
+);

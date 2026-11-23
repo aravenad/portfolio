@@ -1,8 +1,8 @@
 ---
 import Container from "../ui/Container.astro";
-import { site, socialLinks } from "../../data/site";
+import { site, socialLinks, socialLinksEn } from "../../data/site";
 import { useTranslations } from "../../data/ui";
-import { getLang, localizedUrl } from "../../lib/i18n";
+import { getLang, localized, localizedUrl } from "../../lib/i18n";
 
 const year = new Date().getFullYear();
 const lang = getLang(Astro.url.pathname);
@@ -49,7 +49,7 @@ const pageLink = "whitespace-nowrap transition hover:text-zinc-200";
     {/* Elle va à la ligne si le texte est agrandi (WCAG 1.4.4) : sinon toute la page défile en largeur. */}
     <ul class="flex flex-wrap items-center gap-x-6 gap-y-2">
       {
-        socialLinks.map((link) => (
+        localized(lang, { fr: socialLinks, en: socialLinksEn }).map((link) => (
           <li>
             <a href={link.href} rel={outbound(link.href)} class="transition hover:text-zinc-200">
               {link.label}

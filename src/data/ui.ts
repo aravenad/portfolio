@@ -105,7 +105,7 @@ const fr = {
       paragraphs: [
         "La plupart de mes projets se sont déroulés en équipe, de deux à sept personnes, et j'en ai mené trois comme chef de projet. J'y ai appris à répartir le travail, à tenir des délais et à documenter mes choix pour que les autres puissent reprendre le code derrière moi.",
         "Plusieurs d'entre eux m'ont demandé de sortir du code : recueillir un besoin auprès d'un client, vulgariser un sujet technique pour un public qui ne l'est pas, ou rédiger en anglais un guide d'installation suffisamment précis pour être reproduit pas à pas.",
-        "Mon année chez Horizon Groupe m'a appris la rigueur d'un service technique : quatre postes en un an, de la réception du matériel à sa préparation pour des clients grands comptes. En 2026, j'ai aussi repris seul trois anciens projets d'équipe : audit du code, tests avant chaque correction, puis finitions.",
+        "Mon année chez Horizon Groupe m'a appris la rigueur d'un service technique : trois postes en un an, de la réception du matériel à sa préparation pour des clients grands comptes. En 2026, j'ai aussi repris seul trois anciens projets d'équipe : audit du code, tests avant chaque correction, puis finitions.",
       ],
     },
   },
@@ -476,7 +476,7 @@ const en = {
       paragraphs: [
         "Most of my projects were team efforts, with two to seven people, and I led three of them as project lead. They taught me to share the work, meet deadlines and document my choices so that others can pick up the code after me.",
         "Several of them required me to step away from the code: gathering a client's requirements, explaining a technical topic to a non-technical audience, or writing an installation guide in English precise enough to be followed step by step.",
-        "My year at Horizon Groupe taught me the rigor of a technical department: four positions in a year, from receiving hardware to preparing it for large corporate clients. In 2026, I also took over three former team projects on my own: code audit, tests before each fix, then finishing touches.",
+        "My year at Horizon Groupe taught me the rigor of a technical department: three positions in a year, from receiving hardware to preparing it for large corporate clients. In 2026, I also took over three former team projects on my own: code audit, tests before each fix, then finishing touches.",
       ],
     },
   },
