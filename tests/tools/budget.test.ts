@@ -61,6 +61,31 @@ describe("measure", () => {
     expect(image.file.replaceAll("\\", "/")).toBe("_astro/fond.webp");
   });
 
+  it("retient la plus lourde des cartes d'aperçu, celle du site comprise", () => {
+    write("_astro/dauphineo.Ab12.jpg", Buffer.alloc(500));
+    write("og-v6.jpg", Buffer.alloc(800));
+    write("og-v5.png", Buffer.alloc(9000));
+
+    expect(measure(dist).card).toEqual({ file: "og-v6.jpg", bytes: 800 });
+  });
+
+  it("additionne les fichiers des démos, et eux seuls", () => {
+    write("demos/jeu/embed.js", Buffer.alloc(700));
+    write("demos/jeu/poster.jpg", Buffer.alloc(200));
+    write("demos-notes.txt", Buffer.alloc(50));
+
+    const measures = measure(dist);
+    expect(measures.demos).toBe(900);
+    expect(measures.card.bytes).toBe(0);
+  });
+
+  it("retient le plus lourd des PDF, le CV", () => {
+    write("cv-public.pdf", Buffer.alloc(400));
+    write("cv-public-en.pdf", Buffer.alloc(600));
+
+    expect(measure(dist).pdf).toEqual({ file: "cv-public-en.pdf", bytes: 600 });
+  });
+
   it("mesure zéro sur un site vide", () => {
     mkdirSync(join(dist, "_astro"));
     expect(measure(dist)).toEqual({
@@ -69,6 +94,9 @@ describe("measure", () => {
       cssGzip: 0,
       htmlGzip: { file: "", bytes: 0 },
       image: { file: "", bytes: 0 },
+      card: { file: "", bytes: 0 },
+      demos: 0,
+      pdf: { file: "", bytes: 0 },
     });
   });
 });
@@ -80,6 +108,9 @@ describe("check", () => {
     cssGzip: 20,
     htmlGzip: { file: "index.html", bytes: 30 },
     image: { file: "_astro/fond.webp", bytes: 401 },
+    card: { file: "og-v6.jpg", bytes: 90 },
+    demos: 1000,
+    pdf: { file: "cv.pdf", bytes: 200 },
   };
   const limits = { js: 100, jsGzip: 60, cssGzip: 20, htmlGzip: 40, image: 400 };
 

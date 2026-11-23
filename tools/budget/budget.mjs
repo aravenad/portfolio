@@ -28,10 +28,29 @@ export const LIMITS = {
   // La plus grosse image servie aux visiteurs : la matière du fond (417 Ko,
   // 5,2 Mo avant son passage en WebP q80).
   image: 500 * 1024,
+  // La plus lourde des cartes d'aperçu, celle du site et celles des fiches
+  // (77 Ko). LinkedIn et les messageries la téléchargent à chaque partage, et
+  // certaines ignorent un aperçu de plus de 300 Ko : rendues en 2400 × 1260,
+  // elles pesaient jusqu'à 400 Ko.
+  card: 100 * 1024,
+  // Les démos jouables, tous fichiers confondus (1061 Ko). Chargées à la
+  // demande, mais d'un seul bloc : le moteur de la démo pèse 824 Ko à lui seul.
+  demos: 1250 * 1024,
+  // Le plus lourd des CV publics, l'anglais (261 Ko, 914 Ko avant que
+  // tools/cv-pdf/compress.mjs passe son bandeau en JPEG). Ses polices, que
+  // Chrome a écrites en Type 3, en font l'essentiel ; le français pèse 137 Ko.
+  pdf: 300 * 1024,
 };
 
 /** Les images que les pages affichent ; les JPEG sont les cartes d'aperçu, lues par LinkedIn. */
 const VISITOR_IMAGE = /\.(webp|avif|png|svg|gif)$/i;
+
+/**
+ * Les cartes d'aperçu : celle du site (public/og-v<n>.jpg) et celles des fiches
+ * (_astro/). Les anciennes versions en PNG restent servies pour les partages
+ * passés, mais aucune page ne les annonce plus.
+ */
+const CARD = /\.jpe?g$/i;
 
 /** Les fichiers d'un dossier, sous-dossiers compris. */
 function files(directory) {
@@ -61,6 +80,7 @@ export function measure(dist) {
   const css = assets.filter((path) => path.endsWith(".css"));
   const sum = (paths, size) => paths.reduce((total, path) => total + size(path), 0);
   const raw = (path) => statSync(path).size;
+  const inDemos = (path) => relative(dist, path).split(/[\\/]/)[0] === "demos";
 
   return {
     js: sum(js, raw),
@@ -68,6 +88,9 @@ export function measure(dist) {
     cssGzip: sum(css, gzip),
     htmlGzip: largest(all.filter((path) => path.endsWith(".html")), gzip, dist),
     image: largest(assets.filter((path) => VISITOR_IMAGE.test(path)), raw, dist),
+    card: largest(all.filter((path) => CARD.test(path) && !inDemos(path)), raw, dist),
+    demos: sum(all.filter(inDemos), raw),
+    pdf: largest(all.filter((path) => path.toLowerCase().endsWith(".pdf")), raw, dist),
   };
 }
 
@@ -87,6 +110,9 @@ const LABELS = {
   cssGzip: "CSS (gzip)",
   htmlGzip: "Page HTML la plus lourde (gzip)",
   image: "Plus grosse image",
+  card: "Carte d'aperçu la plus lourde",
+  demos: "Démos jouables",
+  pdf: "CV en PDF, le plus lourd",
 };
 
 const kb = (bytes) => `${(bytes / 1024).toFixed(1).replace(".", ",")} Ko`;

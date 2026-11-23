@@ -27,8 +27,9 @@ describe.each(["fr", "en"] as const)("cartes d'aperçu (%s)", (lang) => {
     const card = projectCard(lang, slug);
 
     expect(card, `src/assets/og/${lang}/${slug}.jpg manque : lancer npm run og`).toBeDefined();
-    // Rendue à 2× : 1200 × 630, le format des aperçus, deux fois plus net.
-    expect([card!.width, card!.height]).toEqual([2400, 1260]);
+    // 1200 × 630, le format des aperçus : rendue à 2× puis réduite, nette et
+    // légère (tools/og-projects/render.mjs).
+    expect([card!.width, card!.height]).toEqual([1200, 630]);
     expect(card!.format).toBe("jpg");
   });
 

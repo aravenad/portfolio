@@ -81,10 +81,16 @@ const alternates = languages.map((code) => ({
  * ~520px puis réencodée en JPEG, elle paraissait floue. Elle n'a jamais servi
  * ailleurs que dans l'inspecteur et n'est pas conservée. v3 reste dans public/ :
  * les publications déjà partagées continuent de pointer dessus.
+ *
+ * v6 : 1200 × 630 en JPEG (45 Ko) au lieu de 2400 × 1260 en PNG (400 Ko).
+ * Certaines messageries ignorent un aperçu de plus de 300 Ko, et LinkedIn le
+ * réduit de toute façon. Le texte passe en Noto Sans, la police du site, et le
+ * tiret du sous-titre cède la place à « à Grenoble ». v5 reste dans public/
+ * pour la même raison que v3.
  */
 const ogImage = image
   ? { ...image, src: new URL(image.src, Astro.site) }
-  : { src: new URL(url("/og-v5.png"), Astro.site), width: 2400, height: 1260, alt: t.meta.ogImageAlt };
+  : { src: new URL(url("/og-v6.jpg"), Astro.site), width: 1200, height: 630, alt: t.meta.ogImageAlt };
 ---
 
 <!doctype html>

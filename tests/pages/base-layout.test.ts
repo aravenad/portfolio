@@ -76,7 +76,7 @@ describe("BaseLayout", () => {
       // ⚠️ Republier sous le même nom ne met pas l'aperçu à jour : LinkedIn
       // garde l'ancienne image indéfiniment.
       expect(meta((await renderPage(BaseLayout, options())).document, "og:image"))
-        .toMatch(/og-v\d+\.png$/);
+        .toMatch(/og-v\d+\.jpg$/);
     });
 
     it("annonce les dimensions attendues par les aperçus", async () => {

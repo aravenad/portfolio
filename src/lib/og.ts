@@ -7,8 +7,8 @@ import type { Lang } from "./i18n";
  *
  * Importées plutôt que posées dans public/ : Vite leur donne une empreinte
  * dans leur nom, si bien qu'une carte refaite change d'URL et que LinkedIn,
- * qui garde ses aperçus par URL, la retélécharge. og-v5.png doit être
- * renommée à la main pour le même effet.
+ * qui garde ses aperçus par URL, la retélécharge. l'image du site
+ * (public/og-v6.jpg) doit être renommée à la main pour le même effet.
  */
 const cards = import.meta.glob<ImageMetadata>("../assets/og/*/*.jpg", {
   eager: true,

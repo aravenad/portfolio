@@ -8,7 +8,10 @@
  * Démarre son propre `astro dev`, seul à servir les cartes
  * (tools/og-projects/Card.astro), et les capture dans le Chromium de
  * Playwright (`npx playwright install chromium` au besoin). Rendues à 2×,
- * comme public/og-v5.png : LinkedIn réduit l'image, elle doit rester nette.
+ * puis réduites à 1200 × 630, la taille que LinkedIn recommande : la
+ * réduction garde les bords du texte nets, et la carte pèse 50 à 110 Ko au
+ * lieu de 200 à 400 Ko en 2400 × 1260. Certaines messageries ignorent un
+ * aperçu de plus de 300 Ko.
  *
  * Les images sont importées par src/lib/og.ts, et Vite leur donne une empreinte dans
  * leur nom : une carte modifiée change d'URL, et LinkedIn la retélécharge.
@@ -19,6 +22,7 @@ import { fileURLToPath } from "node:url";
 
 import { chromium } from "@playwright/test";
 import { dev } from "astro";
+import sharp from "sharp";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const content = join(root, "src/content/projects");
@@ -43,9 +47,13 @@ const server = await dev({
 });
 const browser = await chromium.launch();
 
+/** La taille publiée, la moitié du rendu. */
+const WIDTH = 1200;
+const HEIGHT = 630;
+
 try {
   const page = await browser.newPage({
-    viewport: { width: 1200, height: 630 },
+    viewport: { width: WIDTH, height: HEIGHT },
     deviceScaleFactor: 2,
     // La trame, figée : la même image à chaque rendu.
     reducedMotion: "reduce",
@@ -77,9 +85,14 @@ try {
     await mkdir(join(out, lang), { recursive: true });
     /*
      * En JPEG : la trame est un bruit fin que le PNG ne sait pas compresser
-     * (1,4 Mo par carte, contre ~300 Ko ici). LinkedIn réencode de toute façon.
+     * (1,4 Mo par carte). LinkedIn réencode de toute façon. Capturée sans
+     * perte, réduite, puis compressée une seule fois.
      */
-    await page.screenshot({ path: join(out, lang, `${slug}.jpg`), type: "jpeg", quality: 88 });
+    const shot = await page.screenshot({ type: "png" });
+    await sharp(shot)
+      .resize(WIDTH, HEIGHT, { kernel: "lanczos3" })
+      .jpeg({ quality: 86, mozjpeg: true })
+      .toFile(join(out, lang, `${slug}.jpg`));
     console.log(`og/${lang}/${slug}.jpg`);
   }
 } finally {

@@ -209,7 +209,7 @@ describe("fiche d'un projet", () => {
       props,
     });
 
-    expect(meta(document, "og:image")).toMatch(/og-v\d+\.png$/);
+    expect(meta(document, "og:image")).toMatch(/og-v\d+\.jpg$/);
   });
 
   it("affiche les étiquettes, le statut, le type et le contexte", async () => {

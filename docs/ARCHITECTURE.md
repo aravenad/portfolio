@@ -111,7 +111,7 @@ La version anglaise a les mêmes routes, préfixées par `/en` :
   L'accueil décrit aussi la personne en données structurées (`Person`,
   JSON-LD, `src/lib/structured-data.ts`) : nom, études, ville et profils
   GitHub et LinkedIn, tirés des données du site.
-- **L'aperçu d'un lien** (LinkedIn, messageries) montre `public/og-v5.png`,
+- **L'aperçu d'un lien** (LinkedIn, messageries) montre `public/og-v6.jpg`,
   sauf sur une fiche, qui a sa propre carte : sa couverture tramée, son titre
   chromé, l'auteur, l'équipe et l'année (`src/assets/og/<langue>/<fiche>.jpg`,
   trouvée par `src/lib/og.ts` et passée au gabarit par la prop `image`). Vite
@@ -370,7 +370,7 @@ Côté Vitest :
 | **Ajouter une langue** | L'ajouter à `languages` (`src/lib/i18n.ts`), lui donner un dictionnaire dans `ui.ts`, ses contenus (`…De`…), une collection dans `content.config.ts`, et ses fichiers dans `src/pages/<code>/`. Le sélecteur du header, prévu pour deux langues, devient alors une liste. |
 | **Ajouter un comportement JS** | La règle dans `src/lib/` avec son test, le câblage dans le `<script>` du composant via `onEachPage((signal) => …)`, et un test de ce que voit le visiteur dans `e2e/`. |
 | **Changer une couleur** | `--color-accent` dans `@theme` (`global.css`) pour le sombre, et dans le bloc `:root[data-theme="light"]` pour le clair, qui redéfinit aussi l'échelle `zinc`. Les autres teintes du sombre sont les gris `zinc` de Tailwind, sauf `zinc-500`, redéfini dans `@theme` ; un gris de texte sous 4,5:1 fait échouer les tests. |
-| **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v6.png`), puis pointer `ogImageURL` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. Les cartes des fiches, elles, se refont par `npm run og` (titre, équipe, année ou couverture changés, ou retouche de `tools/og-projects/Card.astro`). |
+| **Refaire l'image d'aperçu** | Modifier `tools/og.html`, la rendre (commande ci-dessous) sous un **nouveau nom** (`og-v7.jpg`), puis pointer `ogImage` dessus dans `BaseLayout`. LinkedIn garde en cache l'ancienne URL ; ne pas supprimer l'ancien fichier, les partages existants y pointent. Les cartes des fiches, elles, se refont par `npm run og` (titre, équipe, année ou couverture changés, ou retouche de `tools/og-projects/Card.astro`). |
 | **Retoucher le fondu du fond** | Modifier `tools/chrome-fade/chrome-fade.svg`, puis `node tools/chrome-fade/render.mjs` (détails dans son README). |
 | **Charger une ressource d'un autre site** | Ajouter son origine à la directive qui la concerne dans `sitePolicy()` (`src/lib/csp.ts`), avec son test. Un script en ligne n'a besoin de rien : le build calcule son empreinte. |
 | **Changer de domaine** | Mettre à jour `site` dans `astro.config.mjs` et `SITE_ORIGIN` dans `tests/helpers/render.ts`, le domaine personnalisé dans les réglages Pages du dépôt, puis les DNS chez le registraire (Infomaniak). Pour revenir sur `aravenad.github.io/portfolio`, remettre aussi `base: '/portfolio'` et le préfixe `/portfolio/` dans `e2e/` et `playwright.config.ts`. |
@@ -381,8 +381,14 @@ Rendu de l'image d'aperçu, depuis la racine du projet. Sous Windows, remplacer
 
 ```sh
 chrome --headless=new --hide-scrollbars --force-device-scale-factor=2 \
-  --window-size=1200,630 --screenshot=public/og-v6.png "file://$PWD/tools/og.html"
+  --window-size=1200,630 --screenshot=og-2x.png "file://$PWD/tools/og.html"
+node -e "require('sharp')('og-2x.png').resize(1200, 630, { kernel: 'lanczos3' }).jpeg({ quality: 86, mozjpeg: true }).toFile('public/og-v7.jpg')"
 ```
+
+La capture à 2× puis réduite donne des lettres plus nettes qu'un rendu direct
+en 1200 × 630, pour 45 Ko au lieu de 400 Ko en PNG pleine taille. Certaines
+messageries ignorent un aperçu de plus de 300 Ko, et le budget de performance
+(`npm run budget`) plafonne l'image.
 
 La police est Noto Sans, celle du site : elle doit être installée sur la
 machine qui fait la capture (fonts.google.com), sinon Chrome en substitue une
@@ -392,8 +398,9 @@ Les cartes des fiches ne sont pas rendues par `astro build` : la trame de la
 couverture se peint dans un `<canvas>`, que seul un navigateur sait dessiner,
 et la CI n'en a pas. `npm run og` (`tools/og-projects/render.mjs`) lance son
 propre `astro dev`, le seul à servir la page des cartes (`/__og/<langue>/<fiche>/`,
-intégration `ogCards` d'`astro.config.mjs`), et la capture à 2× en JPEG dans le
-Chromium de Playwright. Les cartes sont versionnées comme `og-v5.png`.
+intégration `ogCards` d'`astro.config.mjs`), et la capture à 2× dans le Chromium de Playwright, réduite ensuite en JPEG de
+1200 × 630. Le nom d'une carte porte une empreinte (src/lib/og.ts) : pas de
+version à la main comme pour `og-v6.jpg`.
 
 ## 7. Workflow de publication
 
@@ -439,14 +446,17 @@ test ───┤            ├──> deploy
 
 | Fichier | Sert à |
 | :--- | :--- |
-| `og.html` | Source de l'image d'aperçu `public/og-v5.png` (§6) |
+| `og.html` | Source de l'image d'aperçu `public/og-v6.jpg` (§6) |
 | `og-projects/` | La page des cartes d'aperçu des fiches et leur rendu, `npm run og` (§6) |
 | `chrome-fade/` | Source et script de rendu du masque de fondu du fond |
 | `budget/` | Le budget de performance, `npm run budget` après un build, et en CI |
+| `cv-pdf/` | Allège un export du CV public avant de le copier dans `public/` |
 
 **Budget de performance.** `budget/budget.mjs` mesure `dist/` : JavaScript
-total (brut et gzip), CSS gzip, page HTML la plus lourde et plus grosse image
-servie (les JPEG, cartes d'aperçu, sont exclus). Chaque poste a un plafond,
+total (brut et gzip), CSS gzip, page HTML la plus lourde, plus grosse image
+servie aux pages, plus lourde carte d'aperçu (les JPEG : celle du site et
+celles des fiches), poids total des démos (`demos/`) et plus lourd des CV
+en PDF. Chaque poste a un plafond,
 15 à 20 % au-dessus de sa taille de novembre 2026 ; un dépassement fait
 échouer le job `build`, donc le déploiement. Relever un plafond se fait dans
 un commit qui dit pourquoi.
@@ -465,3 +475,15 @@ l'adresse mail. Le site n'en reçoit que les exports publics, copiés à la main
 dans `public/cv-damien-aravena-bravo-public.pdf` et
 `public/cv-damien-aravena-bravo-public-en.pdf` : un nouveau CV public, c'est ce
 fichier à remplacer, sous le même nom. Les tests vérifient que les deux existent.
+
+Chrome intègre le bandeau chromé du CV en PNG, sans perte : 720 Ko à lui seul.
+Un export passe donc par `cv-pdf/` avant d'entrer dans `public/` :
+
+```sh
+node tools/cv-pdf/compress.mjs export.pdf public/cv-damien-aravena-bravo-public.pdf
+```
+
+Le script réencode les images en JPEG et laisse le reste octet pour octet
+(texte, polices, liens). Ghostscript ferait la même économie mais réécrit les
+polices, et cassait les ligatures de l'export anglais au copier. Le budget
+plafonne le plus lourd des deux PDF : un export oublié le fait échouer.
