@@ -31,9 +31,18 @@ const {
 const words = title.trim().split(/\s+/);
 const lastWord = words.pop()!;
 const leading = words.join(" ");
+
+/*
+ * Un titre de section se révèle au défilement (`.reveal`). Le h1 d'une page est
+ * déjà à l'écran à l'ouverture : il entre avec le gabarit (`.page-enter`), en
+ * CSS seule. En `.reveal`, il attendait le module qui révèle les blocs, puis sa
+ * transition : sur /projects/, le paragraphe, mesure du LCP, n'apparaissait
+ * qu'à 3 s sur un téléphone en 4G lente.
+ */
+const entrance = Heading === "h1" ? "page-enter" : "reveal";
 ---
 
-<div class="reveal max-w-2xl">
+<div class:list={[entrance, "max-w-2xl"]}>
   <Heading id={headingId} class="text-3xl font-bold tracking-tight sm:text-5xl">
     {
       chrome ? (

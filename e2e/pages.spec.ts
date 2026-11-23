@@ -266,6 +266,20 @@ test("un lien filtré s'ouvre filtré, même sur une autre page", async ({ page 
   await expect(page.locator("[data-filters-empty]")).toBeHidden();
 });
 
+test.describe("sans JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("la liste des projets ne montre pas de filtres qui ne filtreraient rien", async ({ page }) => {
+    // Le média `scripting` les masque : ils ne portent plus `hidden`, que le
+    // script levait en les faisant apparaître (voir ProjectsList.astro).
+    await page.goto("projects/");
+
+    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("[data-project-filters]")).toBeHidden();
+    await expect(page.locator("[data-project-list] > li:visible")).toHaveCount(6);
+  });
+});
+
 test("les filtres disent quand rien ne répond", async ({ page }) => {
   await page.goto("projects/?status=en-cours");
 

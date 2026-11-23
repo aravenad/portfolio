@@ -377,6 +377,32 @@ test.describe("accueil allégé", () => {
   });
 });
 
+test("la liste des projets ne bouge pas quand les scripts arrivent", async ({ page }) => {
+  // Sur un réseau lent, les scripts arrivent bien après le premier rendu : on
+  // les retarde. Les filtres apparaissaient alors et poussaient la liste de
+  // 142 px (un CLS de 0,085) ; ils tiennent désormais leur place d'emblée.
+  await page.route("**/_astro/*.js", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    await route.continue();
+  });
+  await page.goto("projects/");
+  await page.waitForFunction(() => window.__pageLoads > 0);
+  await expect(page.getByRole("button", { name: "Filtrer", exact: true })).toBeVisible();
+
+  const shift = await page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        new PerformanceObserver((list) => {
+          const entries = list.getEntries() as unknown as { value: number; hadRecentInput: boolean }[];
+          resolve(entries.reduce((sum, entry) => sum + (entry.hadRecentInput ? 0 : entry.value), 0));
+        }).observe({ type: "layout-shift", buffered: true });
+        // Sans décalage, l'observateur n'est jamais appelé.
+        setTimeout(() => resolve(0), 500);
+      }),
+  );
+  expect(shift).toBeLessThan(0.01);
+});
+
 test("la démo jouable tient dans la largeur et se lance au toucher", async ({ page }) => {
   await page.goto("projects/arrow-block");
   const demo = page.locator("[data-demo]");

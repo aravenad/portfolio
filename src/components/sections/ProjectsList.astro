@@ -114,7 +114,6 @@ const fields = [
       data-total={all.length}
       role="search"
       aria-label={f.label}
-      hidden
       class="mt-12"
     >
       {/*
@@ -293,7 +292,6 @@ const fields = [
       select.value = initial[key];
       if (select.value !== initial[key]) select.value = "";
     }
-    root.hidden = false;
     setOpen(isActive(read()));
     show(read());
 
@@ -328,6 +326,18 @@ const fields = [
 </script>
 
 <style>
+  /*
+   * Sans script, des filtres qui ne filtrent rien n'ont pas à paraître. Le média
+   * `scripting` les masque, plutôt qu'un `hidden` que le script levait : avec
+   * lui, ils prennent leur place dès le premier rendu, au lieu de pousser la
+   * liste en apparaissant (142 px sur téléphone, un CLS de 0,085).
+   */
+  @media (scripting: none) {
+    [data-project-filters] {
+      display: none;
+    }
+  }
+
   /* Repliés sur téléphone tant que le bouton ne les a pas ouverts ; toujours visibles au-delà. */
   @media (width < 40rem) {
     .filter-fields:not([data-open]) {

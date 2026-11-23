@@ -141,6 +141,16 @@ describe("SectionHeading", () => {
     expect(one.body.querySelector("h1")).toBeTruthy();
   });
 
+  // Le h1 est à l'écran dès l'ouverture : il n'attend pas le script des blocs.
+  it("fait entrer le titre d'une page avec le gabarit, et révèle les autres au défilement", async () => {
+    const two = await render(SectionHeading, { props: { title: "Mes projets" } });
+    const one = await render(SectionHeading, { props: { title: "Mes projets", as: "h1" } });
+
+    expect(two.body.firstElementChild?.classList.contains("reveal")).toBe(true);
+    expect(one.body.firstElementChild?.classList.contains("page-enter")).toBe(true);
+    expect(one.body.querySelector(".reveal")).toBeNull();
+  });
+
   it("chrome le dernier mot, et lui seul", async () => {
     const { body } = await render(SectionHeading, {
       props: { title: "Compétences techniques", chrome: true },

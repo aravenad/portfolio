@@ -445,12 +445,13 @@ describe("ProjectsList", () => {
       .toHaveLength(4);
   });
 
-  // Sans script, des filtres qui ne filtrent rien n'ont pas à paraître.
-  it("masque les filtres et leur décompte jusqu'au script", async () => {
+  // Sans script, le média `scripting` les masque (e2e/pages.spec.ts) ; avec,
+  // ils tiennent leur place dès le premier rendu, sans attendre le script.
+  it("laisse les filtres à leur place dès le premier rendu, sans leur décompte vide", async () => {
     const { body } = await render(ProjectsList, { props: page });
     const filters = body.querySelector("[data-project-filters]");
 
-    expect(filters?.hasAttribute("hidden")).toBe(true);
+    expect(filters?.hasAttribute("hidden")).toBe(false);
     expect(filters?.getAttribute("role")).toBe("search");
     expect(filters?.querySelector('[role="status"]')).not.toBeNull();
     expect(body.querySelector("[data-filters-empty]")?.hasAttribute("hidden")).toBe(true);
