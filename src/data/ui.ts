@@ -69,7 +69,7 @@ const fr = {
   hero: {
     intro: "Bonjour, moi c'est",
     description:
-      "Étudiant en BUT Informatique à Grenoble, je développe surtout pour le web. En ce moment, je mène une équipe de sept sur PASSE, une application d'aide aux étudiants, et je construis Arrow Block, un jeu de réflexion en 3D aux 240\u00a0niveaux vérifiés par un solveur.",
+      "Étudiant en BUT Informatique à Grenoble, je souhaite me spécialiser dans le développement web. Je pilote actuellement une équipe de sept étudiants sur PASSE, une application d'aide aux étudiants, tout en développant Arrow Block de mon côté, un jeu de réflexion en 3D.",
     /**
      * Le stage recherché, sous l'accroche. Les dates viennent de
      * src/data/internship.ts ; la phrase disparaît quand `internship.open`
@@ -450,7 +450,7 @@ const en = {
   hero: {
     intro: "Hi, I'm",
     description:
-      "I'm a computer science student in Grenoble and I mostly build for the web. Right now, I'm leading a team of seven on PASSE, an app that helps students find support, and building Arrow Block, a 3D puzzle game with 240\u00a0levels checked by a solver.",
+      "I'm a computer science student in Grenoble and I want to specialize in web development. I'm currently leading a team of seven students on PASSE, an app that helps students find support, while building Arrow Block on my own, a 3D puzzle game.",
     availability: `I'm looking for a development internship from ${datesEn.start} to ${datesEn.end}, in or around Grenoble.`,
     projects: "See my projects",
     contact: "Contact me",
