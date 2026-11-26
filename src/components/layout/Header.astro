@@ -1335,7 +1335,35 @@ const switches = [
    * de la page d'arrivée n'était plus câblé.
    */
   document.addEventListener("astro:before-swap", (event) => {
-    if (pending) event.newDocument.documentElement.setAttribute("data-lang-switching", "");
+    if (!pending) return;
+
+    const root = event.newDocument.documentElement;
+    root.setAttribute("data-lang-switching", "");
+    root.setAttribute("data-lang-fading", "");
+
+    // Le fondu fini, le contenu perd son nom de transition (voir global.css).
+    event.viewTransition?.finished.finally(() =>
+      document.documentElement.removeAttribute("data-lang-fading"),
+    );
+  });
+
+  /*
+   * Fondu de traduction : le contenu sort et entre flouté, le fond reste en
+   * place (voir global.css). Le drapeau est posé sur la page quittée avant sa
+   * capture, puis reporté sur la page d'arrivée ci-dessus.
+   *
+   * Une navigation partie d'un autre lien n'est pas un changement de langue,
+   * même après un clic sur le lien resté sans suite (ouvert dans un onglet).
+   */
+  document.addEventListener("astro:before-preparation", (event) => {
+    if (!pending) return;
+
+    if (!(event.sourceElement as Element | undefined)?.matches?.("[data-lang-switch]")) {
+      pending = null;
+      return;
+    }
+
+    document.documentElement.setAttribute("data-lang-fading", "");
   });
 
   /*

@@ -78,3 +78,36 @@ test("le thème est gardé en changeant de langue", async ({ page }) => {
     "true",
   );
 });
+
+test("le contenu passe en fondu flouté, puis rend son nom de transition", async ({ page }) => {
+  await page.goto("");
+
+  // Les animations du routeur, relevées au départ de la transition.
+  await page.evaluate(() => {
+    const start = document.startViewTransition.bind(document);
+    const seen: string[] = [];
+    Object.assign(window, { langAnimations: seen });
+    document.startViewTransition = ((update: () => void) => {
+      const transition = start(update);
+      transition.ready.then(() => {
+        for (const animation of document.getAnimations()) {
+          if (animation instanceof CSSAnimation) seen.push(animation.animationName);
+        }
+      });
+      return transition;
+    }) as typeof document.startViewTransition;
+  });
+
+  await afterNavigation(page, () => langLink(page).click());
+
+  const animations = () =>
+    page.evaluate(() => (window as unknown as { langAnimations: string[] }).langAnimations);
+  await expect.poll(animations).toEqual(expect.arrayContaining(["lang-out", "lang-in"]));
+
+  // Nommé, le contenu deviendrait la racine du flou du header, qui ne verrait
+  // plus le fond : le nom ne doit pas survivre à la transition.
+  await expect(page.locator("html")).not.toHaveAttribute("data-lang-fading");
+  await expect
+    .poll(() => page.locator("#main").evaluate((main) => getComputedStyle(main).viewTransitionName))
+    .toBe("none");
+});

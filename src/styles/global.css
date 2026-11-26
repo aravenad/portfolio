@@ -847,6 +847,82 @@ body::after {
 }
 
 /*
+ * Changement de langue (View Transitions du routeur) : le texte sort en se
+ * floutant et sa traduction entre en se précisant, au même endroit. Le drapeau
+ * est posé par le script du header, le temps de la transition seulement.
+ *
+ * Seuls le contenu et le pied de page sont nommés, donc capturés à part : le
+ * fond en glyphes, identique dans les deux langues, reste dans la capture de la
+ * page et ne se floute pas. Le header y reste aussi, et y suit un fondu simple
+ * de même durée : nommé, il deviendrait la racine de son `backdrop-filter`, qui
+ * ne verrait plus le fond à flouter.
+ */
+:root[data-lang-fading] #main {
+  view-transition-name: lang-main;
+}
+
+:root[data-lang-fading] #main ~ footer {
+  view-transition-name: lang-footer;
+}
+
+/*
+ * Le fondu de la page garde ses deux moitiés synchrones : sur le fond
+ * identique, elles s'additionnent sans le faire pâlir. Il bascule au milieu du
+ * passage du contenu.
+ */
+:root[data-lang-fading]::view-transition-old(root),
+:root[data-lang-fading]::view-transition-new(root) {
+  animation-duration: 0.24s;
+  animation-delay: 0.08s;
+  animation-fill-mode: both;
+}
+
+:root[data-lang-fading]::view-transition-group(lang-main),
+:root[data-lang-fading]::view-transition-group(lang-footer) {
+  animation-duration: 0.54s;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+:root[data-lang-fading]::view-transition-old(lang-main),
+:root[data-lang-fading]::view-transition-old(lang-footer) {
+  animation: lang-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root[data-lang-fading]::view-transition-new(lang-main),
+:root[data-lang-fading]::view-transition-new(lang-footer) {
+  animation: lang-in 0.36s cubic-bezier(0.33, 1, 0.68, 1) 0.18s both;
+}
+
+@keyframes lang-out {
+  to {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+@keyframes lang-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+/* Animations réduites : le même passage, sans flou. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes lang-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes lang-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/*
  * Changement de thème (View Transitions, voir `withViewTransition` dans
  * src/lib/theme.ts et le front dans src/lib/theme-front.ts). Le nouveau thème
  * est imprimé par la trame : un front de glyphes traverse la page, vers le bas
