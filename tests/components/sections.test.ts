@@ -88,7 +88,7 @@ describe("About", () => {
 
   it("affiche chaque paragraphe de son texte", async () => {
     const { body } = await render(About);
-    expect(body.querySelectorAll("section .text-lg p")).toHaveLength(ui.fr.about.paragraphs.length);
+    expect(body.querySelectorAll("section .sm\\:text-lg p")).toHaveLength(ui.fr.about.paragraphs.length);
   });
 
   it("donne le nom complet, que le hero réduit au prénom", async () => {

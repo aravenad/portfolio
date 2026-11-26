@@ -31,7 +31,7 @@ const introWords = intro.split(/\s+/).filter(Boolean);
       les annonceraient un par un. Pas d'`aria-label` : Orca lit le texte d'un
       titre, pas son nom, et n'annonçait plus qu'un « en-tête 1 » vide.
     */}
-    <h1 class="max-w-4xl text-5xl font-bold tracking-tight sm:text-7xl">
+    <h1 class="max-w-4xl text-4xl font-bold tracking-tight text-balance sm:text-7xl">
       <span class="sr-only">{`${intro} ${name}.`}</span>
       <span aria-hidden="true">
         {introWords.map((word, index) => (
@@ -44,7 +44,7 @@ const introWords = intro.split(/\s+/).filter(Boolean);
       </span>
     </h1>
 
-    <p class="page-enter mt-6 max-w-2xl text-lg leading-8 text-zinc-400" style="--index: 1">
+    <p class="page-enter mt-6 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg sm:leading-8" style="--index: 1">
       {description}
     </p>
 
@@ -54,7 +54,7 @@ const introWords = intro.split(/\s+/).filter(Boolean);
     */}
     {
       availability && (
-        <p class="availability page-enter mt-4 max-w-2xl text-lg leading-8 text-zinc-200" style="--index: 1">
+        <p class="availability page-enter mt-4 max-w-2xl text-base leading-7 text-zinc-200 sm:text-lg sm:leading-8" style="--index: 1">
           {availability}
         </p>
       )
@@ -67,7 +67,7 @@ const introWords = intro.split(/\s+/).filter(Boolean);
       s'alignent quelle que soit la langue.
     */}
     <div
-      class="page-enter mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
+      class="page-enter mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
       style="--index: 2"
     >
       <Button href="#projects">{t.hero.projects}</Button>
