@@ -197,9 +197,14 @@ describe("Skills", () => {
       slots: { default: "<p>x</p>" },
     });
 
-    expect(normal.html).not.toContain("lg:order-1");
-    expect(inverse.html).toContain("lg:order-1");
-    expect(inverse.html).toContain("lg:order-2");
+    // Le texte passe à droite, les compétences à gauche.
+    const columns = (body: Element) =>
+      [...body.querySelectorAll('[class*="lg:col-start"]')].map((cell) =>
+        cell.className.match(/lg:col-start-\d/)?.[0],
+      );
+
+    expect(columns(normal.body)).toEqual(["lg:col-start-1", "lg:col-start-1", "lg:col-start-2"]);
+    expect(columns(inverse.body)).toEqual(["lg:col-start-2", "lg:col-start-2", "lg:col-start-1"]);
   });
 
   it("rend le texte d'introduction reçu", async () => {

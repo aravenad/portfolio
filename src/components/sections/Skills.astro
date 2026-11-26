@@ -18,19 +18,31 @@ interface Props {
 }
 
 const { id, title, skills, variant = "grid", reverse = false } = Astro.props;
+
+/*
+ * Sur grand écran, deux rangées : le titre seul, puis le texte et les
+ * compétences côte à côte. Les tuiles et la liste partent ainsi de la première
+ * ligne du texte, pas du haut du titre. Sur téléphone, une seule colonne dans
+ * l'ordre du document : titre, texte, compétences.
+ */
+const textColumn = reverse ? "lg:col-start-2" : "lg:col-start-1";
+const skillsColumn = reverse ? "lg:col-start-1" : "lg:col-start-2";
 ---
 
 <Section id={id} aria-labelledby={`${id}-title`}>
-  <div class="grid items-start gap-12 lg:grid-cols-2 lg:gap-20">
-    <div class:list={[reverse && "lg:order-2"]}>
+  <div class="grid items-start lg:grid-cols-2 lg:gap-x-20">
+    <div class:list={["lg:row-start-1", textColumn]}>
       <SectionHeading headingId={`${id}-title`} title={title} chrome />
+    </div>
 
+    <div class:list={["lg:row-start-2", textColumn]}>
       <ReadMore class="mt-6 text-lg leading-8 text-zinc-400">
         <slot />
       </ReadMore>
     </div>
 
-    <div class:list={[reverse && "lg:order-1"]}>
+    {/* `lg:mt-6` : la même marge que le texte, posée dans ReadMore. */}
+    <div class:list={["mt-12 lg:row-start-2 lg:mt-6", skillsColumn]}>
       {
         variant === "grid" ? (
           <Fragment>
