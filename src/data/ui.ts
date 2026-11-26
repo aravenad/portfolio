@@ -84,7 +84,7 @@ const fr = {
     title: "À propos",
     paragraphs: [
       "Après un bac STI2D, j'ai passé trois ans en classe préparatoire TSI à Chambéry. J'y ai appris à tenir une forte charge de travail dans la durée, à être rigoureux, et à mesurer ce que l'entraide change au travail d'équipe. En rejoignant le BUT Informatique, je suis passé d'un enseignement très théorique à une formation par la pratique : une adaptation exigeante, que j'ai appréciée dès la première année.",
-      "En 2025-2026, j'ai pris une année de césure pour découvrir le monde du travail. Chez Microstore (Horizon Groupe), une entreprise du Green IT qui gère et reconditionne les parcs informatiques de grands comptes, j'ai occupé trois postes au pôle technique, de la réception du matériel à la préparation logicielle d'environ 800 machines par mois. En parallèle, j'ai continué à développer des projets personnels.",
+      "En 2025-2026, j'ai pris une année de césure pour découvrir le monde du travail. J'ai rejoint Microstore (Horizon Groupe), une entreprise du Green IT qui gère et reconditionne les parcs informatiques de grandes entreprises. J'ai occupé trois postes au pôle technique, de la réception du matériel à la préparation logicielle d'environ 800 machines par mois. En parallèle, j'ai continué à développer des projets personnels.",
       "Ce que je préfère, c'est mener un projet de A à Z, du besoin jusqu'à une application qui fonctionne. Arrow Block en est l'exemple : des règles du jeu et de ses douze mondes jusqu'à une démo jouable en ligne et une application Android.",
       "En dehors de l'informatique, je partage mon temps entre la musique, les jeux vidéo et les documentaires, surtout d'investigation, et je suis de près l'actualité des nouvelles technologies.",
     ],
@@ -460,7 +460,7 @@ const en = {
     title: "About",
     paragraphs: [
       "After a technology baccalaureate (STI2D), I spent three years in a TSI preparatory class in Chambéry. It taught me to sustain a heavy workload over time, to be rigorous, and how much helping one another changes teamwork. Moving on to the BUT in computer science took me from very theoretical teaching to learning by doing: a demanding shift, and one I enjoyed from the first year.",
-      "In 2025-2026, I took a gap year to get a first taste of the working world. At Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large corporate clients, I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside that, I kept building personal projects.",
+      "In 2025-2026, I took a gap year to get a first taste of the working world. I joined Microstore (Horizon Groupe), a Green IT company that manages and refurbishes the IT fleets of large companies. I held three positions in the technical department, from receiving hardware to preparing the software of about 800 machines a month. Alongside that, I kept building personal projects.",
       "What I enjoy most is carrying a project from start to finish, from the need to an application that works. Arrow Block is one example: from the rules of the game and its twelve worlds to a playable online demo and an Android app.",
       "Outside computing, I spend my time on music, video games and documentaries, especially investigative ones, and I closely follow news about new technologies.",
     ],
